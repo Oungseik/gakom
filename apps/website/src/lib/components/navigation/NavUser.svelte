@@ -22,7 +22,7 @@
 
   async function handleLogout() {
     await authClient.signOut();
-    window.location.href = "/auth/signin".concat(
+    window.location.href = "/signin".concat(
       page.url.pathname === "/" ? "" : `?return_url=${page.url.href}`
     );
   }

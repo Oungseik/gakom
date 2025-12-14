@@ -30,16 +30,14 @@
           name: value.name,
           email: value.email,
           password: value.password,
-          callbackURL: "/auth/signin".concat(
+          callbackURL: "/signin".concat(
             params.return_url ? `?return_url=${params.return_url}` : ""
           ),
         },
         {
           onSuccess: () => {
             isSubmitting = false;
-            goto(
-              "/auth/signin".concat(params.return_url ? `?return_url=${params.return_url}` : "")
-            );
+            goto("/signin".concat(params.return_url ? `?return_url=${params.return_url}` : ""));
           },
           onError: ({ error }) => {
             if (error.status === 403) {
@@ -183,7 +181,7 @@
         <div class="mt-6 text-center text-sm">
           Already have an account?
           <a
-            href={`/auth/signin${page.url.search}`}
+            href={`/signin${page.url.search}`}
             class={buttonVariants({ variant: "link", class: "px-0" })}
           >
             Sign in

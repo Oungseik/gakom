@@ -45,20 +45,20 @@ const authHandle: Handle = async ({ event, resolve }) => {
 
   const isEmailVerified = session?.user.emailVerified;
 
-  if (session && !isEmailVerified && event.url.pathname !== "/auth/verify-account") {
-    return redirect(303, "/auth/verify-account");
+  if (session && !isEmailVerified && event.url.pathname !== "/verify-account") {
+    return redirect(303, "/verify-account");
   }
 
-  if (session && (event.url.pathname === "/auth/signin" || event.url.pathname === "/auth/signup")) {
+  if (session && (event.url.pathname === "/signin" || event.url.pathname === "/signup")) {
     if (isEmailVerified) {
-      return redirect(303, "/");
+      return redirect(303, "/dashboard");
     }
-    return redirect(303, "/auth/verify-account");
+    return redirect(303, "/verify-account");
   }
 
   const { pathname } = event.url;
   if (PROTECTED_PATHS.some((path) => pathname.startsWith(path)) && !session) {
-    return redirect(303, `/auth/signin?return_url=${pathname}`);
+    return redirect(303, `/signin?return_url=${pathname}`);
   }
 
   return resolve(event);

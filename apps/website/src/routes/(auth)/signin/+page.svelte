@@ -86,7 +86,7 @@
                   <div class="flex items-center justify-between">
                     <Label for={field.name}>Password</Label>
                     <a
-                      href={"/auth/forgot-password".concat(page.url.search)}
+                      href={"/forgot-password".concat(page.url.search)}
                       class="text-sm underline-offset-4 hover:underline"
                     >
                       Forgot your password?
@@ -129,7 +129,7 @@
         <div class="mt-6 text-center text-sm">
           Don't have an account?
           <a
-            href={`/auth/signup${page.url.search}`}
+            href={`/signup${page.url.search}`}
             class="ml-1 underline underline-offset-4 hover:underline"
           >
             Sign up
