@@ -1,6 +1,6 @@
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
-import { organization } from "better-auth/plugins";
+import { emailOTP, organization, twoFactor } from "better-auth/plugins";
 import { sveltekitCookies } from "better-auth/svelte-kit";
 
 import { getRequestEvent } from "$app/server";
@@ -20,12 +20,40 @@ export const auth = betterAuth({
     },
   },
 
+  appName: "EzOrg",
   secret: AUTH_SECRET,
 
   emailAndPassword: {
     enabled: true,
     autoSignIn: false,
+    sendResetPassword: async ({ user, url, token }) => {
+      // TODO: Implement email sending for password reset
+      console.log(`Password reset for ${user.email}: ${url}`);
+    },
   },
 
-  plugins: [organization({ teams: { enabled: true } }), sveltekitCookies(getRequestEvent)],
+  emailVerification: {
+    sendVerificationEmail: async ({ user, url, token }) => {
+      // TODO: Implement email sending for verification
+      console.log(`Verification for ${user.email}: ${url}`);
+    },
+  },
+
+  plugins: [
+    organization({ teams: { enabled: true } }),
+    emailOTP({
+      sendVerificationOTP: async ({ email, otp, type }) => {
+        // TODO: Implement email sending for email otp
+      },
+    }),
+    twoFactor({
+      otpOptions: {
+        sendOTP: async ({ user, otp }) => {
+          // TODO: Implement OTP sending
+          console.log(`OTP for ${user.email}: ${otp}`);
+        },
+      },
+    }),
+    sveltekitCookies(getRequestEvent),
+  ],
 });
