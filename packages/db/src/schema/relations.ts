@@ -11,6 +11,7 @@ export const relations = defineRelations(
       members: r.many.member(),
       invitations: r.many.invitation(),
       teamMembers: r.many.teamMember(),
+      twoFactors: r.many.twoFactor(),
     },
     session: {
       user: r.one.user({ from: r.session.userId, to: r.user.id }),
