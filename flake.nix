@@ -27,7 +27,6 @@
             sqlx-cli
           ];
 
-          DATABASE_URL = "sqlite:./database/expanse-tracker.sqlite";
           OTEL_EXPORTER_OTLP_ENDPOINT = "http://localhost:4318";
           OTEL_TRACES_EXPORTER = "otlp";
           OTEL_EXPORTER_OTLP_PROTOCOL = "http/protobuf";

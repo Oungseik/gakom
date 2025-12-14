@@ -6,7 +6,7 @@ import { account, session, user, verification } from "./schema/core";
 import { invitation, member, organization } from "./schema/organization";
 import { relations } from "./schema/relations";
 
-const db = drizzle(process.env.AUTH_DATABASE_URL!, {
+const db = drizzle(process.env.DATABASE_URL!, {
   schema: { user, session, account, verification, invitation, member, organization },
   relations,
 });

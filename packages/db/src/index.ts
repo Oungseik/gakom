@@ -1,3 +1,4 @@
+import { Database } from "@tursodatabase/database";
 import {
   and,
   avg,
@@ -23,7 +24,9 @@ import { relations } from "./schema/relations";
 let _: ReturnType<typeof connect> | undefined;
 
 function connect() {
-  return drizzle(process.env.AUTH_DATABASE_URL!, {
+  const client = new Database(process.env.DATABASE_URL!);
+  return drizzle({
+    client,
     schema: { user, session, account, verification, invitation, member, organization },
     relations,
   });
