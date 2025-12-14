@@ -1,9 +1,9 @@
 import { defineRelations } from "drizzle-orm";
-import { account, session, user } from "./core";
+import { account, session, twoFactor, user } from "./core";
 import { invitation, member, organization, team, teamMember } from "./organization";
 
 export const relations = defineRelations(
-  { user, session, account, invitation, organization, member, team, teamMember },
+  { user, session, account, invitation, organization, member, team, teamMember, twoFactor },
   (r) => ({
     user: {
       sessions: r.many.session(),
@@ -41,6 +41,9 @@ export const relations = defineRelations(
     teamMember: {
       team: r.one.team({ from: r.teamMember.teamId, to: r.team.id }),
       user: r.one.user({ from: r.teamMember.userId, to: r.user.id }),
+    },
+    twoFactor: {
+      user: r.one.user({ from: r.twoFactor.userId, to: r.user.id }),
     },
   }),
 );

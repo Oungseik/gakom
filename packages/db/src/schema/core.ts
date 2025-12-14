@@ -8,6 +8,7 @@ export const user = sqliteTable(
     name: text("name").notNull(),
     email: text("email").notNull(),
     emailVerified: integer("email_verified", { mode: "boolean" }).default(false).notNull(),
+    twoFactorEnabled: integer("two_factor_enabled", { mode: "boolean" }).default(false),
     image: text("image"),
     createdAt: integer("created_at", { mode: "timestamp_ms" })
       .default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)
@@ -90,4 +91,27 @@ export const verification = sqliteTable(
       .notNull(),
   },
   (t) => [index("verification_identifier_idx").on(t.identifier)],
+);
+
+export const twoFactor = sqliteTable(
+  "two_factor",
+  {
+    id: text("id").primaryKey(),
+    userId: text("user_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    secret: text("secret"),
+    backupCodes: text("backup_codes"),
+    createdAt: integer("created_at", { mode: "timestamp_ms" })
+      .default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)
+      .notNull(),
+    updatedAt: integer("updated_at", { mode: "timestamp_ms" })
+      .default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)
+      .$onUpdate(() => /* @__PURE__ */ new Date())
+      .notNull(),
+  },
+  (t) => [
+    index("two_factor_user_id_idx").on(t.userId),
+    index("two_factor_secret_idx").on(t.secret),
+  ],
 );
