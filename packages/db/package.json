@@ -4,7 +4,6 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "dev": "bun --bun run with-env bun run ./src/index.ts",
     "with-env": "dotenv -e ../../.env --",
     "check": "biome check --write .",
     "build": "tsdown",
@@ -34,7 +33,7 @@
     "dotenv-cli": "^11.0.0",
     "drizzle-kit": "1.0.0-beta.2-58a4521",
     "drizzle-seed": "^0.3.1",
-    "tsdown": "^0.17.2",
+    "tsdown": "^0.17.4",
     "typescript": "^5.9.3"
   }
 }
