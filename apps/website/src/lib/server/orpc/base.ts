@@ -41,4 +41,3 @@ export const authMiddleware = os.middleware(async ({ context, next }) => {
 
   return next({ context: { session } });
 });
-

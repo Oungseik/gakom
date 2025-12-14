@@ -1,9 +1,11 @@
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
+import { organization } from "better-auth/plugins";
 import { sveltekitCookies } from "better-auth/svelte-kit";
 
 import { getRequestEvent } from "$app/server";
 import { AUTH_SECRET } from "$env/static/private";
+
 import { db } from "./server/db";
 
 export const auth = betterAuth({
@@ -25,5 +27,5 @@ export const auth = betterAuth({
     autoSignIn: false,
   },
 
-  plugins: [sveltekitCookies(getRequestEvent)],
+  plugins: [organization({ teams: { enabled: true } }), sveltekitCookies(getRequestEvent)],
 });
