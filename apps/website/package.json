@@ -58,6 +58,7 @@
     "@orpc/tanstack-query": "^1.12.0",
     "@repo/db": "workspace:*",
     "@repo/ui": "workspace:*",
+    "@tanstack/svelte-form": "^1.27.3",
     "@tanstack/svelte-query": "^6.0.9",
     "better-auth": "^1.4.4",
     "clsx": "^2.1.1",
