@@ -1,9 +1,12 @@
-import type { Handle } from "@sveltejs/kit";
+import { type Handle, redirect } from "@sveltejs/kit";
 import { sequence } from "@sveltejs/kit/hooks";
-
+import { svelteKitHandler } from "better-auth/svelte-kit";
+import { building } from "$app/environment";
+import { auth } from "$lib/auth";
 import { paraglideMiddleware } from "$lib/paraglide/server";
 import { client } from "$lib/server/orpc/router";
 import { rateLimiter } from "$lib/server/rate-limit";
+import { PROTECTED_PATHS } from "$lib/utils";
 
 globalThis.$client = client;
 
@@ -33,7 +36,31 @@ const rateLimitHandle: Handle = async ({ event, resolve }) => {
 };
 
 const authHandle: Handle = async ({ event, resolve }) => {
-  // TODO handle authentication here
+  if (event.url.pathname.startsWith("/api/auth")) {
+    return svelteKitHandler({ event, resolve, auth, building });
+  }
+
+  const session = await auth.api.getSession({ headers: event.request.headers });
+  event.locals.session = session;
+
+  const isEmailVerified = session?.user.emailVerified;
+
+  if (session && !isEmailVerified && event.url.pathname !== "/auth/verify-account") {
+    return redirect(303, "/auth/verify-account");
+  }
+
+  if (session && (event.url.pathname === "/auth/signin" || event.url.pathname === "/auth/signup")) {
+    if (isEmailVerified) {
+      return redirect(303, "/");
+    }
+    return redirect(303, "/auth/verify-account");
+  }
+
+  const { pathname } = event.url;
+  if (PROTECTED_PATHS.some((path) => pathname.startsWith(path)) && !session) {
+    return redirect(303, `/auth/signin?return_url=${pathname}`);
+  }
+
   return resolve(event);
 };
 
