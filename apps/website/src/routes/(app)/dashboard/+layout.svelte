@@ -4,10 +4,14 @@
   import * as Sidebar from "@repo/ui/sidebar";
 
   import AppSidebar from "$lib/components/sidebar/AppSidebar.svelte";
+  import { breadcrumb } from "$lib/store/breadcrumb.svelte";
 
   import { type LayoutProps } from "./$types";
 
-  const { data }: LayoutProps = $props();
+  const { data, children }: LayoutProps = $props();
+
+  const items = $derived(breadcrumb.value.slice(0, breadcrumb.value.length - 1));
+  const page = $derived(breadcrumb.value.at(-1));
 </script>
 
 <Sidebar.Provider>
@@ -21,24 +25,23 @@
         <Separator orientation="vertical" class="me-2 data-[orientation=vertical]:h-4" />
         <Breadcrumb.Root>
           <Breadcrumb.List>
-            <Breadcrumb.Item class="hidden md:block">
-              <Breadcrumb.Link href="##">Building Your Application</Breadcrumb.Link>
-            </Breadcrumb.Item>
-            <Breadcrumb.Separator class="hidden md:block" />
-            <Breadcrumb.Item>
-              <Breadcrumb.Page>Data Fetching</Breadcrumb.Page>
-            </Breadcrumb.Item>
+            {#each items as item (item.href)}
+              <Breadcrumb.Item class="hidden md:block">
+                <Breadcrumb.Link href={item.href}>{item.desc}</Breadcrumb.Link>
+              </Breadcrumb.Item>
+              <Breadcrumb.Separator class="hidden md:block" />
+            {/each}
+            {#if page}
+              <Breadcrumb.Item>
+                <Breadcrumb.Page>{page.desc}</Breadcrumb.Page>
+              </Breadcrumb.Item>
+            {/if}
           </Breadcrumb.List>
         </Breadcrumb.Root>
       </div>
     </header>
     <div class="flex flex-1 flex-col gap-4 p-4 pt-0">
-      <div class="grid auto-rows-min gap-4 md:grid-cols-3">
-        <div class="bg-muted/50 aspect-video rounded-xl"></div>
-        <div class="bg-muted/50 aspect-video rounded-xl"></div>
-        <div class="bg-muted/50 aspect-video rounded-xl"></div>
-      </div>
-      <div class="bg-muted/50 min-h-screen flex-1 rounded-xl md:min-h-min"></div>
+      {@render children()}
     </div>
   </Sidebar.Inset>
 </Sidebar.Provider>

@@ -2,7 +2,7 @@
   import BadgeCheckIcon from "@lucide/svelte/icons/badge-check";
   import BellIcon from "@lucide/svelte/icons/bell";
   import ChevronsUpDownIcon from "@lucide/svelte/icons/chevrons-up-down";
-  import CreditCardIcon from "@lucide/svelte/icons/credit-card";
+  import LockIcon from "@lucide/svelte/icons/lock";
   import LogOutIcon from "@lucide/svelte/icons/log-out";
   import SparklesIcon from "@lucide/svelte/icons/sparkles";
   import * as Avatar from "@repo/ui/avatar";
@@ -13,7 +13,7 @@
   import { page } from "$app/state";
   import { authClient } from "$lib/auth_client";
 
-  let { user }: { user: { name: string; email: string; image?: string } } = $props();
+  let { user }: { user: { name: string; email: string; image?: string | null } } = $props();
   const sidebar = useSidebar();
 
   const name = $derived(user.name.split(" "));
@@ -81,9 +81,16 @@
             <BadgeCheckIcon />
             Account
           </DropdownMenu.Item>
-          <DropdownMenu.Item>
-            <CreditCardIcon />
-            Billing
+          <DropdownMenu.Item class="p-0">
+            {#snippet children()}
+              <a
+                href="/dashboard/settings/password"
+                class="flex h-full w-full items-center gap-2 p-2"
+              >
+                <LockIcon />
+                Password
+              </a>
+            {/snippet}
           </DropdownMenu.Item>
           <DropdownMenu.Item>
             <BellIcon />

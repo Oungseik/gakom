@@ -148,7 +148,7 @@
   type User = {
     email: string;
     name: string;
-    image?: string;
+    image?: string | null;
   };
 
   let {
