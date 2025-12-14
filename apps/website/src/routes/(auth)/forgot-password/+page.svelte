@@ -7,7 +7,6 @@
   import NewPasswordForm from "$lib/components/forms/NewPasswordForm.svelte";
   import OTPVerificationForm from "$lib/components/forms/OTPVerificationForm.svelte";
   import PasswordResetForm from "$lib/components/forms/PasswordResetForm.svelte";
-  import { localizeHref } from "$lib/paraglide/runtime";
 
   let submission = $state<
     | { status: "REQUEST_OTP" }
@@ -18,7 +17,7 @@
 
 <div class="bg-muted flex min-h-svh flex-col items-center justify-center gap-6 p-6 md:p-10">
   <div class="flex w-full max-w-sm flex-col gap-6">
-    <a href={localizeHref("/")} class="flex items-center gap-2 self-center font-medium">
+    <a href="/" class="flex items-center gap-2 self-center font-medium">
       <img src="/logo.svg" class="size-5" alt="logo" />
       <span>Doh Htar Nay</span>
     </a>
@@ -76,7 +75,7 @@
         <div class="mt-6 text-center text-sm">
           Remember the password?
           <a
-            href={localizeHref(`/signin${page.url.search}`)}
+            href={`/signin${page.url.search}`}
             class={buttonVariants({ variant: "link", class: "px-0" })}
           >
             Sign in

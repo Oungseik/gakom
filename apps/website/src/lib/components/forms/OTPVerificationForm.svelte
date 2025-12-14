@@ -54,7 +54,7 @@
         <InputOTP.Root maxlength={6} bind:value={otp} class="my-8">
           {#snippet children({ cells })}
             <InputOTP.Group
-              class="flex w-full items-center justify-between  gap-2.5 *:data-[slot=input-otp-slot]:rounded-md *:data-[slot=input-otp-slot]:border"
+              class="mx-auto flex w-full max-w-90 items-center justify-between  gap-2.5 *:data-[slot=input-otp-slot]:rounded-md *:data-[slot=input-otp-slot]:border"
             >
               {#each cells as cell (cell)}
                 <InputOTP.Slot {cell} class="size-12" />
