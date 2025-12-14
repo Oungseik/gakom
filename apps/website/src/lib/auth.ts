@@ -2,11 +2,32 @@ import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { emailOTP, organization, twoFactor } from "better-auth/plugins";
 import { sveltekitCookies } from "better-auth/svelte-kit";
+import { createTransport } from "nodemailer";
 
 import { getRequestEvent } from "$app/server";
-import { AUTH_SECRET } from "$env/static/private";
+import {
+  AUTH_SECRET,
+  GOOGLE_CLIENT_ID,
+  GOOGLE_CLIENT_SECRET,
+  GOOGLE_REFRESH_TOKEN,
+  GOOGLE_USER,
+  NO_REPLY_EMAIL,
+} from "$env/static/private";
 
 import { db } from "./server/db";
+
+const transporter = createTransport({
+  host: "smtp.gmail.com",
+  port: 465,
+  secure: true,
+  auth: {
+    type: "OAuth2",
+    user: GOOGLE_USER,
+    clientId: GOOGLE_CLIENT_ID,
+    clientSecret: GOOGLE_CLIENT_SECRET,
+    refreshToken: GOOGLE_REFRESH_TOKEN,
+  },
+});
 
 export const auth = betterAuth({
   database: drizzleAdapter(db, {
@@ -26,16 +47,25 @@ export const auth = betterAuth({
   emailAndPassword: {
     enabled: true,
     autoSignIn: false,
-    sendResetPassword: async ({ user, url, token }) => {
-      // TODO: Implement email sending for password reset
-      console.log(`Password reset for ${user.email}: ${url}`);
-    },
   },
 
   emailVerification: {
-    sendVerificationEmail: async ({ user, url, token }) => {
-      // TODO: Implement email sending for verification
-      console.log(`Verification for ${user.email}: ${url}`);
+    sendOnSignUp: true,
+    sendVerificationEmail: async ({ user, url }) => {
+      await transporter.sendMail({
+        from: NO_REPLY_EMAIL,
+        to: user.email,
+        subject: "Verify your email",
+        html: `$verify your email with ${url}`,
+      });
+    },
+  },
+
+  socialProviders: {
+    google: {
+      prompt: "select_account",
+      clientId: GOOGLE_CLIENT_ID,
+      clientSecret: GOOGLE_CLIENT_SECRET,
     },
   },
 
@@ -43,14 +73,25 @@ export const auth = betterAuth({
     organization({ teams: { enabled: true } }),
     emailOTP({
       sendVerificationOTP: async ({ email, otp, type }) => {
-        // TODO: Implement email sending for email otp
+        if (type === "forget-password") {
+          await transporter.sendMail({
+            from: NO_REPLY_EMAIL,
+            to: email,
+            subject: "Reset password",
+            html: `OTP for reset password ${otp}`,
+          });
+        }
       },
     }),
     twoFactor({
       otpOptions: {
         sendOTP: async ({ user, otp }) => {
-          // TODO: Implement OTP sending
-          console.log(`OTP for ${user.email}: ${otp}`);
+          await transporter.sendMail({
+            from: NO_REPLY_EMAIL,
+            to: user.email,
+            subject: "Reset password",
+            html: `OTP is ${otp}`,
+          });
         },
       },
     }),
