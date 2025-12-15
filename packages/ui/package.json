@@ -30,7 +30,7 @@
     "embla-carousel-svelte": "^8.6.0",
     "jsrepo": "^3.0.8",
     "mode-watcher": "^1.1.0",
-    "runed": "^0.37.0",
+    "runed": "^0.36.0",
     "svelte": "^5.46.0",
     "svelte-check": "^4.3.4",
     "svelte-easy-crop": "^5.0.0",
