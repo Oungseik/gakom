@@ -1,8 +1,8 @@
-import { Database } from "@tursodatabase/database";
-import { drizzle } from "drizzle-orm/tursodatabase/database";
+import { Database } from "bun:sqlite";
+import { drizzle } from "drizzle-orm/bun-sqlite";
 import { account, session, twoFactor, user, verification } from "./schema/core";
 import { image } from "./schema/image";
-import { invitation, member, organization } from "./schema/organization";
+import { invitation, member, organization, team, teamMember } from "./schema/organization";
 import { relations } from "./schema/relations";
 
 export function connect(url: string) {
@@ -19,11 +19,15 @@ export function connect(url: string) {
       member,
       organization,
       image,
+      team,
+      teamMember,
     },
     relations,
   });
 }
 
-export { account, session, user, verification, twoFactor, invitation, member, organization, image };
-
 export * from "drizzle-orm";
+export * from "./schema/core";
+export * from "./schema/image";
+export * from "./schema/organization";
+export * from "./schema/relations";
