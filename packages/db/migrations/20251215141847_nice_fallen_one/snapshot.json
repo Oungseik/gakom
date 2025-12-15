@@ -1,9 +1,9 @@
 {
   "version": "7",
   "dialect": "sqlite",
-  "id": "93c4b2da-8eba-4c02-944f-7196b8b2e4b8",
+  "id": "999d09e8-e839-49e1-ace9-f1243ce35e16",
   "prevIds": [
-    "0416cdc4-5e59-4ee5-a99a-e0ac0e969ae0"
+    "00000000-0000-0000-0000-000000000000"
   ],
   "ddl": [
     {
@@ -28,6 +28,10 @@
     },
     {
       "name": "jwks",
+      "entityType": "tables"
+    },
+    {
+      "name": "image",
       "entityType": "tables"
     },
     {
@@ -526,6 +530,66 @@
       "autoincrement": false,
       "default": null,
       "generated": null,
+      "name": "object_path",
+      "entityType": "columns",
+      "table": "image"
+    },
+    {
+      "type": "text",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "name": "filename",
+      "entityType": "columns",
+      "table": "image"
+    },
+    {
+      "type": "text",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "name": "uploader_id",
+      "entityType": "columns",
+      "table": "image"
+    },
+    {
+      "type": "text",
+      "notNull": true,
+      "autoincrement": false,
+      "default": "'image/webp'",
+      "generated": null,
+      "name": "type",
+      "entityType": "columns",
+      "table": "image"
+    },
+    {
+      "type": "integer",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "name": "size",
+      "entityType": "columns",
+      "table": "image"
+    },
+    {
+      "type": "integer",
+      "notNull": true,
+      "autoincrement": false,
+      "default": "(cast(unixepoch('subsecond') * 1000 as integer))",
+      "generated": null,
+      "name": "updated_at",
+      "entityType": "columns",
+      "table": "image"
+    },
+    {
+      "type": "text",
+      "notNull": false,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
       "name": "id",
       "entityType": "columns",
       "table": "invitation"
@@ -1006,6 +1070,15 @@
     },
     {
       "columns": [
+        "object_path"
+      ],
+      "nameExplicit": false,
+      "name": "image_pk",
+      "table": "image",
+      "entityType": "pks"
+    },
+    {
+      "columns": [
         "id"
       ],
       "nameExplicit": false,
@@ -1108,6 +1181,20 @@
     {
       "columns": [
         {
+          "value": "secret",
+          "isExpression": false
+        }
+      ],
+      "isUnique": false,
+      "where": null,
+      "origin": "manual",
+      "name": "two_factor_secret_idx",
+      "entityType": "indexes",
+      "table": "two_factor"
+    },
+    {
+      "columns": [
+        {
           "value": "email",
           "isExpression": false
         }
@@ -1132,6 +1219,20 @@
       "name": "verification_identifier_idx",
       "entityType": "indexes",
       "table": "verification"
+    },
+    {
+      "columns": [
+        {
+          "value": "uploader_id",
+          "isExpression": false
+        }
+      ],
+      "isUnique": false,
+      "where": null,
+      "origin": "manual",
+      "name": "image_uploader_id_idx",
+      "entityType": "indexes",
+      "table": "image"
     },
     {
       "columns": [

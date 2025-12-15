@@ -28,11 +28,22 @@ CREATE TABLE `session` (
 	CONSTRAINT `fk_session_user_id_user_id_fk` FOREIGN KEY (`user_id`) REFERENCES `user`(`id`) ON DELETE cascade
 );
 --> statement-breakpoint
+CREATE TABLE `two_factor` (
+	`id` text PRIMARY KEY,
+	`user_id` text NOT NULL,
+	`secret` text,
+	`backup_codes` text,
+	`created_at` integer DEFAULT (cast(unixepoch('subsecond') * 1000 as integer)) NOT NULL,
+	`updated_at` integer DEFAULT (cast(unixepoch('subsecond') * 1000 as integer)) NOT NULL,
+	CONSTRAINT `fk_two_factor_user_id_user_id_fk` FOREIGN KEY (`user_id`) REFERENCES `user`(`id`) ON DELETE cascade
+);
+--> statement-breakpoint
 CREATE TABLE `user` (
 	`id` text PRIMARY KEY,
 	`name` text NOT NULL,
 	`email` text NOT NULL,
 	`email_verified` integer DEFAULT 0 NOT NULL,
+	`two_factor_enabled` integer DEFAULT 0,
 	`image` text,
 	`created_at` integer DEFAULT (cast(unixepoch('subsecond') * 1000 as integer)) NOT NULL,
 	`updated_at` integer DEFAULT (cast(unixepoch('subsecond') * 1000 as integer)) NOT NULL
@@ -53,6 +64,15 @@ CREATE TABLE `jwks` (
 	`private_key` text NOT NULL,
 	`created_at` integer DEFAULT (cast(unixepoch('subsecond') * 1000 as integer)) NOT NULL,
 	`expires_at` integer
+);
+--> statement-breakpoint
+CREATE TABLE `image` (
+	`object_path` text PRIMARY KEY,
+	`filename` text NOT NULL,
+	`uploader_id` text NOT NULL,
+	`type` text DEFAULT 'image/webp' NOT NULL,
+	`size` integer NOT NULL,
+	`updated_at` integer DEFAULT (cast(unixepoch('subsecond') * 1000 as integer)) NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE `invitation` (
@@ -108,8 +128,11 @@ CREATE TABLE `team_memeber` (
 CREATE INDEX `account_user_id_idx` ON `account` (`user_id`);--> statement-breakpoint
 CREATE INDEX `session_user_id_idx` ON `session` (`user_id`);--> statement-breakpoint
 CREATE INDEX `session_token_idx` ON `session` (`token`);--> statement-breakpoint
+CREATE INDEX `two_factor_user_id_idx` ON `two_factor` (`user_id`);--> statement-breakpoint
+CREATE INDEX `two_factor_secret_idx` ON `two_factor` (`secret`);--> statement-breakpoint
 CREATE INDEX `user_email_idx` ON `user` (`email`);--> statement-breakpoint
 CREATE INDEX `verification_identifier_idx` ON `verification` (`identifier`);--> statement-breakpoint
+CREATE INDEX `image_uploader_id_idx` ON `image` (`uploader_id`);--> statement-breakpoint
 CREATE INDEX `invitation_organization_id_idx` ON `invitation` (`organization_id`);--> statement-breakpoint
 CREATE INDEX `invitation_email_idx` ON `invitation` (`email`);--> statement-breakpoint
 CREATE INDEX `member_organization_id_idx` ON `member` (`organization_id`);--> statement-breakpoint

@@ -1,6 +1,7 @@
-import { index, integer, pgTable, text, timestamp } from "drizzle-orm/pg-core";
+import { sql } from "drizzle-orm";
+import { index, integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
 
-export const image = pgTable(
+export const image = sqliteTable(
   "image",
   {
     objectPath: text("object_path").primaryKey(),
@@ -8,8 +9,9 @@ export const image = pgTable(
     uploaderId: text("uploader_id").notNull(),
     type: text("type").notNull().default("image/webp"),
     size: integer("size").notNull(),
-    uploadedAt: timestamp("uploaded_at")
-      .$defaultFn(() => new Date())
+    updatedAt: integer("updated_at", { mode: "timestamp_ms" })
+      .default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)
+      .$onUpdate(() => /* @__PURE__ */ new Date())
       .notNull(),
   },
   (t) => [index("image_uploader_id_idx").on(t.uploaderId)],

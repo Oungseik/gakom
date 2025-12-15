@@ -9,7 +9,17 @@ export function connect(url: string) {
   const client = new Database(url);
   return drizzle({
     client,
-    schema: { user, session, account, verification, twoFactor, invitation, member, organization },
+    schema: {
+      user,
+      session,
+      account,
+      verification,
+      twoFactor,
+      invitation,
+      member,
+      organization,
+      image,
+    },
     relations,
   });
 }
