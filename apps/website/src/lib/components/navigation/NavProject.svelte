@@ -6,6 +6,7 @@
   import * as DropdownMenu from "@repo/ui/dropdown-menu";
   import { useSidebar } from "@repo/ui/sidebar";
   import * as Sidebar from "@repo/ui/sidebar";
+  import type { Component } from "svelte";
 
   let {
     projects,
@@ -13,9 +14,7 @@
     projects: {
       name: string;
       url: string;
-      // This should be `Component` after @lucide/svelte updates types
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      icon: any;
+      icon: Component;
     }[];
   } = $props();
   const sidebar = useSidebar();

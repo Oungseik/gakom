@@ -1,9 +1,10 @@
 import { defineRelations } from "drizzle-orm";
 import { account, session, twoFactor, user } from "./core";
+import { image } from "./image";
 import { invitation, member, organization, team, teamMember } from "./organization";
 
 export const relations = defineRelations(
-  { user, session, account, invitation, organization, member, team, teamMember, twoFactor },
+  { user, session, account, invitation, organization, member, team, teamMember, twoFactor, image },
   (r) => ({
     user: {
       sessions: r.many.session(),
@@ -12,6 +13,7 @@ export const relations = defineRelations(
       invitations: r.many.invitation(),
       teamMembers: r.many.teamMember(),
       twoFactors: r.many.twoFactor(),
+      images: r.many.image(),
     },
     session: {
       user: r.one.user({ from: r.session.userId, to: r.user.id }),
@@ -45,6 +47,9 @@ export const relations = defineRelations(
     },
     twoFactor: {
       user: r.one.user({ from: r.twoFactor.userId, to: r.user.id }),
+    },
+    image: {
+      user: r.one.user({ from: r.image.uploaderId, to: r.user.id }),
     },
   }),
 );

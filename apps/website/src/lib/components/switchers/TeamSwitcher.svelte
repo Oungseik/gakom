@@ -4,10 +4,9 @@
   import * as DropdownMenu from "@repo/ui/dropdown-menu";
   import * as Sidebar from "@repo/ui/sidebar";
   import { useSidebar } from "@repo/ui/sidebar";
+  import type { Component } from "svelte";
 
-  // This should be `Component` after @lucide/svelte updates types
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  let { teams }: { teams: { name: string; logo: any; plan: string }[] } = $props();
+  let { teams }: { teams: { name: string; logo: Component; plan: string }[] } = $props();
   const sidebar = useSidebar();
   let activeTeam = $derived(teams[0]);
 </script>

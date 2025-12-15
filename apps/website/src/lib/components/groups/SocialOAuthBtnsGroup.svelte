@@ -3,7 +3,6 @@
 
   import { page } from "$app/state";
   import { authClient } from "$lib/auth_client";
-  import { localizeHref } from "$lib/paraglide/runtime";
 </script>
 
 <div class="flex flex-col gap-4">
@@ -13,7 +12,7 @@
     onclick={() =>
       authClient.signIn.social({
         provider: "google",
-        callbackURL: localizeHref(page.url.searchParams.get("return_url") ?? "/"),
+        callbackURL: page.url.searchParams.get("return_url") ?? "/",
       })}
   >
     <svg

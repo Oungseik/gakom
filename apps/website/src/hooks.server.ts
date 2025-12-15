@@ -43,6 +43,11 @@ const authHandle: Handle = async ({ event, resolve }) => {
   const session = await auth.api.getSession({ headers: event.request.headers });
   event.locals.session = session;
 
+  const { pathname } = event.url;
+  if (PROTECTED_PATHS.some((path) => pathname.startsWith(path)) && !session) {
+    return redirect(303, `/signin?return_url=${pathname}`);
+  }
+
   const isEmailVerified = session?.user.emailVerified;
 
   if (session && !isEmailVerified && event.url.pathname !== "/verify-account") {
@@ -54,11 +59,6 @@ const authHandle: Handle = async ({ event, resolve }) => {
       return redirect(303, "/dashboard");
     }
     return redirect(303, "/verify-account");
-  }
-
-  const { pathname } = event.url;
-  if (PROTECTED_PATHS.some((path) => pathname.startsWith(path)) && !session) {
-    return redirect(303, `/signin?return_url=${pathname}`);
   }
 
   return resolve(event);
