@@ -38,13 +38,28 @@
         return;
       }
 
-      await authClient.organization.create(
-        { name: value.name, slug: value.slug },
+      const { data, error: createOrgError } = await authClient.organization.create({
+        name: value.name,
+        slug: value.slug,
+      });
+
+      if (createOrgError) {
+        isSubmitting = false;
+        toast.error(createOrgError.message ?? "Failed to create organization");
+        return;
+      }
+
+      authClient.organization.setActive(
         {
-          onSuccess: () => goto(`/${value.slug}/dashboard`),
-          onError: ({ error }) => void toast.error(error.message),
+          organizationId: data.id,
+          organizationSlug: data.slug,
+        },
+        {
+          onSuccess: () => goto(`/${data.slug}/dashboard`),
+          onError: (e) => void toast.error(e.error.message),
         }
       );
+
       isSubmitting = false;
     },
   }));
