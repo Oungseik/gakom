@@ -9,8 +9,8 @@
   import { breadcrumb } from "$lib/store/breadcrumb.svelte";
 
   breadcrumb.value = [
-    { desc: "Dashboard", href: "/dashboard" },
-    { desc: "Settings", href: "/dashboard/settings" },
+    { desc: "Dashboard", href: "/app/dashboard" },
+    { desc: "Settings", href: "/app/settings" },
   ];
 
   let submission = $state<

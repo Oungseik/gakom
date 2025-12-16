@@ -1,6 +1,6 @@
 class Breadcrumb {
   private state: { href: string; desc: string }[] = $state([
-    { desc: "Dashboard", href: "/dashboard" },
+    { desc: "Dashboard", href: "/app/dashboard" },
   ]);
 
   get value() {

@@ -4,9 +4,8 @@
   import * as DropdownMenu from "@repo/ui/dropdown-menu";
   import * as Sidebar from "@repo/ui/sidebar";
   import { useSidebar } from "@repo/ui/sidebar";
-  import type { Component } from "svelte";
 
-  let { teams }: { teams: { name: string; logo: Component; plan: string }[] } = $props();
+  let { teams }: { teams: { name: string; logo: string; plan?: string }[] } = $props();
   const sidebar = useSidebar();
   let activeTeam = $derived(teams[0]);
 </script>
@@ -21,33 +20,31 @@
             size="lg"
             class="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
           >
-            <div
-              class="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg"
-            >
-              <activeTeam.logo class="size-4" />
-            </div>
+            <img
+              src={activeTeam.logo}
+              class="aspect-square size-8 rounded-lg border"
+              alt={activeTeam.name}
+            />
             <div class="grid flex-1 text-start text-sm leading-tight">
               <span class="truncate font-medium">
                 {activeTeam.name}
               </span>
-              <span class="truncate text-xs">{activeTeam.plan}</span>
+              <span class="truncate text-xs">{activeTeam.plan ?? "Free"}</span>
             </div>
             <ChevronsUpDownIcon class="ms-auto" />
           </Sidebar.MenuButton>
         {/snippet}
       </DropdownMenu.Trigger>
       <DropdownMenu.Content
-        class="w-(--bits-dropdown-menu-anchor-width) min-w-56 rounded-lg"
         align="start"
+        class="w-(--bits-dropdown-menu-anchor-width) min-w-56 rounded-lg"
         side={sidebar.isMobile ? "bottom" : "right"}
         sideOffset={4}
       >
         <DropdownMenu.Label class="text-muted-foreground text-xs">Teams</DropdownMenu.Label>
         {#each teams as team, index (team.name)}
           <DropdownMenu.Item onSelect={() => (activeTeam = team)} class="gap-2 p-2">
-            <div class="flex size-6 items-center justify-center rounded-md border">
-              <team.logo class="size-3.5 shrink-0" />
-            </div>
+            <img src={team.logo} class="size-6 shrink-0 rounded-md border" alt={team.name} />
             {team.name}
             <DropdownMenu.Shortcut>⌘{index + 1}</DropdownMenu.Shortcut>
           </DropdownMenu.Item>

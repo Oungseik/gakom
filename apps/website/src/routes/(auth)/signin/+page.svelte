@@ -23,7 +23,7 @@
           email: value.email,
           password: value.password,
           rememberMe: true,
-          callbackURL: page.url.searchParams.get("return_url") ?? "/",
+          callbackURL: page.url.searchParams.get("return_url") ?? "/app/dashboard",
         },
         {
           onError: ({ error }) => {

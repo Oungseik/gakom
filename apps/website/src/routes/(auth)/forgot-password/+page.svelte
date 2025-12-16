@@ -75,7 +75,7 @@
         <div class="mt-6 text-center text-sm">
           Remember the password?
           <a
-            href={`/signin${page.url.search}`}
+            href={"/signin".concat(page.url.search)}
             class={buttonVariants({ variant: "link", class: "px-0" })}
           >
             Sign in

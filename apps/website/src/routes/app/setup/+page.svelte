@@ -41,6 +41,7 @@
       const { data, error: createOrgError } = await authClient.organization.create({
         name: value.name,
         slug: value.slug,
+        logo,
       });
 
       if (createOrgError) {
@@ -55,7 +56,7 @@
           organizationSlug: data.slug,
         },
         {
-          onSuccess: () => goto(`/${data.slug}/dashboard`),
+          onSuccess: () => goto(`/app/dashboard/${data.slug}`),
           onError: (e) => void toast.error(e.error.message),
         }
       );

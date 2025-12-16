@@ -30,14 +30,16 @@
           name: value.name,
           email: value.email,
           password: value.password,
-          callbackURL: "/signin".concat(
-            params.return_url ? `?return_url=${params.return_url}` : ""
-          ),
+          callbackURL: params.return_url
+            ? "/signin".concat(`?return_url=${params.return_url}`)
+            : "/signin",
         },
         {
           onSuccess: () => {
             isSubmitting = false;
-            goto("/signin".concat(params.return_url ? `?return_url=${params.return_url}` : ""));
+            goto(
+              params.return_url ? "/signin".concat(`?return_url=${params.return_url}`) : "/signin"
+            );
           },
           onError: ({ error }) => {
             if (error.status === 403) {

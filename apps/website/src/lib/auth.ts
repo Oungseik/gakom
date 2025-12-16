@@ -35,6 +35,10 @@ export const auth = betterAuth({
   }),
 
   session: {
+    additionalFields: {
+      activeOrganizationId: { type: "string", required: false },
+      activeTeamId: { type: "string", required: false },
+    },
     cookieCache: {
       enabled: true,
       maxAge: 5 * 60,

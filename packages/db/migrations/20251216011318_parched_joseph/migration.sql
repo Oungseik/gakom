@@ -101,8 +101,8 @@ CREATE TABLE `member` (
 CREATE TABLE `organization` (
 	`id` text PRIMARY KEY,
 	`name` text NOT NULL,
-	`slug` text NOT NULL UNIQUE,
-	`logo` text,
+	`slug` text NOT NULL,
+	`logo` text NOT NULL,
 	`created_at` integer DEFAULT (cast(unixepoch('subsecond') * 1000 as integer)) NOT NULL,
 	`metadata` text
 );
@@ -137,6 +137,7 @@ CREATE INDEX `invitation_organization_id_idx` ON `invitation` (`organization_id`
 CREATE INDEX `invitation_email_idx` ON `invitation` (`email`);--> statement-breakpoint
 CREATE INDEX `member_organization_id_idx` ON `member` (`organization_id`);--> statement-breakpoint
 CREATE INDEX `member_user_id_idx` ON `member` (`user_id`);--> statement-breakpoint
+CREATE INDEX `organization_slug_idx` ON `organization` (`slug`);--> statement-breakpoint
 CREATE INDEX `team_organization_id_idx` ON `team` (`organization_id`);--> statement-breakpoint
 CREATE INDEX `team_member_team_id_idx` ON `team_memeber` (`team_id`);--> statement-breakpoint
 CREATE INDEX `team_member_user_id_idx` ON `team_memeber` (`user_id`);

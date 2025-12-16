@@ -84,7 +84,7 @@
           <DropdownMenu.Item class="p-0">
             {#snippet children()}
               <a
-                href="/dashboard/settings#password"
+                href="/app/settings#password"
                 class="flex h-full w-full items-center gap-2 p-2"
               >
                 <LockIcon />

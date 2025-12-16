@@ -1,7 +1,7 @@
 <script lang="ts">
   import { breadcrumb } from "$lib/store/breadcrumb.svelte";
 
-  breadcrumb.value = [{ desc: "Dashboard", href: "/dashboard" }];
+  breadcrumb.value = [{ desc: "Dashboard", href: "/app/dashboard" }];
 </script>
 
 <div class="grid auto-rows-min gap-4 md:grid-cols-3">
