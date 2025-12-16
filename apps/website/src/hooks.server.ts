@@ -51,7 +51,7 @@ const authHandle: Handle = async ({ event, resolve }) => {
   const isEmailVerified = session?.user.emailVerified;
 
   if (session && !isEmailVerified && event.url.pathname !== "/verify-account") {
-    return redirect(303, "/verify-account");
+    return redirect(303, `/verify-account?return_url=${pathname}`);
   }
 
   if (session && (event.url.pathname === "/signin" || event.url.pathname === "/signup")) {
