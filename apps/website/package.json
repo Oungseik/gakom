@@ -15,7 +15,7 @@
     "format": "prettier --write .",
     "lint": "prettier --check . && eslint .",
     "test:unit": "bunx --bun vitest",
-    "test": "npm run test:unit -- --run"
+    "test": "bun run test:unit -- --run"
   },
   "devDependencies": {
     "@eslint/compat": "^2.0.0",
@@ -42,6 +42,7 @@
     "prettier-plugin-svelte": "^3.4.1",
     "prettier-plugin-tailwindcss": "^0.7.2",
     "svelte": "^5.46.0",
+    "svelte-adapter-bun": "^1.0.1",
     "svelte-check": "^4.3.4",
     "svelte-meta-tags": "^4.5.0",
     "tailwindcss": "^4.1.18",
