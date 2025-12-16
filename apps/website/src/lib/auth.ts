@@ -61,7 +61,7 @@ export const auth = betterAuth({
         from: NO_REPLY_EMAIL,
         to: user.email,
         subject: "Verify your email",
-        html: `$verify your email with ${url}`,
+        html: `verify your email with ${url}`,
       });
     },
   },
