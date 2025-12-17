@@ -6,6 +6,7 @@
   import { getFileFromUrl } from "@repo/ui/image-cropper";
   import { Input } from "@repo/ui/input";
   import { Label } from "@repo/ui/label";
+  import { Spinner } from "@repo/ui/spinner";
   import { createForm } from "@tanstack/svelte-form";
   import { createMutation } from "@tanstack/svelte-query";
   import { toast } from "svelte-sonner";
@@ -16,6 +17,7 @@
   import { orpc } from "$lib/orpc_client";
 
   let isSubmitting = $state(false);
+  let isUploading = $state(false);
   let logo: string | undefined = $state(undefined);
 
   const imageUploadMutation = createMutation(() => orpc.images.upload.mutationOptions());
@@ -66,6 +68,14 @@
   }));
 </script>
 
+{#if isUploading}
+  <div
+    class="bg-background/80 absolute top-0 left-0 z-1 flex h-dvh w-full items-center justify-center"
+  >
+    <Spinner class="size-10" />
+  </div>
+{/if}
+
 <div class="mt-20 flex min-h-svh flex-col items-center gap-6 p-6 md:p-10">
   <div class="flex w-full max-w-md flex-col gap-6">
     <Card.Root>
@@ -81,7 +91,7 @@
           <div class="mx-auto w-fit">
             <ImageCropper.Root
               onCropped={async (url) => {
-                isSubmitting = true;
+                isUploading = true;
                 const file = await getFileFromUrl(url);
                 imageUploadMutation.mutate(
                   { file },
@@ -91,7 +101,7 @@
                     },
                     onError: (e) => toast.error(e.message),
                     onSettled: () => {
-                      isSubmitting = false;
+                      isUploading = false;
                     },
                   }
                 );
