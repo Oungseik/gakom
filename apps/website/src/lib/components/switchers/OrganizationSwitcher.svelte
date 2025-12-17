@@ -4,19 +4,31 @@
   import * as DropdownMenu from "@repo/ui/dropdown-menu";
   import * as Sidebar from "@repo/ui/sidebar";
   import { useSidebar } from "@repo/ui/sidebar";
+  import { toast } from "svelte-sonner";
+
+  import { goto } from "$app/navigation";
+  import { authClient } from "$lib/auth_client";
 
   type Props = {
     orgs: { id: string; name: string; logo: string; slug: string; plan?: string }[];
-    activeOrganizationId?: string;
+    activeOrganizationId?: string | null;
   };
 
   let { orgs, activeOrganizationId }: Props = $props();
   const sidebar = useSidebar();
   let activeOrganization = $derived(orgs.find((o) => o.id === activeOrganizationId) ?? orgs[0]);
 
-  function handleSwitchOrganization(param: { id: string; slug: string }) {
-    // TODO : switch organization appropriately
-    console.log(param);
+  async function handleSwitchOrganization(param: { id: string; slug: string }) {
+    if (activeOrganization.id === param.id) {
+      return;
+    }
+    await authClient.organization
+      .setActive({
+        organizationId: param.id,
+        organizationSlug: param.slug,
+      })
+      .then(() => goto(`/app/dashboard/${param.slug}`))
+      .catch((e) => toast.error(e));
   }
 </script>
 
@@ -68,7 +80,7 @@
           <div class="flex size-6 items-center justify-center rounded-md border bg-transparent">
             <PlusIcon class="size-4" />
           </div>
-          <div class="text-muted-foreground font-medium">Add organization</div>
+          <div class="text-muted-foreground font-medium">Create organization</div>
         </DropdownMenu.Item>
       </DropdownMenu.Content>
     </DropdownMenu.Root>

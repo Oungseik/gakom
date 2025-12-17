@@ -148,7 +148,7 @@
   }: ComponentProps<typeof Sidebar.Root> & {
     user: User;
     orgs: Organization[];
-    activeOrganizationId?: string;
+    activeOrganizationId?: string | null;
   } = $props();
 </script>
 
