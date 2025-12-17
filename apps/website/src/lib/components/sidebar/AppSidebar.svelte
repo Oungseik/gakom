@@ -123,7 +123,7 @@
   import NavMain from "$lib/components/navigation/NavMain.svelte";
   import NavProjects from "$lib/components/navigation/NavProject.svelte";
   import NavUser from "$lib/components/navigation/NavUser.svelte";
-  import TeamSwitcher from "$lib/components/switchers/TeamSwitcher.svelte";
+  import OrganizationSwitcher from "$lib/components/switchers/OrganizationSwitcher.svelte";
 
   type User = {
     email: string;
@@ -132,8 +132,10 @@
   };
 
   type Organization = {
+    id: string;
     name: string;
     logo: string;
+    slug: string;
     plan?: string;
   };
 
@@ -147,7 +149,7 @@
 
 <Sidebar.Root {collapsible} {...restProps}>
   <Sidebar.Header>
-    <TeamSwitcher teams={orgs} />
+    <OrganizationSwitcher teams={orgs} />
   </Sidebar.Header>
   <Sidebar.Content>
     <NavMain items={data.navMain} />

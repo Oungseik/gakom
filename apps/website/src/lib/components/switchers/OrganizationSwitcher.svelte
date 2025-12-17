@@ -5,7 +5,10 @@
   import * as Sidebar from "@repo/ui/sidebar";
   import { useSidebar } from "@repo/ui/sidebar";
 
-  let { teams }: { teams: { name: string; logo: string; plan?: string }[] } = $props();
+  let {
+    teams,
+  }: { teams: { id: string; name: string; logo: string; slug: string; plan?: string }[] } =
+    $props();
   const sidebar = useSidebar();
   let activeTeam = $derived(teams[0]);
 </script>
