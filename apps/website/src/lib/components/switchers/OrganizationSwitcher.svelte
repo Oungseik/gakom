@@ -4,9 +4,10 @@
   import * as DropdownMenu from "@repo/ui/dropdown-menu";
   import * as Sidebar from "@repo/ui/sidebar";
   import { useSidebar } from "@repo/ui/sidebar";
+  import { useQueryClient } from "@tanstack/svelte-query";
   import { toast } from "svelte-sonner";
 
-  import { goto } from "$app/navigation";
+  import { goto, invalidateAll } from "$app/navigation";
   import { authClient } from "$lib/auth_client";
 
   type Props = {
@@ -15,8 +16,10 @@
   };
 
   let { orgs, activeOrganizationId }: Props = $props();
-  const sidebar = useSidebar();
   let activeOrganization = $derived(orgs.find((o) => o.id === activeOrganizationId) ?? orgs[0]);
+
+  const queryClient = useQueryClient();
+  const sidebar = useSidebar();
 
   async function handleSwitchOrganization(param: { id: string; slug: string }) {
     if (activeOrganization.id === param.id) {
@@ -28,6 +31,8 @@
         organizationSlug: param.slug,
       })
       .then(() => goto(`/app/dashboard/${param.slug}`))
+      .then(() => queryClient.invalidateQueries())
+      .then(() => invalidateAll())
       .catch((e) => toast.error(e));
   }
 </script>
