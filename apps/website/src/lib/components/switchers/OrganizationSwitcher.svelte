@@ -8,14 +8,14 @@
 
   import { authClient } from "$lib/auth_client";
 
+  type Organization = { id: string; name: string; logo: string; slug: string; plan?: string };
   type Props = {
-    orgs: { id: string; name: string; logo: string; slug: string; plan?: string }[];
-    activeOrganizationId?: string | null;
+    orgs: Organization[];
+    activeOrganization: Organization;
     onCreateOrganization: () => void;
   };
 
-  let { orgs, activeOrganizationId, onCreateOrganization }: Props = $props();
-  let activeOrganization = $derived(orgs.find((o) => o.id === activeOrganizationId) ?? orgs[0]);
+  let { orgs, activeOrganization, onCreateOrganization }: Props = $props();
 
   const sidebar = useSidebar();
 

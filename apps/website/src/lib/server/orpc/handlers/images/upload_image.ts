@@ -23,7 +23,7 @@ export const uploadImageHandler = os
   .input(input)
   .handler(async ({ input, context }) => {
     const buffer = await input.file.arrayBuffer();
-    const result = await sharp(buffer).resize(900, 450).toBuffer();
+    const result = await sharp(buffer).toBuffer();
 
     const name = input.file.name.split(".");
     name.pop();

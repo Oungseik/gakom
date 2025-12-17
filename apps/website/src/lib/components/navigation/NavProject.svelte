@@ -23,7 +23,7 @@
 <Sidebar.Group class="group-data-[collapsible=icon]:hidden">
   <Sidebar.GroupLabel>Projects</Sidebar.GroupLabel>
   <Sidebar.Menu>
-    {#each projects as item (item.name)}
+    {#each projects as item (item.url)}
       <Sidebar.MenuItem>
         <Sidebar.MenuButton>
           {#snippet child({ props })}
