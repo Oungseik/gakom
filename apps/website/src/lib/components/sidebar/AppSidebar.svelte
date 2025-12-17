@@ -7,6 +7,8 @@
   import Settings2Icon from "@lucide/svelte/icons/settings-2";
   import SquareTerminalIcon from "@lucide/svelte/icons/square-terminal";
 
+  import AddOrganizationForm from "../forms/AddOrganizationForm.svelte";
+
   // This is sample data.
   const data = {
     navMain: [
@@ -150,11 +152,17 @@
     orgs: Organization[];
     activeOrganizationId?: string | null;
   } = $props();
+
+  let open = $state(false);
 </script>
 
 <Sidebar.Root {collapsible} {...restProps}>
   <Sidebar.Header>
-    <OrganizationSwitcher {orgs} {activeOrganizationId} />
+    <OrganizationSwitcher
+      {orgs}
+      {activeOrganizationId}
+      onCreateOrganization={() => (open = true)}
+    />
   </Sidebar.Header>
   <Sidebar.Content>
     <NavMain items={data.navMain} />
@@ -165,3 +173,5 @@
   </Sidebar.Footer>
   <Sidebar.Rail />
 </Sidebar.Root>
+
+<AddOrganizationForm variant="dialog" bind:open />

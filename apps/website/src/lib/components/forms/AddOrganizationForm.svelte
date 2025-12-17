@@ -12,13 +12,12 @@
   import { toast } from "svelte-sonner";
   import z from "zod";
 
-  import { goto } from "$app/navigation";
   import { authClient } from "$lib/auth_client";
   import FullPageSpinner from "$lib/components/overlays/FullPageSpinner.svelte";
   import { orpc } from "$lib/orpc_client";
 
-  type Props = { variant: "dialog"; open: boolean } | { variant: "card" };
-  let props: Props = $props();
+  type Props = { variant: "dialog" | "card"; open?: boolean };
+  let { variant, open = $bindable(false) }: Props = $props();
 
   let isSubmitting = $state(false);
   let isUploading = $state(false);
@@ -56,13 +55,15 @@
         return;
       }
 
-      authClient.organization.setActive(
+      await authClient.organization.setActive(
         {
           organizationId: data.id,
           organizationSlug: data.slug,
         },
         {
-          onSuccess: () => goto(`/app/dashboard/${data.slug}`),
+          onSuccess: () => {
+            window.location.href = `/app/dashboard/${data.slug}`;
+          },
           onError: (e) => void toast.error(e.error.message),
         }
       );
@@ -191,8 +192,8 @@
   </form>
 {/snippet}
 
-{#if props.variant === "dialog"}
-  <Dialog.Root bind:open={props.open}>
+{#if variant === "dialog"}
+  <Dialog.Root bind:open>
     <Dialog.Content>
       {@render Form()}
     </Dialog.Content>

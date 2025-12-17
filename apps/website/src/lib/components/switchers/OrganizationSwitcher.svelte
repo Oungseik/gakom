@@ -4,21 +4,19 @@
   import * as DropdownMenu from "@repo/ui/dropdown-menu";
   import * as Sidebar from "@repo/ui/sidebar";
   import { useSidebar } from "@repo/ui/sidebar";
-  import { useQueryClient } from "@tanstack/svelte-query";
   import { toast } from "svelte-sonner";
 
-  import { goto, invalidateAll } from "$app/navigation";
   import { authClient } from "$lib/auth_client";
 
   type Props = {
     orgs: { id: string; name: string; logo: string; slug: string; plan?: string }[];
     activeOrganizationId?: string | null;
+    onCreateOrganization: () => void;
   };
 
-  let { orgs, activeOrganizationId }: Props = $props();
+  let { orgs, activeOrganizationId, onCreateOrganization }: Props = $props();
   let activeOrganization = $derived(orgs.find((o) => o.id === activeOrganizationId) ?? orgs[0]);
 
-  const queryClient = useQueryClient();
   const sidebar = useSidebar();
 
   async function handleSwitchOrganization(param: { id: string; slug: string }) {
@@ -30,9 +28,7 @@
         organizationId: param.id,
         organizationSlug: param.slug,
       })
-      .then(() => goto(`/app/dashboard/${param.slug}`))
-      .then(() => queryClient.invalidateQueries())
-      .then(() => invalidateAll())
+      .then(() => (window.location.href = `/app/dashboard/${param.slug}`))
       .catch((e) => toast.error(e));
   }
 </script>
@@ -69,7 +65,7 @@
         sideOffset={4}
       >
         <DropdownMenu.Label class="text-muted-foreground text-xs">Organizations</DropdownMenu.Label>
-        {#each orgs as org (org.name)}
+        {#each orgs as org (org.slug)}
           <DropdownMenu.Item
             onSelect={() => {
               handleSwitchOrganization({ id: org.id, slug: org.slug });
@@ -81,7 +77,7 @@
           </DropdownMenu.Item>
         {/each}
         <DropdownMenu.Separator />
-        <DropdownMenu.Item class="gap-2 p-2">
+        <DropdownMenu.Item class="gap-2 p-2" onclick={onCreateOrganization}>
           <div class="flex size-6 items-center justify-center rounded-md border bg-transparent">
             <PlusIcon class="size-4" />
           </div>
