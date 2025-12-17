@@ -143,13 +143,18 @@
     collapsible = "icon",
     user,
     orgs,
+    activeOrganizationId,
     ...restProps
-  }: ComponentProps<typeof Sidebar.Root> & { user: User; orgs: Organization[] } = $props();
+  }: ComponentProps<typeof Sidebar.Root> & {
+    user: User;
+    orgs: Organization[];
+    activeOrganizationId?: string;
+  } = $props();
 </script>
 
 <Sidebar.Root {collapsible} {...restProps}>
   <Sidebar.Header>
-    <OrganizationSwitcher teams={orgs} />
+    <OrganizationSwitcher {orgs} {activeOrganizationId} />
   </Sidebar.Header>
   <Sidebar.Content>
     <NavMain items={data.navMain} />
