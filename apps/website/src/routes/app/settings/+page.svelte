@@ -6,12 +6,6 @@
   import NewPasswordForm from "$lib/components/forms/NewPasswordForm.svelte";
   import OTPVerificationForm from "$lib/components/forms/OTPVerificationForm.svelte";
   import PasswordResetForm from "$lib/components/forms/PasswordResetForm.svelte";
-  import { breadcrumb } from "$lib/store/breadcrumb.svelte";
-
-  breadcrumb.value = [
-    { desc: "Dashboard", href: "/app/dashboard" },
-    { desc: "Settings", href: "/app/settings" },
-  ];
 
   let submission = $state<
     | { status: "REQUEST_OTP" }
