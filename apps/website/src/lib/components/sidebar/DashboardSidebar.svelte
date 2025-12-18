@@ -138,8 +138,8 @@
     ],
     organization: [
       {
-        name: "Invite members",
-        url: `${activeOrganization.slug}/invite`,
+        name: "Members",
+        url: `${activeOrganization.slug}/members`,
         icon: UserPlusIcon,
       },
     ],
