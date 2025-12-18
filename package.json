@@ -1,6 +1,7 @@
 {
   "$schema": "https://json.schemastore.org/package.json",
-  "name": "svelte_kit_starter",
+  "name": "gakom",
+  "description": "Organization and HR management software",
   "private": true,
   "workspaces": [
     "apps/*",
