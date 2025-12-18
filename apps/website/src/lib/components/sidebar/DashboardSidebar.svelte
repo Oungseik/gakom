@@ -6,7 +6,7 @@
 </script>
 
 <script lang="ts">
-  import UserPlusIcon from "@lucide/svelte/icons/user-plus";
+  import UsersIcon from "@lucide/svelte/icons/users";
   import * as Sidebar from "@repo/ui/sidebar";
   import type { ComponentProps } from "svelte";
 
@@ -140,7 +140,7 @@
       {
         name: "Members",
         url: `/app/dashboard/${activeOrganization.slug}/members`,
-        icon: UserPlusIcon,
+        icon: UsersIcon,
       },
     ],
   });

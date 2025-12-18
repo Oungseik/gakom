@@ -55,10 +55,12 @@ export const invitation = sqliteTable(
     inviterId: text("inviter_id")
       .notNull()
       .references(() => user.id, { onDelete: "cascade" }),
+    teamId: text("team_id").references(() => team.id, { onDelete: "cascade" }),
   },
   (table) => [
     index("invitation_organization_id_idx").on(table.organizationId),
     index("invitation_email_idx").on(table.email),
+    index("invitation_team_id_idx").on(table.teamId),
   ],
 );
 
