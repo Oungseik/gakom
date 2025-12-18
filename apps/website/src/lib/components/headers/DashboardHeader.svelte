@@ -12,10 +12,8 @@
   type Props = { breadcrumbItems: BreadcrumbItem[]; actions?: Snippet };
 
   const { breadcrumbItems, actions }: Props = $props();
-  const items = $derived(breadcrumbItems.slice(0, breadcrumbItems.length - 2));
+  const items = $derived(breadcrumbItems.slice(0, breadcrumbItems.length - 1));
   const page = $derived(breadcrumbItems.at(-1));
-
-  console.log("hello");
 </script>
 
 <header

@@ -11,7 +11,7 @@
   import type { ComponentProps } from "svelte";
 
   import NavMain from "$lib/components/navigation/NavMain.svelte";
-  import NavProjects from "$lib/components/navigation/NavProject.svelte";
+  import NavOrganization from "$lib/components/navigation/NavOrganization.svelte";
   import NavUser from "$lib/components/navigation/NavUser.svelte";
   import OrganizationSwitcher from "$lib/components/switchers/OrganizationSwitcher.svelte";
 
@@ -139,7 +139,7 @@
     organization: [
       {
         name: "Members",
-        url: `${activeOrganization.slug}/members`,
+        url: `/app/dashboard/${activeOrganization.slug}/members`,
         icon: UserPlusIcon,
       },
     ],
@@ -152,7 +152,7 @@
   </Sidebar.Header>
   <Sidebar.Content>
     <NavMain items={data.navMain} />
-    <NavProjects projects={data.organization} />
+    <NavOrganization features={data.organization} />
   </Sidebar.Content>
   <Sidebar.Footer>
     <NavUser {user} />
