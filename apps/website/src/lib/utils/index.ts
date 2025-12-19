@@ -1,4 +1,5 @@
 import type { DehydratedState } from "@tanstack/svelte-query";
+import { env } from "$env/dynamic/public";
 
 export const PROTECTED_PATHS: string[] = ["/app", "/dashboard", "/account"];
 
@@ -32,4 +33,8 @@ export function getImageContentType(file: string) {
       : file.endsWith("png")
         ? "image/png"
         : "image/jpeg";
+}
+
+export function getBaseURL() {
+  return env["PUBLIC_WEBSITE_URL"] ?? "http://localhost:5173";
 }

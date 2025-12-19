@@ -34,6 +34,7 @@
         toast.error(error.message ?? "something went wrong while inviting member");
       } else {
         open = false;
+        form.reset();
         toast.success(`Successfully invite ${value.email} to ${organization.name}.`);
       }
 
@@ -95,7 +96,7 @@
 
       <Dialog.Footer>
         <Dialog.Close class={buttonVariants({ variant: "outline" })}>Cancel</Dialog.Close>
-        <Button type="submit" disabled={isInviting}>
+        <Button type="submit" disabled={isInviting} class="w-17">
           {#if isInviting}
             <Loader2Icon class="mr-2 size-4 animate-spin" />
           {:else}
