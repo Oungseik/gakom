@@ -22,7 +22,7 @@
       await authClient.sendVerificationEmail(
         {
           email: value.email,
-          callbackURL: page.url.searchParams.get("return_url") ?? "/app/dashboard",
+          callbackURL: page.url.searchParams.get("return_url") ?? "/app",
         },
         {
           onResponse: () => void (isResending = false),
@@ -38,7 +38,7 @@
   <div class="flex w-full max-w-sm flex-col gap-6">
     <a href="/" class="flex items-center gap-2 self-center font-medium">
       <img src="/logo.svg" class="size-5" alt="logo" />
-      <span>Eazy Org</span>
+      <span>Kagom</span>
     </a>
 
     <Card.Root>

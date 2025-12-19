@@ -75,7 +75,14 @@ export const auth = betterAuth({
   },
 
   plugins: [
-    organization({ teams: { enabled: true } }),
+    organization({
+      teams: { enabled: true },
+      organizationHooks: {
+        afterCreateInvitation: async ({ invitation, organization }) => {
+          // TODO send email
+        },
+      },
+    }),
     emailOTP({
       sendVerificationOTP: async ({ email, otp, type }) => {
         if (type === "forget-password") {

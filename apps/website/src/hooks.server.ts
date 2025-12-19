@@ -1,4 +1,4 @@
-import { type Handle, redirect } from "@sveltejs/kit";
+import { error, type Handle } from "@sveltejs/kit";
 import { sequence } from "@sveltejs/kit/hooks";
 import { svelteKitHandler } from "better-auth/svelte-kit";
 import { building } from "$app/environment";
@@ -44,21 +44,16 @@ const authHandle: Handle = async ({ event, resolve }) => {
   event.locals.session = session;
 
   const { pathname } = event.url;
-  if (PROTECTED_PATHS.some((path) => pathname.startsWith(path)) && !session) {
-    return redirect(303, `/signin?return_url=${pathname}`);
-  }
-
   const isEmailVerified = session?.user.emailVerified;
 
-  if (session && !isEmailVerified && event.url.pathname !== "/verify-account") {
-    return redirect(303, `/verify-account?return_url=${pathname}`);
-  }
-
-  if (session && (event.url.pathname === "/signin" || event.url.pathname === "/signup")) {
-    if (isEmailVerified) {
-      return redirect(303, "/app/dashboard");
+  if (PROTECTED_PATHS.some((path) => pathname.startsWith(path))) {
+    if (!session) {
+      return error(401);
     }
-    return redirect(303, "/verify-account");
+
+    if (!isEmailVerified) {
+      return error(403, { message: "Email verification required" });
+    }
   }
 
   return resolve(event);
