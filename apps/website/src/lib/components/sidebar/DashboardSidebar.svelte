@@ -35,16 +35,16 @@
     collapsible = "icon",
     user,
     orgs,
-    activeOrganizationId,
+    currentOrganizationSlug,
     ...restProps
   }: ComponentProps<typeof Sidebar.Root> & {
     user: User;
     orgs: Organization[];
-    activeOrganizationId?: string | null;
+    currentOrganizationSlug?: string | null;
   } = $props();
 
   const activeOrganization = $derived(
-    orgs.find((o) => o.id === activeOrganizationId) ?? orgs.at(0)!
+    orgs.find((o) => o.slug === currentOrganizationSlug) ?? orgs.at(0)!
   );
   let open = $state(false);
 
@@ -139,7 +139,7 @@
     organization: [
       {
         name: "Members",
-        url: `/app/dashboard/${activeOrganization.slug}/members`,
+        url: `/dashboard/${activeOrganization.slug}/members`,
         icon: UsersIcon,
       },
     ],

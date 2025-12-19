@@ -29,6 +29,15 @@ declare global {
           image?: string | null;
         };
       } | null;
+      organizations?: {
+        id: string;
+        name: string;
+        slug: string;
+        logo: string;
+        createdAt: Date;
+        role: string;
+        joinedAt: Date;
+      }[];
     }
     // interface PageData {}
     // interface PageState {}
