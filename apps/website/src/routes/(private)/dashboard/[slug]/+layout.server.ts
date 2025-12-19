@@ -12,5 +12,6 @@ export const load: LayoutServerLoad = async ({ parent, params }) => {
 
   return {
     currentOrganization,
+    organizations: organizations?.filter((o) => o.role !== "member"),
   };
 };

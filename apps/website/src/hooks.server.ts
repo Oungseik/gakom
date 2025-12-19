@@ -78,7 +78,7 @@ const authHandle: Handle = async ({ event, resolve }) => {
   event.locals.organizations = organizations;
   const slug = pathname.split("/").at(2);
 
-  if (!slug) {
+  if (!slug || pathname.startsWith("/account")) {
     return resolve(event);
   }
 

@@ -1,6 +1,6 @@
 import type { DehydratedState } from "@tanstack/svelte-query";
 
-export const PROTECTED_PATHS: string[] = ["/app", "/dashboard"];
+export const PROTECTED_PATHS: string[] = ["/app", "/dashboard", "/account"];
 
 const replacements = {
   "<": "\\u003C",
