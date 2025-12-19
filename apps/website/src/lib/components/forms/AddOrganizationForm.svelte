@@ -62,7 +62,7 @@
         },
         {
           onSuccess: () => {
-            window.location.href = `/app/dashboard/${data.slug}`;
+            window.location.href = `/dashboard/${data.slug}`;
           },
           onError: (e) => void toast.error(e.error.message),
         }
