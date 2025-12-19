@@ -13,7 +13,7 @@
 </script>
 
 <Sidebar.Group class="group-data-[collapsible=icon]:hidden">
-  <Sidebar.GroupLabel>Organization</Sidebar.GroupLabel>
+  <Sidebar.GroupLabel>Managements</Sidebar.GroupLabel>
   <Sidebar.Menu>
     {#each features as item (item.url)}
       <Sidebar.MenuItem>
