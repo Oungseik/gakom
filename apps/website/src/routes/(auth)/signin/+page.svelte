@@ -11,6 +11,8 @@
   import { authClient } from "$lib/auth_client";
   import SocialOauthBtnsGroup from "$lib/components/groups/SocialOAuthBtnsGroup.svelte";
 
+  import NavigationIcon from "../NavigationIcon.svelte";
+
   let isSubmitting = $state(false);
   const defaultValues = { email: "", password: "" };
 
@@ -42,10 +44,7 @@
 
 <div class="bg-muted flex min-h-svh flex-col items-center justify-center gap-6 p-6 md:p-10">
   <div class="flex w-full max-w-sm flex-col gap-6">
-    <a href="/" class="flex items-center gap-2 self-center font-medium">
-      <img src="/logo.svg" class="size-5" alt="logo" />
-      <span>Kagom</span>
-    </a>
+    <NavigationIcon />
 
     <Card.Root>
       <Card.Header class="text-center">
