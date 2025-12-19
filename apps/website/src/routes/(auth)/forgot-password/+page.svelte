@@ -9,6 +9,9 @@
   import PasswordResetForm from "$lib/components/forms/PasswordResetForm.svelte";
 
   import NavigationIcon from "../NavigationIcon.svelte";
+  import type { PageProps } from "./$types";
+
+  const { data }: PageProps = $props();
 
   let submission = $state<
     | { status: "REQUEST_OTP" }
@@ -42,6 +45,7 @@
       <Card.Content>
         {#if submission.status === "REQUEST_OTP"}
           <PasswordResetForm
+            email={data.user?.email}
             onSubmit={({ email }) => {
               submission = { status: "VERIFY_OTP", email };
             }}
