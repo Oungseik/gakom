@@ -30,6 +30,8 @@ export const listMembersHandler = os
         name: user.name,
         email: user.email,
         image: user.image,
+        address: user.address,
+        city: user.city,
         countryCode: user.countryCode,
         position: member.position,
         role: member.role,

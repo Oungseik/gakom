@@ -1,7 +1,9 @@
-import { Checkbox } from "@repo/ui/checkbox";
+// import { Checkbox } from "@repo/ui/checkbox";
+
 import { renderComponent } from "@repo/ui/data-table";
 import type { ColumnDef } from "@tanstack/table-core";
 import DataTableActions from "./DataTableActions.svelte";
+import DataTableAddress from "./DataTableAddress.svelte";
 import DataTableMemberInfo from "./DataTableMemberInfo.svelte";
 import DataTableMembershipPeriod from "./DataTableMembershipPeriod.svelte";
 import DataTableUserId from "./DataTableUserId.svelte";
@@ -12,6 +14,8 @@ export type Member = {
   email: string;
   image?: string | null;
   role: string;
+  address?: string | null;
+  city?: string | null;
   countryCode?: string | null;
   position?: string | null;
   joinedAt: Date;
@@ -19,24 +23,24 @@ export type Member = {
 };
 
 export const columns: ColumnDef<Member>[] = [
-  {
-    id: "select",
-    header: ({ table }) =>
-      renderComponent(Checkbox, {
-        checked: table.getIsAllPageRowsSelected(),
-        indeterminate: table.getIsSomePageRowsSelected() && !table.getIsAllPageRowsSelected(),
-        onCheckedChange: (value: boolean) => table.toggleAllPageRowsSelected(value),
-        "aria-label": "Select all",
-      }),
-    cell: ({ row }) =>
-      renderComponent(Checkbox, {
-        checked: row.getIsSelected(),
-        onCheckedChange: (value: boolean) => row.toggleSelected(value),
-        "aria-label": "Select row",
-      }),
-    enableSorting: false,
-    enableHiding: false,
-  },
+  // {
+  //   id: "select",
+  //   header: ({ table }) =>
+  //     renderComponent(Checkbox, {
+  //       checked: table.getIsAllPageRowsSelected(),
+  //       indeterminate: table.getIsSomePageRowsSelected() && !table.getIsAllPageRowsSelected(),
+  //       onCheckedChange: (value: boolean) => table.toggleAllPageRowsSelected(value),
+  //       "aria-label": "Select all",
+  //     }),
+  //   cell: ({ row }) =>
+  //     renderComponent(Checkbox, {
+  //       checked: row.getIsSelected(),
+  //       onCheckedChange: (value: boolean) => row.toggleSelected(value),
+  //       "aria-label": "Select row",
+  //     }),
+  //   enableSorting: false,
+  //   enableHiding: false,
+  // },
 
   {
     accessorKey: "userId",
@@ -45,7 +49,7 @@ export const columns: ColumnDef<Member>[] = [
   },
   {
     id: "info",
-    header: "Info",
+    header: "Personal Info",
     cell: ({ row }) =>
       renderComponent(DataTableMemberInfo, {
         name: row.original.name,
@@ -53,7 +57,16 @@ export const columns: ColumnDef<Member>[] = [
         image: row.original.image,
       }),
   },
-  { accessorKey: "countryCode", header: "Location" },
+  {
+    id: "address",
+    header: "Address",
+    cell: ({ row }) =>
+      renderComponent(DataTableAddress, {
+        address: row.original.address,
+        city: row.original.city,
+        countryCode: row.original.countryCode,
+      }),
+  },
   { accessorKey: "position", header: "Position" },
   {
     id: "membershipPeriod",

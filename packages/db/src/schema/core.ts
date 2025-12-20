@@ -11,6 +11,8 @@ export const user = sqliteTable(
     emailVerified: integer("email_verified", { mode: "boolean" }).default(false).notNull(),
     twoFactorEnabled: integer("two_factor_enabled", { mode: "boolean" }).default(false),
     image: text("image"),
+    address: text("address"),
+    city: text("city"),
     countryCode: text("country_code", { enum: COUNTRY_CODES }),
     createdAt: integer("created_at", { mode: "timestamp_ms" })
       .default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)
