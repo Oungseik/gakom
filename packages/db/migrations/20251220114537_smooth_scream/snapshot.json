@@ -1,9 +1,9 @@
 {
   "version": "7",
   "dialect": "sqlite",
-  "id": "5fd888c0-81bf-4078-9388-9478407e9d00",
+  "id": "940bb580-4582-4533-b86b-d3206dd435b4",
   "prevIds": [
-    "a2dc8b28-508a-4ce9-bea5-c0644b26a101"
+    "00000000-0000-0000-0000-000000000000"
   ],
   "ddl": [
     {
@@ -395,6 +395,36 @@
       "table": "user"
     },
     {
+      "type": "text",
+      "notNull": false,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "name": "address",
+      "entityType": "columns",
+      "table": "user"
+    },
+    {
+      "type": "text",
+      "notNull": false,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "name": "city",
+      "entityType": "columns",
+      "table": "user"
+    },
+    {
+      "type": "text",
+      "notNull": false,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "name": "country_code",
+      "entityType": "columns",
+      "table": "user"
+    },
+    {
       "type": "integer",
       "notNull": true,
       "autoincrement": false,
@@ -715,12 +745,32 @@
       "table": "member"
     },
     {
+      "type": "text",
+      "notNull": false,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "name": "position",
+      "entityType": "columns",
+      "table": "member"
+    },
+    {
       "type": "integer",
       "notNull": true,
       "autoincrement": false,
       "default": "(cast(unixepoch('subsecond') * 1000 as integer))",
       "generated": null,
       "name": "created_at",
+      "entityType": "columns",
+      "table": "member"
+    },
+    {
+      "type": "integer",
+      "notNull": false,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "name": "left_at",
       "entityType": "columns",
       "table": "member"
     },
@@ -765,6 +815,16 @@
       "table": "organization"
     },
     {
+      "type": "text",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "name": "country_code",
+      "entityType": "columns",
+      "table": "organization"
+    },
+    {
       "type": "integer",
       "notNull": true,
       "autoincrement": false,
@@ -801,6 +861,16 @@
       "default": null,
       "generated": null,
       "name": "name",
+      "entityType": "columns",
+      "table": "team"
+    },
+    {
+      "type": "text",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "name": "timezone_country_code",
       "entityType": "columns",
       "table": "team"
     },
@@ -1228,6 +1298,20 @@
       "where": null,
       "origin": "manual",
       "name": "user_email_idx",
+      "entityType": "indexes",
+      "table": "user"
+    },
+    {
+      "columns": [
+        {
+          "value": "country_code",
+          "isExpression": false
+        }
+      ],
+      "isUnique": false,
+      "where": null,
+      "origin": "manual",
+      "name": "user_country_code_idx",
       "entityType": "indexes",
       "table": "user"
     },

@@ -45,6 +45,9 @@ CREATE TABLE `user` (
 	`email_verified` integer DEFAULT 0 NOT NULL,
 	`two_factor_enabled` integer DEFAULT 0,
 	`image` text,
+	`address` text,
+	`city` text,
+	`country_code` text,
 	`created_at` integer DEFAULT (cast(unixepoch('subsecond') * 1000 as integer)) NOT NULL,
 	`updated_at` integer DEFAULT (cast(unixepoch('subsecond') * 1000 as integer)) NOT NULL
 );
@@ -84,8 +87,10 @@ CREATE TABLE `invitation` (
 	`expires_at` integer NOT NULL,
 	`created_at` integer DEFAULT (cast(unixepoch('subsecond') * 1000 as integer)) NOT NULL,
 	`inviter_id` text NOT NULL,
+	`team_id` text,
 	CONSTRAINT `fk_invitation_organization_id_organization_id_fk` FOREIGN KEY (`organization_id`) REFERENCES `organization`(`id`) ON DELETE cascade,
-	CONSTRAINT `fk_invitation_inviter_id_user_id_fk` FOREIGN KEY (`inviter_id`) REFERENCES `user`(`id`) ON DELETE cascade
+	CONSTRAINT `fk_invitation_inviter_id_user_id_fk` FOREIGN KEY (`inviter_id`) REFERENCES `user`(`id`) ON DELETE cascade,
+	CONSTRAINT `fk_invitation_team_id_team_id_fk` FOREIGN KEY (`team_id`) REFERENCES `team`(`id`) ON DELETE cascade
 );
 --> statement-breakpoint
 CREATE TABLE `member` (
@@ -93,7 +98,9 @@ CREATE TABLE `member` (
 	`organization_id` text NOT NULL,
 	`user_id` text NOT NULL,
 	`role` text DEFAULT 'member' NOT NULL,
+	`position` text,
 	`created_at` integer DEFAULT (cast(unixepoch('subsecond') * 1000 as integer)) NOT NULL,
+	`left_at` integer,
 	CONSTRAINT `fk_member_organization_id_organization_id_fk` FOREIGN KEY (`organization_id`) REFERENCES `organization`(`id`) ON DELETE cascade,
 	CONSTRAINT `fk_member_user_id_user_id_fk` FOREIGN KEY (`user_id`) REFERENCES `user`(`id`) ON DELETE cascade
 );
@@ -103,6 +110,7 @@ CREATE TABLE `organization` (
 	`name` text NOT NULL,
 	`slug` text NOT NULL,
 	`logo` text NOT NULL,
+	`country_code` text NOT NULL,
 	`created_at` integer DEFAULT (cast(unixepoch('subsecond') * 1000 as integer)) NOT NULL,
 	`metadata` text
 );
@@ -110,6 +118,7 @@ CREATE TABLE `organization` (
 CREATE TABLE `team` (
 	`id` text PRIMARY KEY,
 	`name` text NOT NULL,
+	`timezone_country_code` text NOT NULL,
 	`organization_id` text NOT NULL,
 	`created_at` integer DEFAULT (cast(unixepoch('subsecond') * 1000 as integer)) NOT NULL,
 	`updated_at` integer DEFAULT (cast(unixepoch('subsecond') * 1000 as integer)) NOT NULL,
@@ -131,10 +140,12 @@ CREATE INDEX `session_token_idx` ON `session` (`token`);--> statement-breakpoint
 CREATE INDEX `two_factor_user_id_idx` ON `two_factor` (`user_id`);--> statement-breakpoint
 CREATE INDEX `two_factor_secret_idx` ON `two_factor` (`secret`);--> statement-breakpoint
 CREATE INDEX `user_email_idx` ON `user` (`email`);--> statement-breakpoint
+CREATE INDEX `user_country_code_idx` ON `user` (`country_code`);--> statement-breakpoint
 CREATE INDEX `verification_identifier_idx` ON `verification` (`identifier`);--> statement-breakpoint
 CREATE INDEX `image_uploader_id_idx` ON `image` (`uploader_id`);--> statement-breakpoint
 CREATE INDEX `invitation_organization_id_idx` ON `invitation` (`organization_id`);--> statement-breakpoint
 CREATE INDEX `invitation_email_idx` ON `invitation` (`email`);--> statement-breakpoint
+CREATE INDEX `invitation_team_id_idx` ON `invitation` (`team_id`);--> statement-breakpoint
 CREATE INDEX `member_organization_id_idx` ON `member` (`organization_id`);--> statement-breakpoint
 CREATE INDEX `member_user_id_idx` ON `member` (`user_id`);--> statement-breakpoint
 CREATE INDEX `organization_slug_idx` ON `organization` (`slug`);--> statement-breakpoint
