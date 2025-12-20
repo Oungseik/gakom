@@ -10,7 +10,7 @@ export const organization = sqliteTable(
     name: text("name").notNull(),
     slug: text("slug").notNull().unique(),
     logo: text("logo").notNull(),
-    countryCode: text("country_code", { enum: COUNTRY_CODES }).notNull(),
+    countryCode: text("country_code", { enum: COUNTRY_CODES }),
     createdAt: integer("created_at", { mode: "timestamp_ms" })
       .default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)
       .notNull(),
