@@ -1,5 +1,6 @@
 import { sql } from "drizzle-orm";
 import { index, integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
+import { COUNTRY_CODES } from "../country";
 import { user } from "./core";
 
 export const organization = sqliteTable(
@@ -9,6 +10,7 @@ export const organization = sqliteTable(
     name: text("name").notNull(),
     slug: text("slug").notNull().unique(),
     logo: text("logo").notNull(),
+    countryCode: text("country_code", { enum: COUNTRY_CODES }).notNull(),
     createdAt: integer("created_at", { mode: "timestamp_ms" })
       .default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)
       .notNull(),
@@ -28,9 +30,11 @@ export const member = sqliteTable(
       .notNull()
       .references(() => user.id, { onDelete: "cascade" }),
     role: text("role").default("member").notNull(),
+    position: text("position"),
     createdAt: integer("created_at", { mode: "timestamp_ms" })
       .default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)
       .notNull(),
+    leftAt: integer("left_at", { mode: "timestamp_ms" }),
   },
   (table) => [
     index("member_organization_id_idx").on(table.organizationId),
@@ -55,10 +59,12 @@ export const invitation = sqliteTable(
     inviterId: text("inviter_id")
       .notNull()
       .references(() => user.id, { onDelete: "cascade" }),
+    teamId: text("team_id").references(() => team.id, { onDelete: "cascade" }),
   },
   (table) => [
     index("invitation_organization_id_idx").on(table.organizationId),
     index("invitation_email_idx").on(table.email),
+    index("invitation_team_id_idx").on(table.teamId),
   ],
 );
 
@@ -67,6 +73,7 @@ export const team = sqliteTable(
   {
     id: text("id").primaryKey(),
     name: text("name").notNull(),
+    tzCountryCode: text("timezone_country_code", { enum: COUNTRY_CODES }).notNull(),
     organizationId: text("organization_id")
       .notNull()
       .references(() => organization.id, { onDelete: "cascade" }),

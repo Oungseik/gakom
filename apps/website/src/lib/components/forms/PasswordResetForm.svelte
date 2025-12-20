@@ -10,15 +10,16 @@
   import { authClient } from "$lib/auth_client";
 
   type Props = {
+    email?: string;
     onSubmit?: (param: { email: string }) => void;
     onSubmitError?: () => void;
   };
 
   let isSubmitting = $state(false);
-  const { onSubmit, onSubmitError }: Props = $props();
+  const { email, onSubmit, onSubmitError }: Props = $props();
 
   const form = createForm(() => ({
-    defaultValues: { email: "" },
+    defaultValues: { email: email ?? "" },
     onSubmit: async ({ value }) => {
       isSubmitting = true;
       await authClient.forgetPassword.emailOtp(

@@ -8,6 +8,11 @@
   import OTPVerificationForm from "$lib/components/forms/OTPVerificationForm.svelte";
   import PasswordResetForm from "$lib/components/forms/PasswordResetForm.svelte";
 
+  import NavigationIcon from "../NavigationIcon.svelte";
+  import type { PageProps } from "./$types";
+
+  const { data }: PageProps = $props();
+
   let submission = $state<
     | { status: "REQUEST_OTP" }
     | { status: "VERIFY_OTP"; email: string }
@@ -17,10 +22,7 @@
 
 <div class="bg-muted flex min-h-svh flex-col items-center justify-center gap-6 p-6 md:p-10">
   <div class="flex w-full max-w-sm flex-col gap-6">
-    <a href="/" class="flex items-center gap-2 self-center font-medium">
-      <img src="/logo.svg" class="size-5" alt="logo" />
-      <span>Doh Htar Nay</span>
-    </a>
+    <NavigationIcon />
 
     <Card.Root>
       <Card.Header class="text-center">
@@ -43,6 +45,7 @@
       <Card.Content>
         {#if submission.status === "REQUEST_OTP"}
           <PasswordResetForm
+            email={data.user?.email}
             onSubmit={({ email }) => {
               submission = { status: "VERIFY_OTP", email };
             }}

@@ -28,7 +28,7 @@
         organizationId: param.id,
         organizationSlug: param.slug,
       })
-      .then(() => (window.location.href = `/app/dashboard/${param.slug}`))
+      .then(() => (window.location.href = `/dashboard/${param.slug}`))
       .catch((e) => toast.error(e));
   }
 </script>

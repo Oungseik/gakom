@@ -15,6 +15,7 @@ import {
 } from "$env/static/private";
 
 import { db } from "./server/db";
+import { getBaseURL } from "./utils";
 
 const transporter = createTransport({
   host: "smtp.gmail.com",
@@ -75,7 +76,18 @@ export const auth = betterAuth({
   },
 
   plugins: [
-    organization({ teams: { enabled: true } }),
+    organization({
+      teams: { enabled: true },
+      sendInvitationEmail: async ({ id, email }) => {
+        const inviteLink = `${getBaseURL()}/accept-invitation/${id}`;
+        await transporter.sendMail({
+          from: NO_REPLY_EMAIL,
+          to: email,
+          subject: "Invitation",
+          html: `Invite to an organization. Click this link: ${inviteLink}`,
+        });
+      },
+    }),
     emailOTP({
       sendVerificationOTP: async ({ email, otp, type }) => {
         if (type === "forget-password") {

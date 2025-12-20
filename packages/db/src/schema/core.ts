@@ -1,5 +1,6 @@
 import { sql } from "drizzle-orm";
 import { index, integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
+import { COUNTRY_CODES } from "../country";
 
 export const user = sqliteTable(
   "user",
@@ -10,6 +11,9 @@ export const user = sqliteTable(
     emailVerified: integer("email_verified", { mode: "boolean" }).default(false).notNull(),
     twoFactorEnabled: integer("two_factor_enabled", { mode: "boolean" }).default(false),
     image: text("image"),
+    address: text("address"),
+    city: text("city"),
+    countryCode: text("country_code", { enum: COUNTRY_CODES }),
     createdAt: integer("created_at", { mode: "timestamp_ms" })
       .default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)
       .notNull(),
@@ -18,7 +22,7 @@ export const user = sqliteTable(
       .$onUpdate(() => /* @__PURE__ */ new Date())
       .notNull(),
   },
-  (t) => [index("user_email_idx").on(t.email)],
+  (t) => [index("user_email_idx").on(t.email), index("user_country_code_idx").on(t.countryCode)],
 );
 
 export const session = sqliteTable(
