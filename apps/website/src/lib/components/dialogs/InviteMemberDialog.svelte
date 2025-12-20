@@ -53,7 +53,13 @@
       <Dialog.Title>Invite member</Dialog.Title>
     </Dialog.Header>
 
-    <form class="space-y-4" onsubmit={form.handleSubmit}>
+    <form
+      class="space-y-4"
+      onsubmit={(e) => {
+        e.preventDefault();
+        form.handleSubmit();
+      }}
+    >
       <form.Field name="email">
         {#snippet children(field)}
           <div class="space-y-2">

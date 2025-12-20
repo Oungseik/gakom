@@ -17,7 +17,7 @@
   <Sidebar.Menu>
     {#each features as item (item.url)}
       <Sidebar.MenuItem>
-        <Sidebar.MenuButton>
+        <Sidebar.MenuButton tooltipContent={item.name}>
           {#snippet child({ props })}
             <a href={item.url} {...props}>
               <item.icon />

@@ -24,7 +24,7 @@
   };
 
   let {
-    collapsible = "icon",
+    collapsible = "offcanvas",
     user,
     orgs,
     currentOrganizationSlug,
