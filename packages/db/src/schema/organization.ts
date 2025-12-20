@@ -73,7 +73,7 @@ export const team = sqliteTable(
   {
     id: text("id").primaryKey(),
     name: text("name").notNull(),
-    tzCountryCode: text("timezone_country_code", { enum: COUNTRY_CODES }).notNull(),
+    tzCountryCode: text("timezone_country_code", { enum: COUNTRY_CODES }),
     organizationId: text("organization_id")
       .notNull()
       .references(() => organization.id, { onDelete: "cascade" }),

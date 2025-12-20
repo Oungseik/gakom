@@ -5,5 +5,5 @@ export const returnUrlSchema = createSearchParamsSchema({
 });
 
 export const membersTabSchema = createSearchParamsSchema({
-  tab: { type: "string", default: "member" },
+  tab: { type: "string", default: "members" },
 });

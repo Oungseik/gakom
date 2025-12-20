@@ -110,7 +110,7 @@ CREATE TABLE `organization` (
 	`name` text NOT NULL,
 	`slug` text NOT NULL,
 	`logo` text NOT NULL,
-	`country_code` text NOT NULL,
+	`country_code` text,
 	`created_at` integer DEFAULT (cast(unixepoch('subsecond') * 1000 as integer)) NOT NULL,
 	`metadata` text
 );
@@ -118,7 +118,7 @@ CREATE TABLE `organization` (
 CREATE TABLE `team` (
 	`id` text PRIMARY KEY,
 	`name` text NOT NULL,
-	`timezone_country_code` text NOT NULL,
+	`timezone_country_code` text,
 	`organization_id` text NOT NULL,
 	`created_at` integer DEFAULT (cast(unixepoch('subsecond') * 1000 as integer)) NOT NULL,
 	`updated_at` integer DEFAULT (cast(unixepoch('subsecond') * 1000 as integer)) NOT NULL,
