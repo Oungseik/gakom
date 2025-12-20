@@ -7,7 +7,10 @@ export const load: LayoutServerLoad = async ({ locals, url }) => {
   }
 
   const organizations = locals.organizations;
-  if (!organizations || organizations.length < 1) {
+  if (
+    (!organizations || organizations.length < 1) &&
+    !url.pathname.startsWith("/accept-invitation")
+  ) {
     return redirect(303, "/setup");
   }
 

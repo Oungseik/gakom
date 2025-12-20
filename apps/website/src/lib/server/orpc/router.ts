@@ -6,6 +6,7 @@ import { removeImageHandler } from "./handlers/images/remove_image";
 import { uploadImageHandler } from "./handlers/images/upload_image";
 import { listInvitationsHandler } from "./handlers/organizations/listInvitations";
 import { listMembersHandler } from "./handlers/organizations/listMembers";
+import { updateMemberHandler } from "./handlers/organizations/updateMember";
 
 export const router = os.router({
   health: { check: healthCheckHandler },
@@ -14,7 +15,7 @@ export const router = os.router({
     upload: uploadImageHandler,
   },
   organizations: {
-    members: { list: listMembersHandler },
+    members: { list: listMembersHandler, update: updateMemberHandler },
     invitations: { list: listInvitationsHandler },
   },
 });

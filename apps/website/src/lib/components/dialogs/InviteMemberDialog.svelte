@@ -6,9 +6,11 @@
   import { Label } from "@repo/ui/label";
   import * as Select from "@repo/ui/select";
   import { createForm } from "@tanstack/svelte-form";
+  import { useQueryClient } from "@tanstack/svelte-query";
   import { toast } from "svelte-sonner";
 
   import { authClient } from "$lib/auth_client";
+  import { orpc } from "$lib/orpc_client";
 
   type Props = {
     open: boolean;
@@ -17,6 +19,7 @@
 
   let { open = $bindable(false), organization }: Props = $props();
   let isInviting = $state(false);
+  const queryClient = useQueryClient();
 
   const defaultValues: { role: "member" | "admin"; email: string } = { role: "member", email: "" };
   const form = createForm(() => ({
@@ -38,6 +41,7 @@
         toast.success(`Successfully invite ${value.email} to ${organization.name}.`);
       }
 
+      await queryClient.invalidateQueries({ queryKey: orpc.organizations.invitations.list.key() });
       isInviting = false;
     },
   }));

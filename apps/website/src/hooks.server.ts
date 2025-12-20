@@ -1,4 +1,4 @@
-import { eq, member, organization, user } from "@repo/db";
+import { eq, member, organization } from "@repo/db";
 import { error, type Handle, redirect } from "@sveltejs/kit";
 import { sequence } from "@sveltejs/kit/hooks";
 import { svelteKitHandler } from "better-auth/svelte-kit";
@@ -38,12 +38,12 @@ const rateLimitHandle: Handle = async ({ event, resolve }) => {
 };
 
 const authHandle: Handle = async ({ event, resolve }) => {
+  const session = await auth.api.getSession({ headers: event.request.headers });
+  event.locals.session = session;
+
   if (event.url.pathname.startsWith("/api/auth")) {
     return svelteKitHandler({ event, resolve, auth, building });
   }
-
-  const session = await auth.api.getSession({ headers: event.request.headers });
-  event.locals.session = session;
 
   const { pathname } = event.url;
   const isEmailVerified = session?.user.emailVerified;

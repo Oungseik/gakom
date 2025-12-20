@@ -45,7 +45,7 @@ export const authMiddleware = os.middleware(async ({ context, next }) => {
     throw new ORPCError("FORBIDDEN");
   }
 
-  return next({ context: { session } });
+  return next({ context: { ...context, session } });
 });
 
 /**
@@ -53,8 +53,6 @@ export const authMiddleware = os.middleware(async ({ context, next }) => {
  * */
 export const organizationMiddleware = (roles: string[]) =>
   authMiddleware.concat(async ({ context, next }, input: { slug: string }) => {
-    const user = context.session.user;
-
     const organizations = await db
       .select({
         slug: organization.slug,
@@ -62,13 +60,12 @@ export const organizationMiddleware = (roles: string[]) =>
       })
       .from(member)
       .innerJoin(organization, eq(member.organizationId, organization.id))
-      .where(eq(member.userId, user.id));
+      .where(eq(member.userId, context.session.user.id));
 
-    const org = organizations.find((o) => o.slug === input.slug);
-
-    if (!org || !roles.includes(org.role)) {
+    const currentOrganization = organizations?.find((o) => o.slug === input.slug);
+    if (!currentOrganization || !roles.includes(currentOrganization.role)) {
       throw new ORPCError("FORBIDDEN");
     }
 
-    return next({ context });
+    return next({ context: { ...context, organization: currentOrganization } });
   });

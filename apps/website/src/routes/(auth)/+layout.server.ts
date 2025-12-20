@@ -31,7 +31,10 @@ export const load: LayoutServerLoad = async ({ locals, url, request }) => {
     }
 
     if (!isEmailVerified) {
-      return;
+      return {
+        session: locals.session?.session,
+        user: locals.session?.user,
+      };
     }
 
     const organizations = await auth.api.listOrganizations({ headers: request.headers });

@@ -14,10 +14,11 @@
   import type { PageProps } from "./$types";
 
   const { data }: PageProps = $props();
+  const defaultValues = $derived({ email: data.user?.email ?? "" });
 
   let isResending = $state(false);
   const form = createForm(() => ({
-    defaultValues: { email: data.user?.email ?? "" },
+    defaultValues,
     onSubmit: async ({ value }) => {
       isResending = true;
       await authClient.sendVerificationEmail(

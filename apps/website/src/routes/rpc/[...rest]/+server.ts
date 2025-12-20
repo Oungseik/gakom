@@ -1,4 +1,4 @@
-import { ORPCError, ValidationError, onError } from "@orpc/server";
+import { ORPCError, onError, ValidationError } from "@orpc/server";
 import { RPCHandler } from "@orpc/server/fetch";
 import { StrictGetMethodPlugin } from "@orpc/server/plugins";
 import z from "zod";
@@ -43,7 +43,7 @@ const handler = new RPCHandler(router, {
 const handle: RequestHandler = async ({ request, locals }) => {
   const { response } = await handler.handle(request, {
     prefix: "/rpc",
-    context: { session: locals.session },
+    context: { session: locals.session, organizations: locals.organizations },
   });
 
   return response ?? new Response("Not Found", { status: 404 });
