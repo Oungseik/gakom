@@ -3,15 +3,7 @@
 
   import { page } from "$app/state";
 
-  import type { LayoutProps } from "./$types";
-
-  const { data }: LayoutProps = $props();
-
-  const org = $derived(
-    data.organizations.find((org) => org.id == data.session.activeOrganizationId)
-  );
-
-  const href = $derived(org ? `/dashboard/${org.slug}` : "/dashboard");
+  const href = "/dashboard";
 </script>
 
 <div class="mx-auto min-h-dvh max-w-7xl pt-42">
