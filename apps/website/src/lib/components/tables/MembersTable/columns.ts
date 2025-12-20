@@ -2,12 +2,16 @@ import { Checkbox } from "@repo/ui/checkbox";
 import { renderComponent } from "@repo/ui/data-table";
 import type { ColumnDef } from "@tanstack/table-core";
 import DataTableActions from "./DataTableActions.svelte";
+import DataTableMemberInfo from "./DataTableMemberInfo.svelte";
+import DataTableMembershipPeriod from "./DataTableMembershipPeriod.svelte";
+import DataTableUserId from "./DataTableUserId.svelte";
 
 export type Member = {
   userId: string;
   name: string;
   email: string;
   image?: string | null;
+  role: string;
   countryCode?: string | null;
   position?: string | null;
   joinedAt: Date;
@@ -34,12 +38,32 @@ export const columns: ColumnDef<Member>[] = [
     enableHiding: false,
   },
 
-  { accessorKey: "userId", header: "ID" },
-  { accessorKey: "info", header: "Info" },
-  { accessorKey: "countryCode", header: "Country" },
+  {
+    accessorKey: "userId",
+    header: "ID",
+    cell: ({ row }) => renderComponent(DataTableUserId, { userId: row.original.userId }),
+  },
+  {
+    id: "info",
+    header: "Info",
+    cell: ({ row }) =>
+      renderComponent(DataTableMemberInfo, {
+        name: row.original.name,
+        email: row.original.email,
+        image: row.original.image,
+      }),
+  },
+  { accessorKey: "countryCode", header: "Location" },
   { accessorKey: "position", header: "Position" },
-  { accessorKey: "joinedAt", header: "Joined At" },
-  // { accessorKey: "leftAt", header: "Left At" },
+  {
+    id: "membershipPeriod",
+    header: "Membership Period",
+    cell: ({ row }) =>
+      renderComponent(DataTableMembershipPeriod, {
+        joinedAt: row.original.joinedAt,
+        leftAt: row.original.leftAt,
+      }),
+  },
   {
     id: "actions",
     cell: ({ row }) => {

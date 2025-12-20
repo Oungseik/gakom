@@ -32,6 +32,7 @@ export const listMembersHandler = os
         image: user.image,
         countryCode: user.countryCode,
         position: member.position,
+        role: member.role,
         joinedAt: member.createdAt,
         leftAt: member.leftAt,
       })
