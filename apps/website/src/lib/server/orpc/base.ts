@@ -1,4 +1,6 @@
 import { os as base, ORPCError } from "@orpc/server";
+import { eq, member, organization } from "@repo/db";
+import { db } from "$lib/server/db";
 
 type Context = {
   session?: {
@@ -39,5 +41,34 @@ export const authMiddleware = os.middleware(async ({ context, next }) => {
     throw new ORPCError("UNAUTHORIZED");
   }
 
+  if (!session.user.emailVerified) {
+    throw new ORPCError("FORBIDDEN");
+  }
+
   return next({ context: { session } });
 });
+
+/**
+ * Middleware to protect to get the organization information for specific role
+ * */
+export const organizationMiddleware = (roles: string[]) =>
+  authMiddleware.concat(async ({ context, next }, input: { slug: string }) => {
+    const user = context.session.user;
+
+    const organizations = await db
+      .select({
+        slug: organization.slug,
+        role: member.role,
+      })
+      .from(member)
+      .innerJoin(organization, eq(member.organizationId, organization.id))
+      .where(eq(member.userId, user.id));
+
+    const org = organizations.find((o) => o.slug === input.slug);
+
+    if (!org || !roles.includes(org.role)) {
+      throw new ORPCError("FORBIDDEN");
+    }
+
+    return next({ context });
+  });

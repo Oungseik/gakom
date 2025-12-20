@@ -18,9 +18,9 @@
       "types": "./src/index.ts",
       "default": "./src/index.ts"
     },
-    "./auth": {
-      "types": "./src/auth.ts",
-      "default": "./src/auth.ts"
+    "./country": {
+      "types": "./src/country.ts",
+      "default": "./src/country.ts"
     }
   },
   "dependencies": {
