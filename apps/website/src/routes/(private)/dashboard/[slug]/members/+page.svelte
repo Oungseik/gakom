@@ -11,6 +11,8 @@
   import DashboardContainer from "$lib/components/containers/DashboardContainer.svelte";
   import InviteMemberDialog from "$lib/components/dialogs/InviteMemberDialog.svelte";
   import DashboardHeader from "$lib/components/headers/DashboardHeader.svelte";
+  import InvitationsDataTable from "$lib/components/tables/InvitationsTable/DataTable.svelte";
+  import { columns as invitationColumns } from "$lib/components/tables/InvitationsTable/columns";
   import DataTable from "$lib/components/tables/MembersTable/DataTable.svelte";
   import { columns } from "$lib/components/tables/MembersTable/columns";
   import { orpc } from "$lib/orpc_client";
@@ -23,11 +25,6 @@
 
   type View = { id: string; label: string; badge: number };
 
-  let views: View[] = [
-    { id: "members", label: "Members", badge: 0 },
-    { id: "invitations", label: "Invitations", badge: 0 },
-  ];
-
   const searchParams = useSearchParams(membersTabSchema);
   const members = createInfiniteQuery(() =>
     orpc.organizations.members.list.infiniteOptions({
@@ -38,7 +35,22 @@
     })
   );
 
+  const invitations = createInfiniteQuery(() =>
+    orpc.organizations.invitations.list.infiniteOptions({
+      enabled: searchParams.tab === "invitations",
+      initialPageParam: 0,
+      input: (cursor) => ({ pageSize: 10, cursor, slug: params.slug }),
+      getNextPageParam: (lastPage) => lastPage.nextCursor,
+    })
+  );
+
   const allMembers = $derived(members.data?.pages.flatMap((page) => page.items) ?? []);
+  const allInvitations = $derived(invitations.data?.pages.flatMap((page) => page.items) ?? []);
+
+  let views: View[] = $derived([
+    { id: "members", label: "Members", badge: 0 },
+    { id: "invitations", label: "Invitations", badge: 0 },
+  ]);
 </script>
 
 <DashboardHeader
@@ -104,6 +116,43 @@
     {:else}
       <Tabs.Content value="members" class="relative flex flex-col gap-4 overflow-auto">
         <DataTable {columns} data={[]} />
+      </Tabs.Content>
+    {/if}
+
+    {#if invitations.isFetching && !invitations.data}
+      <div class="flex h-40 w-full items-center justify-center">
+        <Spinner class="size-10" />
+      </div>
+    {:else if allInvitations.length > 0}
+      <Tabs.Content value="invitations" class="relative flex flex-col gap-4 overflow-auto">
+        <InvitationsDataTable
+          columns={invitationColumns}
+          data={allInvitations.map((inv) => ({
+            ...inv,
+            organizationId: data.currentOrganization.id,
+          }))}
+        />
+
+        {#if invitations.hasNextPage}
+          <div class="flex items-center justify-center py-4">
+            <Button
+              variant="outline"
+              onclick={() => invitations.fetchNextPage()}
+              disabled={invitations.isFetchingNextPage}
+            >
+              {#if invitations.isFetchingNextPage}
+                <Spinner class="mr-2 size-4" />
+                Loading...
+              {:else}
+                Load More
+              {/if}
+            </Button>
+          </div>
+        {/if}
+      </Tabs.Content>
+    {:else}
+      <Tabs.Content value="invitations" class="relative flex flex-col gap-4 overflow-auto">
+        <InvitationsDataTable columns={invitationColumns} data={[]} />
       </Tabs.Content>
     {/if}
   </Tabs.Root>

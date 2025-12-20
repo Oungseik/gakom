@@ -19,14 +19,13 @@
     {#if image}
       <AvatarImage src={image} alt={name} />
     {/if}
-    <AvatarFallback class="rounded-lg bg-primary/10 text-primary font-medium">
+    <AvatarFallback class="bg-primary/10 text-primary rounded-lg font-medium">
       {initials}
     </AvatarFallback>
   </Avatar>
   <div class="flex flex-col">
-    <span class="font-medium text-sm">{name}</span>
-    <span class="text-sm text-muted-foreground">{email}</span>
+    <span class="text-sm font-medium">{name}</span>
+    <span class="text-muted-foreground text-sm">{email}</span>
   </div>
 </div>
-
 

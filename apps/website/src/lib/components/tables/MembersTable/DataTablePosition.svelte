@@ -1,25 +1,7 @@
 <script lang="ts">
-  export let position: string | null | undefined;
-  export let role: string;
+  import { getRoleBadgeClass } from "$lib/utils";
 
-  // Function to get role badge color based on role
-  function getRoleBadgeClass(role: string): string {
-    switch (role.toLowerCase()) {
-      case "owner":
-        return "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400";
-      case "admin":
-        return "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400";
-      case "member":
-        return "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300";
-      default:
-        return "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300";
-    }
-  }
-
-  // Capitalize first letter of role
-  function capitalizeRole(role: string): string {
-    return role.charAt(0).toUpperCase() + role.slice(1).toLowerCase();
-  }
+  const { role, position } = $props();
 </script>
 
 <div class="flex flex-col gap-1.5">
@@ -32,11 +14,11 @@
   {/if}
   <div>
     <span
-      class="inline-flex items-center rounded-md px-2 py-0.5 text-xs font-medium ring-1 ring-gray-500/10 ring-inset {getRoleBadgeClass(
+      class="inline-flex items-center rounded-md px-2 py-0.5 text-xs font-medium capitalize ring-1 ring-gray-500/10 ring-inset {getRoleBadgeClass(
         role
       )}"
     >
-      {capitalizeRole(role)}
+      {role}
     </span>
   </div>
 </div>
