@@ -79,7 +79,10 @@
       </div>
     {:else if allMembers.length > 0}
       <Tabs.Content value="members" class="relative flex flex-col gap-4 overflow-auto">
-        <DataTable {columns} data={allMembers} />
+        <DataTable
+          {columns}
+          data={allMembers.map((m) => ({ ...m, organizationId: data.currentOrganization.id }))}
+        />
 
         {#if members.hasNextPage}
           <div class="flex items-center justify-center py-4">

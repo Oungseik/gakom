@@ -6,9 +6,11 @@ import DataTableActions from "./DataTableActions.svelte";
 import DataTableAddress from "./DataTableAddress.svelte";
 import DataTableMemberInfo from "./DataTableMemberInfo.svelte";
 import DataTableMembershipPeriod from "./DataTableMembershipPeriod.svelte";
+import DataTablePosition from "./DataTablePosition.svelte";
 import DataTableUserId from "./DataTableUserId.svelte";
 
 export type Member = {
+  organizationId: string;
   userId: string;
   name: string;
   email: string;
@@ -67,7 +69,15 @@ export const columns: ColumnDef<Member>[] = [
         countryCode: row.original.countryCode,
       }),
   },
-  { accessorKey: "position", header: "Position" },
+  {
+    id: "position",
+    header: "Position & Role",
+    cell: ({ row }) =>
+      renderComponent(DataTablePosition, {
+        position: row.original.position,
+        role: row.original.role,
+      }),
+  },
   {
     id: "membershipPeriod",
     header: "Membership Period",
@@ -80,7 +90,11 @@ export const columns: ColumnDef<Member>[] = [
   {
     id: "actions",
     cell: ({ row }) => {
-      return renderComponent(DataTableActions, { id: row.original.userId });
+      return renderComponent(DataTableActions, {
+        userId: row.original.userId,
+        organizationId: row.original.organizationId,
+        email: row.original.email,
+      });
     },
   },
 ];
