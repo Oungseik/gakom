@@ -74,7 +74,7 @@
     </div>
 
     {#if members.isFetching && !members.data}
-      <div class="flex h-full w-full items-center justify-center">
+      <div class="flex h-40 w-full items-center justify-center">
         <Spinner class="size-10" />
       </div>
     {:else if allMembers.length > 0}

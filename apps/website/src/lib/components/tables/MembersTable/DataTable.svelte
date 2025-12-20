@@ -35,7 +35,7 @@
 </script>
 
 <div>
-  <div class="rounded-md border">
+  <div class="overflow-auto rounded-md border">
     <Table.Root>
       <Table.Header>
         {#each table.getHeaderGroups() as headerGroup (headerGroup.id)}
