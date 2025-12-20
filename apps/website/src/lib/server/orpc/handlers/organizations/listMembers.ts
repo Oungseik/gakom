@@ -1,4 +1,4 @@
-import { desc, eq, isNotNull, isNull, member, user } from "@repo/db";
+import { and, desc, eq, isNotNull, isNull, member, organization, user } from "@repo/db";
 import z from "zod";
 import { db } from "$lib/server/db";
 import { organizationMiddleware, os } from "$lib/server/orpc/base";
@@ -15,12 +15,14 @@ export const listMembersHandler = os
   .input(input)
   .use(organizationMiddleware(["admin", "owner"]))
   .handler(async ({ input }) => {
-    const condition =
+    const condition = and(
       input.filter?.type === "active"
         ? isNull(member.leftAt)
         : input.filter?.type === "inactive"
           ? isNotNull(member.leftAt)
-          : undefined;
+          : undefined,
+      eq(organization.slug, input.slug),
+    );
 
     const items = await db
       .select({
@@ -35,6 +37,7 @@ export const listMembersHandler = os
       })
       .from(member)
       .innerJoin(user, eq(member.userId, user.id))
+      .innerJoin(organization, eq(member.organizationId, organization.id))
       .where(condition)
       .orderBy(desc(member.createdAt))
       .offset(input.cursor ?? 0)
