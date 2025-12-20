@@ -1,4 +1,5 @@
 <script lang="ts">
+  import UserPlusIcon from "@lucide/svelte/icons/user-plus";
   import { Badge } from "@repo/ui/badge";
   import { Button } from "@repo/ui/button";
   import { Label } from "@repo/ui/label";
@@ -27,13 +28,7 @@
     { desc: "Dashboard", href: `/dashboard/${params.slug}` },
     { desc: "Members", href: `/dashboard/${params.slug}/members` },
   ]}
->
-  {#snippet actions()}
-    <div>
-      <Button variant="outline" onclick={() => (isInviteDialogOpen = true)}>Invite</Button>
-    </div>
-  {/snippet}
-</DashboardHeader>
+/>
 
 <DashboardContainer>
   <Tabs.Root value="members" class="w-full flex-col justify-start gap-6">
@@ -52,13 +47,20 @@
           </Tabs.Trigger>
         {/each}
       </Tabs.List>
+      <div>
+        <Button variant="outline" onclick={() => (isInviteDialogOpen = true)}>
+          <UserPlusIcon size={4} />
+          Invite</Button
+        >
+      </div>
     </div>
 
     <Tabs.Content value="members" class="relative flex flex-col gap-4 overflow-auto">
       <div class="overflow-hidden rounded-lg border">
         <Table.Root>
-          <!-- TODO  implement table here -->
-          <Table.Header class="bg-muted sticky top-0 z-10"></Table.Header>
+          <Table.Header class="bg-muted sticky top-0 z-10">
+            <Table.Row></Table.Row>
+          </Table.Header>
         </Table.Root>
       </div>
     </Tabs.Content>

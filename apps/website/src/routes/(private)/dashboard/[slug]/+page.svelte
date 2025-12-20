@@ -1,15 +1,13 @@
 <script lang="ts">
   import DashboardContainer from "$lib/components/containers/DashboardContainer.svelte";
-  import DashboardSidebar from "$lib/components/headers/DashboardHeader.svelte";
+  import DashboardHeader from "$lib/components/headers/DashboardHeader.svelte";
 
   import type { PageProps } from "./$types.js";
 
   const { params }: PageProps = $props();
 </script>
 
-<DashboardSidebar
-  breadcrumbItems={[{ desc: "Dashboard", href: `/dashboard/${params.slug}` }]}
-/>
+<DashboardHeader breadcrumbItems={[{ desc: "Dashboard", href: `/dashboard/${params.slug}` }]} />
 
 <DashboardContainer>
   <div class="grid auto-rows-min gap-4 md:grid-cols-3">
