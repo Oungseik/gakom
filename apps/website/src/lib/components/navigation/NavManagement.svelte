@@ -1,7 +1,9 @@
 <script lang="ts">
-  import EllipsisIcon from "@lucide/svelte/icons/ellipsis";
   import * as Sidebar from "@repo/ui/sidebar";
+  import { createQuery } from "@tanstack/svelte-query";
   import type { Component } from "svelte";
+
+  import { orpc } from "$lib/orpc_client";
 
   type Feature = {
     name: string;
@@ -9,7 +11,13 @@
     icon: Component;
   };
 
-  let { features }: { features: Feature[] } = $props();
+  let { features, slug }: { features: Feature[]; slug?: string } = $props();
+  const count = createQuery(() =>
+    orpc.organizations.attendancesPolicies.count.queryOptions({
+      input: { slug: slug! },
+      enabled: !!slug,
+    })
+  );
 </script>
 
 <Sidebar.Group class="group-data-[collapsible=icon]:hidden">
@@ -22,16 +30,15 @@
             <a href={item.url} {...props}>
               <item.icon />
               <span>{item.name}</span>
+              {#if item.name === "Attendances" && count?.data?.count === 0}
+                <span class="inline-block size-1.5 animate-pulse rounded-full bg-green-300"
+                  >new</span
+                >
+              {/if}
             </a>
           {/snippet}
         </Sidebar.MenuButton>
       </Sidebar.MenuItem>
     {/each}
-    <Sidebar.MenuItem>
-      <Sidebar.MenuButton class="text-sidebar-foreground/70">
-        <EllipsisIcon class="text-sidebar-foreground/70" />
-        <span>More</span>
-      </Sidebar.MenuButton>
-    </Sidebar.MenuItem>
   </Sidebar.Menu>
 </Sidebar.Group>

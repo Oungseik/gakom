@@ -55,6 +55,7 @@ export const organizationMiddleware = (roles: string[]) =>
   authMiddleware.concat(async ({ context, next }, input: { slug: string }) => {
     const organizations = await db
       .select({
+        id: organization.id,
         slug: organization.slug,
         role: member.role,
       })

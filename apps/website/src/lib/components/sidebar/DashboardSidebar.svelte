@@ -1,4 +1,5 @@
 <script lang="ts">
+  import ClipboardClockIcon from "@lucide/svelte/icons/clipboard-clock";
   import UsersIcon from "@lucide/svelte/icons/users";
   import * as Sidebar from "@repo/ui/sidebar";
   import type { ComponentProps } from "svelte";
@@ -47,6 +48,11 @@
         url: `/dashboard/${activeOrganization.slug}/members`,
         icon: UsersIcon,
       },
+      {
+        name: "Attendances",
+        url: `/dashboard/${activeOrganization.slug}/attendances`,
+        icon: ClipboardClockIcon,
+      },
     ],
   });
 </script>
@@ -56,7 +62,7 @@
     <OrganizationSwitcher {orgs} {activeOrganization} onCreateOrganization={() => (open = true)} />
   </Sidebar.Header>
   <Sidebar.Content>
-    <NavManagement features={data.managements} />
+    <NavManagement features={data.managements} slug={currentOrganizationSlug} />
   </Sidebar.Content>
   <Sidebar.Footer>
     <NavUser {user} />

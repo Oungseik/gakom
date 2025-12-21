@@ -1,5 +1,6 @@
 import { Database } from "bun:sqlite";
 import { drizzle } from "drizzle-orm/bun-sqlite";
+import { attendance, attendancePolicy } from "./schema/attendance";
 import { account, session, twoFactor, user, verification } from "./schema/core";
 import { image } from "./schema/image";
 import { invitation, member, organization, team, teamMember } from "./schema/organization";
@@ -21,12 +22,15 @@ export function connect(url: string) {
       image,
       team,
       teamMember,
+      attendancePolicy,
+      attendance,
     },
     relations,
   });
 }
 
 export * from "drizzle-orm";
+export * from "./schema/attendance";
 export * from "./schema/core";
 export * from "./schema/image";
 export * from "./schema/organization";
