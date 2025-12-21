@@ -14,4 +14,6 @@
   ]}
 />
 
-<DashboardContainer><h1>Attendance</h1></DashboardContainer>
+<DashboardContainer>
+  <div>Hello</div>
+</DashboardContainer>

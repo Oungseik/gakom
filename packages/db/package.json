@@ -23,8 +23,8 @@
       "default": "./src/country.ts"
     },
     "./timezone": {
-      "types": "./src/timezone.ts.ts",
-      "default": "./src/timezone.ts.ts"
+      "types": "./src/timezone.ts",
+      "default": "./src/timezone.ts"
     }
   },
   "dependencies": {

@@ -60,3 +60,20 @@ export function formatDate(date: Date): string {
     day: "numeric",
   });
 }
+
+export function formatWorkdays(workdays: string[]): string {
+  if (!workdays || workdays.length === 0) return "N/A";
+
+  // Map to short forms
+  const shortForms: Record<string, string> = {
+    SUN: "Sun",
+    MON: "Mon",
+    TUE: "Tue",
+    WED: "Wed",
+    THU: "Thu",
+    FRI: "Fri",
+    SAT: "Sat",
+  };
+
+  return `${shortForms[workdays[0]]} - ${shortForms[workdays[workdays.length - 1]]}`;
+}

@@ -4,6 +4,8 @@ import { TIMEZONE } from "../timezone";
 import { user } from "./core";
 import { organization } from "./organization";
 
+export type Day = "SUN" | "MON" | "TUE" | "WED" | "THU" | "FRI" | "SAT";
+
 export const attendancePolicy = sqliteTable(
   "attendance_policy",
   {
@@ -16,7 +18,7 @@ export const attendancePolicy = sqliteTable(
     clockInSec: integer("clock_in_sec").notNull(),
     clockOutSec: integer("clock_out_sec").notNull(),
     workDays: text("work_days", { mode: "json" })
-      .$type<("SUN" | "MON" | "TUE" | "WED" | "THU" | "FRI" | "SAT")[]>()
+      .$type<Day[]>()
       .default(["MON", "TUE", "WED", "THU", "FRI"]),
     organizationId: text("organization_id")
       .notNull()
