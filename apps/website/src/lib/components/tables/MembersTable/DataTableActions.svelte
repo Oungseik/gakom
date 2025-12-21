@@ -5,12 +5,15 @@
   import { Button } from "@repo/ui/button";
   import { ConfirmDeleteDialog, confirmDelete } from "@repo/ui/confirm-delete-dialog";
   import * as DropdownMenu from "@repo/ui/dropdown-menu";
+  import { useQueryClient } from "@tanstack/svelte-query";
   import { toast } from "svelte-sonner";
 
   import { authClient } from "$lib/auth_client";
+  import { orpc } from "$lib/orpc_client";
 
   let { email, organizationId }: { userId: string; organizationId: string; email: string } =
     $props();
+  const queryClient = useQueryClient();
 
   function handleRemoveMember() {
     confirmDelete({
@@ -26,6 +29,8 @@
           toast.error(
             error.message ?? "Something went wrong while remove member from the organization"
           );
+        } else {
+          queryClient.invalidateQueries({ queryKey: orpc.organizations.members.key() });
         }
       },
     });

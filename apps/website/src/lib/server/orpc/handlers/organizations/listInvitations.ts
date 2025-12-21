@@ -1,4 +1,4 @@
-import { desc, eq, invitation, organization } from "@repo/db";
+import { and, desc, eq, ilike, invitation, like, organization } from "@repo/db";
 import z from "zod";
 import { db } from "$lib/server/db";
 import { organizationMiddleware, os } from "$lib/server/orpc/base";
@@ -7,6 +7,13 @@ const input = z.object({
   cursor: z.number().optional(),
   pageSize: z.number(),
   slug: z.string(),
+  filter: z
+    .object({
+      role: z.string().optional(),
+      status: z.enum(["pending", "accepted", "rejected", "canceled"]).optional(),
+      search: z.string().optional(),
+    })
+    .optional(),
 });
 
 export const listInvitationsHandler = os
@@ -14,6 +21,14 @@ export const listInvitationsHandler = os
   .input(input)
   .use(organizationMiddleware(["admin", "owner"]))
   .handler(async ({ input }) => {
+    const search = input.filter?.search;
+    const condition = and(
+      eq(organization.slug, input.slug),
+      search ? ilike(invitation.email, `%${search}%`) : undefined,
+      input.filter?.role ? like(invitation.role, input.filter.role) : undefined,
+      input.filter?.status ? like(invitation.status, input.filter.status) : undefined,
+    );
+
     const items = await db
       .select({
         id: invitation.id,
@@ -26,7 +41,7 @@ export const listInvitationsHandler = os
       })
       .from(invitation)
       .innerJoin(organization, eq(invitation.organizationId, organization.id))
-      .where(eq(organization.slug, input.slug))
+      .where(condition)
       .orderBy(desc(invitation.createdAt))
       .offset(input.cursor ?? 0)
       .limit(input.pageSize + 1);

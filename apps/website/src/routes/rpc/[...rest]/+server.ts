@@ -43,7 +43,7 @@ const handler = new RPCHandler(router, {
 const handle: RequestHandler = async ({ request, locals }) => {
   const { response } = await handler.handle(request, {
     prefix: "/rpc",
-    context: { session: locals.session, organizations: locals.organizations },
+    context: { session: locals.session },
   });
 
   return response ?? new Response("Not Found", { status: 404 });

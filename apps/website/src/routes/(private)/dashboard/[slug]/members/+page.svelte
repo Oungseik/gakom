@@ -77,6 +77,7 @@
           </Tabs.Trigger>
         {/each}
       </Tabs.List>
+      <div></div>
       <div>
         <Button variant="outline" onclick={() => (isInviteDialogOpen = true)}>
           <UserPlusIcon size={4} />

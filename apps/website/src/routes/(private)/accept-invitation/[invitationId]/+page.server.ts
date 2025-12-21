@@ -18,6 +18,7 @@ export const load: PageServerLoad = async ({ params, request }) => {
 
     return { invitedOrganizationId: result?.invitation.organizationId };
   } catch (e) {
+    console.log(e);
     if (e instanceof APIError) {
       return error(e.statusCode, { message: e.message });
     }

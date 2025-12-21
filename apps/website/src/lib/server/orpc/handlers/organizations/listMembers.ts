@@ -1,4 +1,4 @@
-import { and, desc, eq, isNotNull, isNull, member, organization, user } from "@repo/db";
+import { and, asc, eq, ilike, like, member, or, organization, user } from "@repo/db";
 import z from "zod";
 import { db } from "$lib/server/db";
 import { organizationMiddleware, os } from "$lib/server/orpc/base";
@@ -7,7 +7,12 @@ const input = z.object({
   cursor: z.number().optional(),
   pageSize: z.number(),
   slug: z.string(),
-  filter: z.object({ type: z.enum(["all", "active", "inactive"]).default("active") }).optional(),
+  filter: z
+    .object({
+      search: z.string().optional(),
+      role: z.string().optional(),
+    })
+    .optional(),
 });
 
 export const listMembersHandler = os
@@ -15,13 +20,17 @@ export const listMembersHandler = os
   .input(input)
   .use(organizationMiddleware(["admin", "owner"]))
   .handler(async ({ input }) => {
+    const search = input.filter?.search;
     const condition = and(
-      input.filter?.type === "active"
-        ? isNull(member.leftAt)
-        : input.filter?.type === "inactive"
-          ? isNotNull(member.leftAt)
-          : undefined,
       eq(organization.slug, input.slug),
+      search
+        ? or(
+            ilike(user.email, `%${search}%`),
+            ilike(user.name, `%${search}%`),
+            ilike(member.position, `%${search}%`),
+          )
+        : undefined,
+      input.filter?.role ? like(member.role, input.filter.role) : undefined,
     );
 
     const items = await db
@@ -42,7 +51,7 @@ export const listMembersHandler = os
       .innerJoin(user, eq(member.userId, user.id))
       .innerJoin(organization, eq(member.organizationId, organization.id))
       .where(condition)
-      .orderBy(desc(member.createdAt))
+      .orderBy(asc(member.createdAt))
       .offset(input.cursor ?? 0)
       .limit(input.pageSize + 1);
 

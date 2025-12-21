@@ -4,50 +4,71 @@
   import XIcon from "@lucide/svelte/icons/x";
   import { Button } from "@repo/ui/button";
   import * as DropdownMenu from "@repo/ui/dropdown-menu";
+  import { useQueryClient } from "@tanstack/svelte-query";
   import { toast } from "svelte-sonner";
 
+  import { authClient } from "$lib/auth_client";
+  import { orpc } from "$lib/orpc_client";
+
   let {
-    invitationId,
-    email,
     status,
+    ...props
   }: {
     invitationId: string;
+    organizationId: string;
     email: string;
+    role: "admin" | "member";
     status: "pending" | "accepted" | "rejected" | "canceled";
   } = $props();
 
-  function handleResendInvitation() {
-    // Dummy implementation - show success toast
-    toast.success(`Resent invitation to ${email}`);
+  const queryClient = useQueryClient();
+
+  async function handleResendInvitation() {
+    const { error } = await authClient.organization.inviteMember({ ...props, resend: true });
+    if (error) {
+      return toast.error(error.message ?? "Something went wrong while resend invitation");
+    }
+    await queryClient.invalidateQueries({ queryKey: orpc.organizations.invitations.list.key() });
+    toast.success(`Resent invitation to ${props.email}`);
   }
 
-  function handleCancelInvitation() {
-    // Dummy implementation - show success toast
-    toast.success(`Cancelled invitation for ${email}`);
+  async function handleCancelInvitation() {
+    const { error } = await authClient.organization.cancelInvitation({
+      invitationId: props.invitationId,
+    });
+
+    if (error) {
+      return toast.error(error.message ?? "Something went wrong while cancel invitation");
+    }
+
+    await queryClient.invalidateQueries({ queryKey: orpc.organizations.invitations.list.key() });
+    toast.success(`Cancelled invitation for ${props.email}`);
   }
 
-  const canTakeAction = $derived(status === "pending");
+  const canTakeAction = $derived(status !== "accepted");
 </script>
 
-<DropdownMenu.Root>
-  <DropdownMenu.Trigger>
-    {#snippet child({ props })}
-      <Button {...props} variant="ghost" size="icon" class="relative size-8 p-0">
-        <span class="sr-only">Open menu</span>
-        <EllipsisIcon />
-      </Button>
-    {/snippet}
-  </DropdownMenu.Trigger>
-  <DropdownMenu.Content>
-    {#if canTakeAction}
+{#if canTakeAction}
+  <DropdownMenu.Root>
+    <DropdownMenu.Trigger>
+      {#snippet child({ props })}
+        <Button {...props} variant="ghost" size="icon" class="relative size-8 p-0">
+          <span class="sr-only">Open menu</span>
+          <EllipsisIcon />
+        </Button>
+      {/snippet}
+    </DropdownMenu.Trigger>
+    <DropdownMenu.Content>
       <DropdownMenu.Item onclick={handleResendInvitation}>
         <MailIcon size={16} class="mr-2" /> Resend Invitation
       </DropdownMenu.Item>
-      <DropdownMenu.Item onclick={handleCancelInvitation} variant="destructive">
+      <DropdownMenu.Item
+        onclick={handleCancelInvitation}
+        variant="destructive"
+        disabled={status === "canceled"}
+      >
         <XIcon size={16} class="mr-2" /> Cancel Invitation
       </DropdownMenu.Item>
-    {:else}
-      <DropdownMenu.Item disabled>No actions available</DropdownMenu.Item>
-    {/if}
-  </DropdownMenu.Content>
-</DropdownMenu.Root>
+    </DropdownMenu.Content>
+  </DropdownMenu.Root>
+{/if}

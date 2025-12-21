@@ -49,6 +49,8 @@ export const columns: ColumnDef<Invitation>[] = [
     cell: ({ row }) => {
       return renderComponent(DataTableActions, {
         invitationId: row.original.id,
+        organizationId: row.original.organizationId,
+        role: row.original.role,
         email: row.original.email,
         status: row.original.status,
       });
