@@ -34,6 +34,7 @@ export const listInvitationsHandler = os
         id: invitation.id,
         email: invitation.email,
         role: invitation.role,
+        position: invitation.position,
         status: invitation.status,
         createdAt: invitation.createdAt,
         expiresAt: invitation.expiresAt,

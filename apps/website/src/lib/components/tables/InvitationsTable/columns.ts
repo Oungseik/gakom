@@ -9,6 +9,7 @@ export type Invitation = {
   id: string;
   email: string;
   role?: string | null;
+  position: string;
   status: string;
   expiresAt: Date;
   createdAt: Date;
@@ -35,6 +36,10 @@ export const columns: ColumnDef<Invitation>[] = [
     },
   },
   {
+    accessorKey: "position",
+    header: "Position",
+  },
+  {
     accessorKey: "createdAt",
     header: "Invited at",
     cell: ({ row }) => formatDate(row.original.createdAt),
@@ -51,6 +56,7 @@ export const columns: ColumnDef<Invitation>[] = [
         invitationId: row.original.id,
         organizationId: row.original.organizationId,
         role: row.original.role,
+        position: row.original.position,
         email: row.original.email,
         status: row.original.status,
       });

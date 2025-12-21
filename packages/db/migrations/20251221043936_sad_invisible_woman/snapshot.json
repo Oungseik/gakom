@@ -1,7 +1,7 @@
 {
   "version": "7",
   "dialect": "sqlite",
-  "id": "307f7e2d-882b-4af2-842e-cc71eb4e0e42",
+  "id": "bca91419-fb4d-43cc-a39c-89ab1d1f67f3",
   "prevIds": [
     "00000000-0000-0000-0000-000000000000"
   ],
@@ -646,11 +646,21 @@
     },
     {
       "type": "text",
-      "notNull": false,
+      "notNull": true,
       "autoincrement": false,
       "default": null,
       "generated": null,
       "name": "role",
+      "entityType": "columns",
+      "table": "invitation"
+    },
+    {
+      "type": "text",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "name": "position",
       "entityType": "columns",
       "table": "invitation"
     },

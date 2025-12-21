@@ -17,6 +17,7 @@
     invitationId: string;
     organizationId: string;
     email: string;
+    position: string;
     role: "admin" | "member";
     status: "pending" | "accepted" | "rejected" | "canceled";
   } = $props();

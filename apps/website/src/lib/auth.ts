@@ -1,9 +1,9 @@
+import { and, eq, member } from "@repo/db";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { emailOTP, organization, twoFactor } from "better-auth/plugins";
 import { sveltekitCookies } from "better-auth/svelte-kit";
 import { createTransport } from "nodemailer";
-
 import { getRequestEvent } from "$app/server";
 import {
   AUTH_SECRET,
@@ -13,7 +13,6 @@ import {
   GOOGLE_USER,
   NO_REPLY_EMAIL,
 } from "$env/static/private";
-
 import { db } from "./server/db";
 import { getBaseURL } from "./utils";
 
@@ -78,6 +77,12 @@ export const auth = betterAuth({
   plugins: [
     organization({
       teams: { enabled: true },
+      schema: {
+        invitation: {
+          additionalFields: { position: { type: "string", required: true, input: true } },
+        },
+        member: { additionalFields: { position: { type: "string", required: true, input: true } } },
+      },
       sendInvitationEmail: async ({ id, email }) => {
         const inviteLink = `${getBaseURL()}/accept-invitation/${id}`;
         await transporter.sendMail({
@@ -86,6 +91,19 @@ export const auth = betterAuth({
           subject: "Invitation",
           html: `Invite to an organization. Click this link: ${inviteLink}`,
         });
+      },
+      organizationHooks: {
+        afterAcceptInvitation: async ({ invitation, member: m }) => {
+          await db
+            .update(member)
+            .set({ position: invitation.position })
+            .where(
+              and(
+                eq(member.userId, m.userId),
+                eq(member.organizationId, invitation.organizationId),
+              ),
+            );
+        },
       },
     }),
     emailOTP({
@@ -115,3 +133,5 @@ export const auth = betterAuth({
     sveltekitCookies(getRequestEvent),
   ],
 });
+
+export type Auth = typeof auth;

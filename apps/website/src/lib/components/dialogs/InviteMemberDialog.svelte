@@ -8,6 +8,7 @@
   import { createForm } from "@tanstack/svelte-form";
   import { useQueryClient } from "@tanstack/svelte-query";
   import { toast } from "svelte-sonner";
+  import { z } from "zod";
 
   import { authClient } from "$lib/auth_client";
   import { orpc } from "$lib/orpc_client";
@@ -21,7 +22,11 @@
   let isInviting = $state(false);
   const queryClient = useQueryClient();
 
-  const defaultValues: { role: "member" | "admin"; email: string } = { role: "member", email: "" };
+  const defaultValues: { role: "member" | "admin"; email: string; position: string } = {
+    role: "member",
+    email: "",
+    position: "",
+  };
   const form = createForm(() => ({
     defaultValues,
     onSubmit: async ({ value }) => {
@@ -30,6 +35,7 @@
         organizationId: organization.id,
         email: value.email,
         role: value.role,
+        position: value.position,
         resend: true,
       });
 
@@ -60,7 +66,15 @@
         form.handleSubmit();
       }}
     >
-      <form.Field name="email">
+      <form.Field
+        name="email"
+        validators={{
+          onChange: ({ value }) => {
+            const { error } = z.email().safeParse(value);
+            return error?.issues?.at(0)?.message ?? undefined;
+          },
+        }}
+      >
         {#snippet children(field)}
           <div class="space-y-2">
             <Label for={field.name}>Email</Label>
@@ -72,6 +86,36 @@
               onblur={field.handleBlur}
               onchange={(e) => field.handleChange(e.currentTarget.value)}
               placeholder="m@example.com"
+              required
+              disabled={isInviting}
+            />
+            {#if field.state.meta.errors.length}
+              <p class="text-sm text-red-500">{field.state.meta.errors}</p>
+            {/if}
+          </div>
+        {/snippet}
+      </form.Field>
+
+      <form.Field
+        name="position"
+        validators={{
+          onChange: ({ value }) => {
+            const { error } = z.string().min(3).max(24).safeParse(value);
+            return error?.issues?.at(0)?.message ?? undefined;
+          },
+        }}
+      >
+        {#snippet children(field)}
+          <div class="space-y-2">
+            <Label for={field.name}>Position</Label>
+            <Input
+              id={field.name}
+              name={field.name}
+              value={field.state.value}
+              type="text"
+              onblur={field.handleBlur}
+              onchange={(e) => field.handleChange(e.currentTarget.value)}
+              placeholder="Software Engineer"
               required
               disabled={isInviting}
             />

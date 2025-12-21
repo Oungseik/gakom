@@ -1,4 +1,4 @@
-import { error } from "@sveltejs/kit";
+import { error, redirect } from "@sveltejs/kit";
 import { APIError } from "better-auth";
 import { auth } from "$lib/auth";
 import type { PageServerLoad } from "./$types";
@@ -18,8 +18,10 @@ export const load: PageServerLoad = async ({ params, request }) => {
 
     return { invitedOrganizationId: result?.invitation.organizationId };
   } catch (e) {
-    console.log(e);
     if (e instanceof APIError) {
+      if (e.statusCode === 400) {
+        return redirect(303, "/app");
+      }
       return error(e.statusCode, { message: e.message });
     }
 

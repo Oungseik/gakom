@@ -8,7 +8,7 @@ export const load: LayoutServerLoad = async ({ locals, url, request }) => {
   const pathname = url.pathname;
   const isEmailVerified = user?.emailVerified;
 
-  if (["/signin", "/signup"].includes(pathname)) {
+  if (["/signin", "/signup"].some((prefix) => pathname.startsWith(prefix))) {
     if (!session) {
       return;
     }
