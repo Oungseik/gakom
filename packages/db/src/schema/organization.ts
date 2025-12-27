@@ -1,6 +1,7 @@
 import { sql } from "drizzle-orm";
 import { index, integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
 import { COUNTRY_CODES } from "../country";
+import { attendancePolicy } from "./attendance";
 import { user } from "./core";
 
 export const organization = sqliteTable(
@@ -29,6 +30,9 @@ export const member = sqliteTable(
     userId: text("user_id")
       .notNull()
       .references(() => user.id, { onDelete: "cascade" }),
+    attendancePolicyId: text("attendance_policy_id")
+      .notNull()
+      .references(() => attendancePolicy.id),
     role: text("role").default("member").notNull(),
     position: text("position"),
     createdAt: integer("created_at", { mode: "timestamp_ms" })
@@ -39,6 +43,7 @@ export const member = sqliteTable(
   (table) => [
     index("member_organization_id_idx").on(table.organizationId),
     index("member_user_id_idx").on(table.userId),
+    index("member_attendance_policy_id_idx").on(table.attendancePolicyId),
   ],
 );
 
