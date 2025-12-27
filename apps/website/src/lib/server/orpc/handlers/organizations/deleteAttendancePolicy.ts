@@ -23,7 +23,7 @@ export const deleteAttendancePolicyHandler = os
       );
 
     if (m.at(0)?.count) {
-      return errors.FORBIDDEN({
+      throw errors.FORBIDDEN({
         message: "Members are assigned to this attendance policy",
       });
     }
@@ -35,10 +35,10 @@ export const deleteAttendancePolicyHandler = os
 
     const policiesCount = ap.at(0)?.count;
     if (!policiesCount) {
-      return errors.INTERNAL_SERVER_ERROR({ message: "Failed to count attendance policies" });
+      throw errors.INTERNAL_SERVER_ERROR({ message: "Failed to count attendance policies" });
     }
     if (policiesCount === 1) {
-      return errors.FORBIDDEN({ message: "Not allow to delete last attendance policy" });
+      throw errors.FORBIDDEN({ message: "Cannot delte the last attendance policy." });
     }
 
     await db

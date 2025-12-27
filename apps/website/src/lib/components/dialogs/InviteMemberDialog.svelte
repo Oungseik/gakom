@@ -152,7 +152,7 @@
         <Dialog.Close class={buttonVariants({ variant: "outline" })}>Cancel</Dialog.Close>
         <Button type="submit" disabled={isInviting} class="w-17">
           {#if isInviting}
-            <Loader2Icon class="mr-2 size-4 animate-spin" />
+            <Loader2Icon class="size-4 animate-spin" />
           {:else}
             Invite
           {/if}

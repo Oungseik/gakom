@@ -40,17 +40,18 @@ export function getBaseURL() {
 }
 
 // Function to get role badge color based on role
-export function getRoleBadgeClass(role: string): string {
-  switch (role.toLowerCase()) {
-    case "owner":
-      return "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400";
-    case "admin":
-      return "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400";
-    case "member":
-      return "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300";
-    default:
-      return "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300";
-  }
+export function getRoleBadgeClass(role: "owner" | "admin" | "member"): string {
+    return role === "owner"?
+       "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400": 
+     role == "admin" ?
+       "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400": 
+       "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300";
+}
+
+export function getStatusBadgeClass(status: "ENABLED" | "DISABLED" ): string {
+    return status === "ENABLED"?
+       "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400" :
+       "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400";
 }
 
 export function formatDate(date: Date): string {
@@ -76,4 +77,23 @@ export function formatWorkdays(workdays: string[]): string {
   };
 
   return `${shortForms[workdays[0]]} - ${shortForms[workdays[workdays.length - 1]]}`;
+}
+
+export function timeToSeconds(timeStr: string): number {
+  const [hours, minutes] = timeStr.split(":").map(Number);
+  return hours * 3600 + minutes * 60;
+}
+
+export function secondsToTime(seconds: number): string {
+  const hours = Math.floor(seconds / 3600);
+  const minutes = Math.floor((seconds % 3600) / 60);
+  return `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}`;
+}
+
+export function formatTime(seconds: number) {
+  const hours = Math.floor(seconds / 3600);
+  const minutes = Math.floor((seconds % 3600) / 60);
+  const period = hours < 12 ? "AM" : "PM";
+  const hours12 = hours === 0 ? 12 : hours > 12 ? hours - 12 : hours;
+  return `${hours12.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")} ${period}`;
 }

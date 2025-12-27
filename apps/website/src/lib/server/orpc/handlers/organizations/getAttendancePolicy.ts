@@ -35,9 +35,8 @@ export const getAttendancePolicyHandler = os
       );
 
     if (!item) {
-      return errors.NOT_FOUND();
+      throw errors.NOT_FOUND();
     }
 
     return { item };
   });
-

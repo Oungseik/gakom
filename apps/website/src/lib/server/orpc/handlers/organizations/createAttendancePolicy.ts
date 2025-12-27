@@ -1,5 +1,5 @@
 import { attendancePolicy } from "@repo/db";
-import { TIMEZONE } from "@repo/db/timezone";
+import { TIMEZONES } from "@repo/db/timezone";
 import z from "zod";
 import { db } from "$lib/server/db";
 import { organizationMiddleware, os } from "$lib/server/orpc/base";
@@ -8,8 +8,7 @@ const input = z.object({
   slug: z.string(),
   data: z.object({
     name: z.string(),
-    enabled: z.boolean(),
-    timezone: z.enum(TIMEZONE),
+    timezone: z.enum(TIMEZONES),
     clockIn: z.number(),
     clockOut: z.number(),
     workdays: z.array(z.enum(["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"])),

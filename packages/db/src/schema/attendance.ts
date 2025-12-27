@@ -1,6 +1,6 @@
 import { sql } from "drizzle-orm";
 import { index, integer, real, sqliteTable, text } from "drizzle-orm/sqlite-core";
-import { TIMEZONE } from "../timezone";
+import { TIMEZONES } from "../timezone";
 import { user } from "./core";
 import { organization } from "./organization";
 
@@ -12,14 +12,15 @@ export const attendancePolicy = sqliteTable(
     id: text("id")
       .primaryKey()
       .$defaultFn(() => crypto.randomUUID()),
-    name: text("name"),
+    name: text("name").notNull(),
     enabled: integer("enabled", { mode: "boolean" }).default(true).notNull(),
-    timezone: text("timezone", { enum: TIMEZONE }).notNull(),
+    timezone: text("timezone", { enum: TIMEZONES }).notNull(),
     clockInSec: integer("clock_in_sec").notNull(),
     clockOutSec: integer("clock_out_sec").notNull(),
     workDays: text("work_days", { mode: "json" })
       .$type<Day[]>()
-      .default(["MON", "TUE", "WED", "THU", "FRI"]),
+      .default(["MON", "TUE", "WED", "THU", "FRI"])
+      .notNull(),
     organizationId: text("organization_id")
       .notNull()
       .references(() => organization.id, { onDelete: "cascade" }),

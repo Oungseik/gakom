@@ -1,4 +1,4 @@
-export const TIMEZONE = [
+export const TIMEZONES = [
   "Africa/Abidjan",
   "Africa/Accra",
   "Africa/Addis_Ababa",
