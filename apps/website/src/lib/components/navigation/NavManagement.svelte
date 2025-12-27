@@ -1,9 +1,8 @@
 <script lang="ts">
   import * as Sidebar from "@repo/ui/sidebar";
-  import { createQuery } from "@tanstack/svelte-query";
   import type { Component } from "svelte";
 
-  import { orpc } from "$lib/orpc_client";
+  import { page } from "$app/state";
 
   type Feature = {
     name: string;
@@ -11,30 +10,24 @@
     icon: Component;
   };
 
-  let { features, slug }: { features: Feature[]; slug?: string } = $props();
-  const count = createQuery(() =>
-    orpc.organizations.attendancesPolicies.count.queryOptions({
-      input: { slug: slug! },
-      enabled: !!slug,
-    })
-  );
+  let { features }: { features: Feature[] } = $props();
 </script>
 
 <Sidebar.Group class="group-data-[collapsible=icon]:hidden">
-  <Sidebar.GroupLabel>Managements</Sidebar.GroupLabel>
   <Sidebar.Menu>
     {#each features as item (item.url)}
       <Sidebar.MenuItem>
-        <Sidebar.MenuButton tooltipContent={item.name}>
+        <Sidebar.MenuButton
+          tooltipContent={item.name}
+          class={{
+            "bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground active:bg-primary/90 active:text-primary-foreground min-w-8 duration-200 ease-linear":
+              page.url.pathname === item.url,
+          }}
+        >
           {#snippet child({ props })}
             <a href={item.url} {...props}>
               <item.icon />
               <span>{item.name}</span>
-              {#if item.name === "Attendances" && count?.data?.count === 0}
-                <span class="inline-block size-1.5 animate-pulse rounded-full bg-green-300"
-                  >new</span
-                >
-              {/if}
             </a>
           {/snippet}
         </Sidebar.MenuButton>

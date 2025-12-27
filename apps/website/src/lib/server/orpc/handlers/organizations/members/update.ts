@@ -6,7 +6,11 @@ import { organizationMiddleware, os } from "$lib/server/orpc/base";
 const input = z.object({
   slug: z.string(),
   userId: z.string(),
-  data: z.object({ position: z.string(), role: z.enum(["admin", "member"]) }),
+  data: z.object({
+    position: z.string(),
+    role: z.enum(["admin", "member"]),
+    attendancePolicyId: z.string().nullable(),
+  }),
 });
 
 export const updateMemberHandler = os
@@ -14,6 +18,10 @@ export const updateMemberHandler = os
   .use(organizationMiddleware(["owner", "admin"]))
   .handler(async ({ input }) => {
     db.update(member)
-      .set({ role: input.data.role, position: input.data.position })
+      .set({
+        role: input.data.role,
+        position: input.data.position,
+        attendancePolicyId: input.data.attendancePolicyId,
+      })
       .where(eq(member.userId, input.userId));
   });

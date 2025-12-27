@@ -1,8 +1,8 @@
 <script lang="ts">
   import UserPlusIcon from "@lucide/svelte/icons/user-plus";
-  import { Badge } from "@repo/ui/badge";
   import { Button } from "@repo/ui/button";
   import { Label } from "@repo/ui/label";
+  import { ScrollArea, Scrollbar } from "@repo/ui/scroll-area";
   import { Spinner } from "@repo/ui/spinner";
   import * as Tabs from "@repo/ui/tabs";
   import { createInfiniteQuery } from "@tanstack/svelte-query";
@@ -26,7 +26,7 @@
   const { params, data }: PageProps = $props();
   let isInviteDialogOpen = $state(false);
 
-  type View = { id: string; label: string; badge: number };
+  type View = { id: string; label: string };
 
   const searchParams = useSearchParams(membersTabSchema);
   const members = createInfiniteQuery(() =>
@@ -53,8 +53,8 @@
   ) as Invitation[];
 
   let views: View[] = $derived([
-    { id: "members", label: "Members", badge: 0 },
-    { id: "invitations", label: "Invitations", badge: 0 },
+    { id: "members", label: "Members" },
+    { id: "invitations", label: "Invitations" },
   ]);
 </script>
 
@@ -76,9 +76,6 @@
         {#each views as view (view.id)}
           <Tabs.Trigger value={view.id}>
             {view.label}
-            {#if view.badge > 0}
-              <Badge variant="secondary">{view.badge}</Badge>
-            {/if}
           </Tabs.Trigger>
         {/each}
       </Tabs.List>
@@ -91,12 +88,12 @@
       </div>
     </div>
 
-    {#if members.isFetching && !members.data}
-      <div class="flex h-40 w-full items-center justify-center">
-        <Spinner class="size-10" />
-      </div>
-    {:else if allMembers.length > 0}
-      <Tabs.Content value="members" class="relative flex flex-col gap-4 overflow-auto">
+    <Tabs.Content value="members">
+      {#if members.isFetching && !members.data}
+        <div class="flex h-40 w-full items-center justify-center">
+          <Spinner class="size-10" />
+        </div>
+      {:else if allMembers.length > 0}
         <DataTable
           {columns}
           data={allMembers.map((m) => ({ ...m, organizationId: data.currentOrganization.id }))}
@@ -118,19 +115,17 @@
             </Button>
           </div>
         {/if}
-      </Tabs.Content>
-    {:else}
-      <Tabs.Content value="members" class="relative flex flex-col gap-4 overflow-auto">
+      {:else}
         <DataTable {columns} data={[]} />
-      </Tabs.Content>
-    {/if}
+      {/if}
+    </Tabs.Content>
 
-    {#if invitations.isFetching && !invitations.data}
-      <div class="flex h-40 w-full items-center justify-center">
-        <Spinner class="size-10" />
-      </div>
-    {:else if allInvitations.length > 0}
-      <Tabs.Content value="invitations" class="relative flex flex-col gap-4 overflow-auto">
+    <Tabs.Content value="invitations">
+      {#if invitations.isFetching}
+        <div class="flex h-40 w-full items-center justify-center">
+          <Spinner class="size-10" />
+        </div>
+      {:else if allInvitations.length > 0}
         <InvitationsDataTable
           columns={invitationColumns}
           data={allInvitations.map((inv) => ({
@@ -155,12 +150,10 @@
             </Button>
           </div>
         {/if}
-      </Tabs.Content>
-    {:else}
-      <Tabs.Content value="invitations" class="relative flex flex-col gap-4 overflow-auto">
+      {:else}
         <InvitationsDataTable columns={invitationColumns} data={[]} />
-      </Tabs.Content>
-    {/if}
+      {/if}
+    </Tabs.Content>
   </Tabs.Root>
 </DashboardContainer>
 

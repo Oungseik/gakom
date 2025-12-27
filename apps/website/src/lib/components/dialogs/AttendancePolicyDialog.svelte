@@ -6,12 +6,12 @@
   import * as Dialog from "@repo/ui/dialog";
   import { Input } from "@repo/ui/input";
   import { Label } from "@repo/ui/label";
-  import * as Select from "@repo/ui/select";
   import { createForm } from "@tanstack/svelte-form";
   import { createMutation, useQueryClient } from "@tanstack/svelte-query";
   import { toast } from "svelte-sonner";
   import { z } from "zod";
 
+  import ComboBox from "$lib/components/inputs/ComboBox.svelte";
   import { orpc } from "$lib/orpc_client";
   import { secondsToTime, timeToSeconds } from "$lib/utils";
 
@@ -165,19 +165,15 @@
         {#snippet children(field)}
           <div class="space-y-2">
             <Label for={field.name}>Timezone</Label>
-            <Select.Root
-              type="single"
-              name={field.name}
-              disabled={isSubmitting}
-              bind:value={timezone}
-            >
-              <Select.Trigger class="w-full">{timezone || "Select a timezone"}</Select.Trigger>
-              <Select.Content>
-                {#each TIMEZONES as t (t)}
-                  <Select.Item value={t}>{t}</Select.Item>
-                {/each}
-              </Select.Content>
-            </Select.Root>
+            <ComboBox
+              value={field.state.value}
+              onChange={(value) => {
+                field.handleChange(value as TimeZone);
+              }}
+              options={TIMEZONES.map((tz) => ({ label: tz, value: tz }))}
+              placeholder="Filter timezone"
+              emptyPlaceHolder="Select a timezone"
+            />
           </div>
         {/snippet}
       </form.Field>

@@ -30,9 +30,7 @@ export const member = sqliteTable(
     userId: text("user_id")
       .notNull()
       .references(() => user.id, { onDelete: "cascade" }),
-    attendancePolicyId: text("attendance_policy_id")
-      .notNull()
-      .references(() => attendancePolicy.id),
+    attendancePolicyId: text("attendance_policy_id").references(() => attendancePolicy.id),
     role: text("role").default("member").notNull(),
     position: text("position"),
     createdAt: integer("created_at", { mode: "timestamp_ms" })

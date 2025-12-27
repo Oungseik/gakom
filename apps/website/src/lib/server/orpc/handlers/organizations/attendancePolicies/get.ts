@@ -20,7 +20,7 @@ export const getAttendancePolicyHandler = os
         timezone: attendancePolicy.timezone,
         clockIn: attendancePolicy.clockInSec,
         clockOut: attendancePolicy.clockOutSec,
-        workdays: attendancePolicy.workDays,
+        workdays: attendancePolicy.workdays,
         organizationId: attendancePolicy.organizationId,
         createdAt: attendancePolicy.createdAt,
         updatedAt: attendancePolicy.updatedAt,

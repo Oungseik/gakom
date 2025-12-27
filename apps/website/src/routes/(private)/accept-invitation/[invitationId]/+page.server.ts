@@ -19,9 +19,6 @@ export const load: PageServerLoad = async ({ params, request }) => {
     return { invitedOrganizationId: result?.invitation.organizationId };
   } catch (e) {
     if (e instanceof APIError) {
-      if (e.statusCode === 400) {
-        return redirect(303, "/app");
-      }
       return error(e.statusCode, { message: e.message });
     }
 

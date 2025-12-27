@@ -1,4 +1,15 @@
-import { and, asc, eq, ilike, like, member, or, organization, user } from "@repo/db";
+import {
+  and,
+  asc,
+  attendancePolicy,
+  eq,
+  ilike,
+  like,
+  member,
+  or,
+  organization,
+  user,
+} from "@repo/db";
 import z from "zod";
 import { db } from "$lib/server/db";
 import { organizationMiddleware, os } from "$lib/server/orpc/base";
@@ -46,10 +57,12 @@ export const listMembersHandler = os
         role: member.role,
         joinedAt: member.createdAt,
         leftAt: member.leftAt,
+        attendancePolicy: attendancePolicy,
       })
       .from(member)
       .innerJoin(user, eq(member.userId, user.id))
       .innerJoin(organization, eq(member.organizationId, organization.id))
+      .leftJoin(attendancePolicy, eq(member.attendancePolicyId, attendancePolicy.id))
       .where(condition)
       .orderBy(asc(member.createdAt))
       .offset(input.cursor ?? 0)

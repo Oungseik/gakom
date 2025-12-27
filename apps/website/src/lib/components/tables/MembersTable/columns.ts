@@ -5,6 +5,7 @@ import { renderComponent } from "@repo/ui/data-table";
 import type { ColumnDef } from "@tanstack/table-core";
 import DataTableActions from "./DataTableActions.svelte";
 import DataTableAddress from "./DataTableAddress.svelte";
+import DataTableAttendancePolicy from "./DataTableAttendancePolicy.svelte";
 import DataTableMemberInfo from "./DataTableMemberInfo.svelte";
 import DataTableMembershipPeriod from "./DataTableMembershipPeriod.svelte";
 import DataTablePosition from "./DataTablePosition.svelte";
@@ -23,13 +24,13 @@ export type Member = {
   position?: string | null;
   joinedAt: Date;
   leftAt?: Date | null;
-  attendance?: {
+  attendancePolicy?: {
     name: string;
     timezone: TimeZone;
-    clockIn: number;
-    clockOut: number;
+    clockInSec: number;
+    clockOutSec: number;
     workdays: Day[];
-  };
+  } | null;
 };
 
 export const columns: ColumnDef<Member>[] = [
@@ -89,6 +90,10 @@ export const columns: ColumnDef<Member>[] = [
   {
     id: "attendancePolicy",
     header: "Attendance Policy",
+    cell: ({ row }) =>
+      renderComponent(DataTableAttendancePolicy, {
+        policy: row.original.attendancePolicy,
+      }),
   },
   {
     id: "membershipPeriod",

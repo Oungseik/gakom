@@ -1,5 +1,6 @@
 <script lang="ts" generics="TData, TValue">
   import { FlexRender, createSvelteTable } from "@repo/ui/data-table";
+  import { ScrollArea, Scrollbar } from "@repo/ui/scroll-area";
   import * as Table from "@repo/ui/table";
   import { type ColumnDef, type RowSelectionState, getCoreRowModel } from "@tanstack/table-core";
 
@@ -34,8 +35,8 @@
   );
 </script>
 
-<div>
-  <div class="overflow-auto rounded-md border">
+<ScrollArea class="grid h-full w-full grid-cols-1 overflow-auto">
+  <div class="overflow-x-auto rounded-md border">
     <Table.Root>
       <Table.Header>
         {#each table.getHeaderGroups() as headerGroup (headerGroup.id)}
@@ -70,4 +71,5 @@
       </Table.Body>
     </Table.Root>
   </div>
-</div>
+  <Scrollbar orientation="horizontal" />
+</ScrollArea>

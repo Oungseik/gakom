@@ -16,7 +16,7 @@ export const attendancePolicy = sqliteTable(
     timezone: text("timezone", { enum: TIMEZONES }).notNull(),
     clockInSec: integer("clock_in_sec").notNull(),
     clockOutSec: integer("clock_out_sec").notNull(),
-    workDays: text("work_days", { mode: "json" })
+    workdays: text("work_days", { mode: "json" })
       .$type<Day[]>()
       .default(["MON", "TUE", "WED", "THU", "FRI"])
       .notNull(),
