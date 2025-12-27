@@ -1,5 +1,5 @@
 ---
-name: implement-orpc-handler
+name: implement-orpc-api
 description: Implement a new handler and attach to the oRPC router
 license: MIT
 compatibility: opencode

@@ -5,9 +5,11 @@ import { healthCheckHandler } from "./handlers/health/health_check";
 import { removeImageHandler } from "./handlers/images/remove_image";
 import { uploadImageHandler } from "./handlers/images/upload_image";
 import { countAttendancePoliciesHandler } from "./handlers/organizations/countAttendancePolicies";
+import { getAttendancePolicyHandler } from "./handlers/organizations/getAttendancePolicy";
 import { listAttendancePoliciesHandler } from "./handlers/organizations/listAttendancePolicies";
 import { listInvitationsHandler } from "./handlers/organizations/listInvitations";
 import { listMembersHandler } from "./handlers/organizations/listMembers";
+import { updateAttendancePolicyHandler } from "./handlers/organizations/updateAttendancePolicy";
 import { updateMemberHandler } from "./handlers/organizations/updateMember";
 
 export const router = os.router({
@@ -20,6 +22,8 @@ export const router = os.router({
     attendances: {},
     attendancesPolicies: {
       count: countAttendancePoliciesHandler,
+      get: getAttendancePolicyHandler,
+      update: updateAttendancePolicyHandler,
       list: listAttendancePoliciesHandler,
     },
     members: { list: listMembersHandler, update: updateMemberHandler },
