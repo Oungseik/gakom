@@ -18,7 +18,6 @@ export const listAttendancePoliciesHandler = os
       .select({
         id: attendancePolicy.id,
         name: attendancePolicy.name,
-        enabled: attendancePolicy.enabled,
         timezone: attendancePolicy.timezone,
         clockIn: attendancePolicy.clockInSec,
         clockOut: attendancePolicy.clockOutSec,

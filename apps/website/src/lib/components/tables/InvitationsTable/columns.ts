@@ -8,9 +8,9 @@ import DataTableStatus from "./DataTableStatus.svelte";
 export type Invitation = {
   id: string;
   email: string;
-  role?: string | null;
+  role: "member" | "admin";
   position: string;
-  status: string;
+  status: "pending" | "accepted" | "rejected" | "canceled";
   expiresAt: Date;
   createdAt: Date;
   organizationId: string;

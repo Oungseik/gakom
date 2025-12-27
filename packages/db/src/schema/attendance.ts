@@ -13,7 +13,6 @@ export const attendancePolicy = sqliteTable(
       .primaryKey()
       .$defaultFn(() => crypto.randomUUID()),
     name: text("name").notNull(),
-    enabled: integer("enabled", { mode: "boolean" }).default(true).notNull(),
     timezone: text("timezone", { enum: TIMEZONES }).notNull(),
     clockInSec: integer("clock_in_sec").notNull(),
     clockOutSec: integer("clock_out_sec").notNull(),

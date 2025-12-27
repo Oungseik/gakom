@@ -4,12 +4,10 @@ import { renderComponent } from "@repo/ui/data-table";
 import type { ColumnDef } from "@tanstack/table-core";
 import DataTableActions from "./DataTableActions.svelte";
 import DataTableSchedule from "./DataTableSchedule.svelte";
-import DataTableStatus from "./DataTableStatus.svelte";
 
 export type AttendancePolicy = {
   id: string;
   name: string;
-  enabled: boolean;
   timezone: (typeof TIMEZONES)[number];
   clockIn: number;
   clockOut: number;
@@ -44,14 +42,6 @@ export const columns = (
         clockIn: row.original.clockIn,
         clockOut: row.original.clockOut,
         workdays: row.original.workdays,
-      }),
-  },
-  {
-    id: "status",
-    header: "Status",
-    cell: ({ row }) =>
-      renderComponent(DataTableStatus, {
-        status: row.original.enabled ? "ENABLED" : "DISABLED",
       }),
   },
   {

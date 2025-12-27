@@ -13,6 +13,7 @@
     columns,
   } from "$lib/components/tables/AttendancePoliciesTable/columns";
   import { orpc } from "$lib/orpc_client";
+  import { noop } from "$lib/utils";
 
   import type { PageProps } from "./$types";
 
@@ -57,7 +58,7 @@
     </Button>
   </div>
 
-  {#if policies.isLoading && !policies.data}
+  {#if policies.isLoading}
     <div class="flex h-40 w-full items-center justify-center">
       <Spinner class="size-10" />
     </div>
@@ -70,9 +71,7 @@
       }))}
     />
   {:else}
-    <div class="text-muted-foreground flex h-40 w-full items-center justify-center">
-      No attendance policies found. Create one to get started.
-    </div>
+    <DataTable columns={columns(noop)} data={[]} />
   {/if}
 
   {#if policies.hasNextPage}

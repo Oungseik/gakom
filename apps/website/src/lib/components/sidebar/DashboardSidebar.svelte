@@ -62,7 +62,7 @@
     <OrganizationSwitcher {orgs} {activeOrganization} onCreateOrganization={() => (open = true)} />
   </Sidebar.Header>
   <Sidebar.Content>
-    <NavManagement features={data.managements} slug={currentOrganizationSlug} />
+    <NavManagement features={data.managements} slug={activeOrganization.slug} />
   </Sidebar.Content>
   <Sidebar.Footer>
     <NavUser {user} />

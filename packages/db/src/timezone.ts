@@ -247,3 +247,5 @@ export const TIMEZONES = [
   "Pacific/Tongatapu",
   "Pacific/Wallis",
 ] as const;
+
+export type TimeZone = (typeof TIMEZONES)[number];

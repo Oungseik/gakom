@@ -11,7 +11,7 @@
 <Sidebar.Provider>
   <DashboardSidebar
     user={data.user}
-    orgs={data.organizations}
+    orgs={data.organizations ?? []}
     currentOrganizationSlug={params.slug}
   />
   <Sidebar.Inset>

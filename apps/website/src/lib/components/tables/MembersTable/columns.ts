@@ -1,3 +1,5 @@
+import type { Day } from "@repo/db";
+import type { TimeZone } from "@repo/db/timezone";
 import { Checkbox } from "@repo/ui/checkbox";
 import { renderComponent } from "@repo/ui/data-table";
 import type { ColumnDef } from "@tanstack/table-core";
@@ -21,6 +23,13 @@ export type Member = {
   position?: string | null;
   joinedAt: Date;
   leftAt?: Date | null;
+  attendance?: {
+    name: string;
+    timezone: TimeZone;
+    clockIn: number;
+    clockOut: number;
+    workdays: Day[];
+  };
 };
 
 export const columns: ColumnDef<Member>[] = [
@@ -76,6 +85,10 @@ export const columns: ColumnDef<Member>[] = [
         position: row.original.position,
         role: row.original.role,
       }),
+  },
+  {
+    id: "attendancePolicy",
+    header: "Attendance Policy",
   },
   {
     id: "membershipPeriod",

@@ -12,7 +12,10 @@
   import InviteMemberDialog from "$lib/components/dialogs/InviteMemberDialog.svelte";
   import DashboardHeader from "$lib/components/headers/DashboardHeader.svelte";
   import InvitationsDataTable from "$lib/components/tables/InvitationsTable/DataTable.svelte";
-  import { columns as invitationColumns } from "$lib/components/tables/InvitationsTable/columns";
+  import {
+    type Invitation,
+    columns as invitationColumns,
+  } from "$lib/components/tables/InvitationsTable/columns";
   import DataTable from "$lib/components/tables/MembersTable/DataTable.svelte";
   import { columns } from "$lib/components/tables/MembersTable/columns";
   import { orpc } from "$lib/orpc_client";
@@ -45,7 +48,9 @@
   );
 
   const allMembers = $derived(members.data?.pages.flatMap((page) => page.items) ?? []);
-  const allInvitations = $derived(invitations.data?.pages.flatMap((page) => page.items) ?? []);
+  const allInvitations = $derived(
+    invitations.data?.pages.flatMap((page) => page.items) ?? []
+  ) as Invitation[];
 
   let views: View[] = $derived([
     { id: "members", label: "Members", badge: 0 },

@@ -97,3 +97,6 @@ export function formatTime(seconds: number) {
   const hours12 = hours === 0 ? 12 : hours > 12 ? hours - 12 : hours;
   return `${hours12.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")} ${period}`;
 }
+
+
+export const noop = () => {}

@@ -9,7 +9,6 @@ const input = z.object({
   slug: z.string(),
   data: z.object({
     name: z.string(),
-    enabled: z.boolean(),
     timezone: z.enum(TIMEZONES),
     clockIn: z.number(),
     clockOut: z.number(),

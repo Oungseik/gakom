@@ -1,7 +1,7 @@
 <script lang="ts">
   import Loader2Icon from "@lucide/svelte/icons/loader-2";
   import type { Day } from "@repo/db";
-  import { TIMEZONES } from "@repo/db/timezone";
+  import { TIMEZONES, type TimeZone } from "@repo/db/timezone";
   import { Button, buttonVariants } from "@repo/ui/button";
   import * as Dialog from "@repo/ui/dialog";
   import { Input } from "@repo/ui/input";
@@ -25,8 +25,6 @@
     policy?: AttendancePolicy | null;
   };
 
-  type TimeZone = (typeof TIMEZONES)[number];
-
   let { open = $bindable(false), slug, policy }: Props = $props();
   let isSubmitting = $state(false);
   const queryClient = useQueryClient();
@@ -48,14 +46,12 @@
     clockIn: string;
     clockOut: string;
     workdays: Day[];
-    enabled: boolean;
   } = $derived({
     name: policy?.name ?? "",
     timezone,
     clockIn: policy ? secondsToTime(policy.clockIn) : "09:00",
     clockOut: policy ? secondsToTime(policy.clockOut) : "17:00",
     workdays: policy?.workdays ?? ["MON", "TUE", "WED", "THU", "FRI"],
-    enabled: policy?.enabled ?? true,
   });
 
   const form = createForm(() => ({
