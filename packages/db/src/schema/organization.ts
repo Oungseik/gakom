@@ -57,6 +57,7 @@ export const invitation = sqliteTable(
     position: text("position").notNull(),
     status: text("status").default("pending").notNull(),
     expiresAt: integer("expires_at", { mode: "timestamp_ms" }).notNull(),
+    attendancePolicyId: text("attendance_policy_id").references(() => attendancePolicy.id),
     createdAt: integer("created_at", { mode: "timestamp_ms" })
       .default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)
       .notNull(),

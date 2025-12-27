@@ -1,10 +1,24 @@
 import { defineRelations } from "drizzle-orm";
+import { attendance, attendancePolicy } from "./attendance";
 import { account, session, twoFactor, user } from "./core";
 import { image } from "./image";
 import { invitation, member, organization, team, teamMember } from "./organization";
 
 export const relations = defineRelations(
-  { user, session, account, invitation, organization, member, team, teamMember, twoFactor, image },
+  {
+    user,
+    session,
+    account,
+    invitation,
+    organization,
+    member,
+    team,
+    teamMember,
+    twoFactor,
+    image,
+    attendancePolicy,
+    attendance,
+  },
   (r) => ({
     user: {
       sessions: r.many.session(),
@@ -14,6 +28,7 @@ export const relations = defineRelations(
       teamMembers: r.many.teamMember(),
       twoFactors: r.many.twoFactor(),
       images: r.many.image(),
+      attendances: r.many.attendance(),
     },
     session: {
       user: r.one.user({ from: r.session.userId, to: r.user.id }),
@@ -25,10 +40,15 @@ export const relations = defineRelations(
       members: r.many.member(),
       invitations: r.many.invitation(),
       teams: r.many.team(),
+      attendancePolicies: r.many.attendancePolicy(),
     },
     member: {
       organization: r.one.organization({ from: r.member.organizationId, to: r.organization.id }),
       user: r.one.user({ from: r.member.userId, to: r.user.id }),
+      attendancePolicy: r.one.attendancePolicy({
+        from: r.member.attendancePolicyId,
+        to: r.attendancePolicy.id,
+      }),
     },
     invitation: {
       organization: r.one.organization({
@@ -50,6 +70,21 @@ export const relations = defineRelations(
     },
     image: {
       user: r.one.user({ from: r.image.uploaderId, to: r.user.id }),
+    },
+    attendancePolicy: {
+      organization: r.one.organization({
+        from: r.attendancePolicy.organizationId,
+        to: r.organization.id,
+      }),
+      members: r.many.member(),
+      attendances: r.many.attendance(),
+    },
+    attendance: {
+      user: r.one.user({ from: r.attendance.userId, to: r.user.id }),
+      attendancePolicy: r.one.attendancePolicy({
+        from: r.attendance.attendancePolicyId,
+        to: r.attendancePolicy.id,
+      }),
     },
   }),
 );

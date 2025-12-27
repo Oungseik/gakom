@@ -55,6 +55,6 @@ export const attendance = sqliteTable(
   },
   (table) => [
     index("attendance_user_id_idx").on(table.userId),
-    index("attendance_organization_id_idx").on(table.attendancePolicyId),
+    index("attendance_attendance_policy_id_idx").on(table.attendancePolicyId),
   ],
 );

@@ -16,7 +16,7 @@
       {policy.name}
     </div>
 
-    <span class="inline-flex items-center rounded-md px-2 py-0.5 text-xs font-medium capitalize">
+    <span class="rounded-md py-0.5 text-xs font-medium capitalize">
       <span class="text-muted-foreground">{formatTime(policy.clockInSec)}</span>
       <span class="text-muted-foreground font-medium">-</span>
       <span class="text-muted-foreground">{formatTime(policy.clockOutSec)}</span>

@@ -12,9 +12,9 @@
 
 <div class="flex flex-col gap-1">
   <div class="flex items-center gap-2 text-sm">
-    <span class="text-muted-foreground">{formatTime(clockIn)}</span>
+    <span>{formatTime(clockIn)}</span>
     <span class="text-muted-foreground font-medium">-</span>
-    <span class="text-muted-foreground">{formatTime(clockOut)}</span>
+    <span>{formatTime(clockOut)}</span>
   </div>
   <div class="text-muted-foreground text-xs">{workdays.join(", ")}</div>
 </div>

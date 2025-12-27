@@ -4,7 +4,6 @@
   import ChevronsUpDownIcon from "@lucide/svelte/icons/chevrons-up-down";
   import LockIcon from "@lucide/svelte/icons/lock";
   import LogOutIcon from "@lucide/svelte/icons/log-out";
-  import SparklesIcon from "@lucide/svelte/icons/sparkles";
   import * as Avatar from "@repo/ui/avatar";
   import * as DropdownMenu from "@repo/ui/dropdown-menu";
   import * as Sidebar from "@repo/ui/sidebar";
@@ -60,7 +59,7 @@
           <div class="flex items-center gap-2 px-1 py-1.5 text-start text-sm">
             <Avatar.Root class="size-8 rounded-lg">
               <Avatar.Image src={user.image} alt={user.name} />
-              <Avatar.Fallback class="rounded-lg">CN</Avatar.Fallback>
+              <Avatar.Fallback class="rounded-lg">{firstWord}{secondWord}</Avatar.Fallback>
             </Avatar.Root>
             <div class="grid flex-1 text-start text-sm leading-tight">
               <span class="truncate font-medium">{user.name}</span>
@@ -71,19 +70,15 @@
         <DropdownMenu.Separator />
         <DropdownMenu.Group>
           <DropdownMenu.Item>
-            <SparklesIcon />
-            Upgrade to Pro
-          </DropdownMenu.Item>
-        </DropdownMenu.Group>
-        <DropdownMenu.Separator />
-        <DropdownMenu.Group>
-          <DropdownMenu.Item>
             <BadgeCheckIcon />
             Account
           </DropdownMenu.Item>
           <DropdownMenu.Item class="p-0">
             {#snippet children()}
-              <a href="/app/settings#password" class="flex h-full w-full items-center gap-2 p-2">
+              <a
+                href="/account/settings#password"
+                class="flex h-full w-full items-center gap-2 p-2"
+              >
                 <LockIcon />
                 Password
               </a>

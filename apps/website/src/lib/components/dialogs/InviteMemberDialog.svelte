@@ -6,7 +6,7 @@
   import { Label } from "@repo/ui/label";
   import * as Select from "@repo/ui/select";
   import { createForm } from "@tanstack/svelte-form";
-  import { useQueryClient } from "@tanstack/svelte-query";
+  import { createQuery, useQueryClient } from "@tanstack/svelte-query";
   import { toast } from "svelte-sonner";
   import { z } from "zod";
 
@@ -15,14 +15,25 @@
 
   type Props = {
     open: boolean;
-    organization: { id: string; name: string };
+    organization: { id: string; name: string; slug: string };
   };
 
   let { open = $bindable(false), organization }: Props = $props();
   let isInviting = $state(false);
   const queryClient = useQueryClient();
 
-  const defaultValues: { role: "member" | "admin"; email: string; position: string } = {
+  const attendancePolicies = createQuery(() =>
+    orpc.organizations.attendancesPolicies.list.queryOptions({
+      input: { slug: organization.slug, pageSize: 100, cursor: 0 },
+    })
+  );
+
+  const defaultValues: {
+    role: "member" | "admin";
+    email: string;
+    position: string;
+    attendancePolicyId?: string;
+  } = {
     role: "member",
     email: "",
     position: "",
@@ -145,6 +156,12 @@
               </Select.Content>
             </Select.Root>
           </div>
+        {/snippet}
+      </form.Field>
+
+      <form.Field name="attendancePolicyId">
+        {#snippet children(field)}
+          <div class="space-y-2"></div>
         {/snippet}
       </form.Field>
 
