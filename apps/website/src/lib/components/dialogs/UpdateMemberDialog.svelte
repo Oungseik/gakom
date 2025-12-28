@@ -6,62 +6,68 @@
   import { Label } from "@repo/ui/label";
   import * as Select from "@repo/ui/select";
   import { createForm } from "@tanstack/svelte-form";
-  import { createQuery, useQueryClient } from "@tanstack/svelte-query";
+  import { createMutation, createQuery, useQueryClient } from "@tanstack/svelte-query";
   import { toast } from "svelte-sonner";
   import { z } from "zod";
 
-  import { authClient } from "$lib/auth_client";
   import { orpc } from "$lib/orpc_client";
   import { formatTime } from "$lib/utils";
 
   type Props = {
+    userId: string;
+    name: string;
+    email: string;
+    position?: string | null;
+    role: "member" | "admin" | "owner";
+    attendancePolicyId?: string | null;
     open: boolean;
-    organization: { id: string; name: string; slug: string };
+    slug: string;
   };
 
-  let { open = $bindable(false), organization }: Props = $props();
-  let isInviting = $state(false);
+  let { open = $bindable(false), slug, ...member }: Props = $props();
+  let isUpdating = $state(false);
   const queryClient = useQueryClient();
 
   const attendancePolicies = createQuery(() =>
     orpc.organizations.attendancesPolicies.list.queryOptions({
-      input: { slug: organization.slug, pageSize: 100, cursor: 0 },
+      input: { slug, pageSize: 100, cursor: 0 },
+      enabled: !!slug,
     })
   );
   const allPolicies = $derived(attendancePolicies.data?.items.flatMap((item) => item) ?? []);
+  const memberUpdate = createMutation(() => orpc.organizations.members.update.mutationOptions());
 
-  const defaultValues: {
-    role: "member" | "admin";
-    email: string;
-    position: string;
-    attendancePolicyId?: string;
-  } = {
-    role: "member",
-    email: "",
-    position: "",
-  };
   const form = createForm(() => ({
-    defaultValues,
+    defaultValues: {
+      position: member.position ?? null,
+      role: member.role ?? null,
+      attendancePolicyId: member.attendancePolicyId ?? null,
+    },
     onSubmit: async ({ value }) => {
-      isInviting = true;
-      const { error } = await authClient.organization.inviteMember({
-        organizationId: organization.id,
-        email: value.email,
-        role: value.role,
-        position: value.position,
-        resend: true,
-      });
+      isUpdating = true;
 
-      if (error) {
-        toast.error(error.message ?? "something went wrong while inviting member");
-      } else {
-        open = false;
-        form.reset();
-        toast.success(`Successfully invite ${value.email} to ${organization.name}.`);
-      }
-
-      await queryClient.invalidateQueries({ queryKey: orpc.organizations.invitations.list.key() });
-      isInviting = false;
+      memberUpdate.mutate(
+        {
+          userId: member.userId,
+          slug,
+          data: {
+            attendancePolicyId: value.attendancePolicyId,
+            position: value.position,
+            role: value.role,
+          },
+        },
+        {
+          onSuccess: () => {
+            toast.success("Successfully update user information");
+            queryClient.invalidateQueries({ queryKey: orpc.organizations.members.list.key() });
+            open = false;
+            isUpdating = false;
+          },
+          onError: (error) => {
+            toast.error(error.message);
+          },
+        }
+      );
     },
   }));
 </script>
@@ -69,7 +75,7 @@
 <Dialog.Root bind:open>
   <Dialog.Content class="sm:max-w-[425px]">
     <Dialog.Header>
-      <Dialog.Title>Invite member</Dialog.Title>
+      <Dialog.Title>Update {member.name}</Dialog.Title>
     </Dialog.Header>
 
     <form
@@ -79,36 +85,6 @@
         form.handleSubmit();
       }}
     >
-      <form.Field
-        name="email"
-        validators={{
-          onChange: ({ value }) => {
-            const { error } = z.email().safeParse(value);
-            return error?.issues?.at(0)?.message ?? undefined;
-          },
-        }}
-      >
-        {#snippet children(field)}
-          <div class="space-y-2">
-            <Label for={field.name}>Email</Label>
-            <Input
-              id={field.name}
-              name={field.name}
-              value={field.state.value}
-              type="email"
-              onblur={field.handleBlur}
-              onchange={(e) => field.handleChange(e.currentTarget.value)}
-              placeholder="m@example.com"
-              required
-              disabled={isInviting}
-            />
-            {#if field.state.meta.errors.length}
-              <p class="text-sm text-red-500">{field.state.meta.errors}</p>
-            {/if}
-          </div>
-        {/snippet}
-      </form.Field>
-
       <form.Field
         name="position"
         validators={{
@@ -130,7 +106,7 @@
               onchange={(e) => field.handleChange(e.currentTarget.value)}
               placeholder="Software Engineer"
               required
-              disabled={isInviting}
+              disabled={isUpdating}
             />
             {#if field.state.meta.errors.length}
               <p class="text-sm text-red-500">{field.state.meta.errors}</p>
@@ -146,11 +122,16 @@
             <Select.Root
               type="single"
               name={field.name}
+              value={field.state.value}
               onValueChange={(value) => field.handleChange(value as "member" | "admin")}
-              disabled={isInviting}
+              disabled={isUpdating || member.role === "owner"}
             >
               <Select.Trigger class="w-full">
-                {field.state.value === "member" ? "Member" : "Admin"}
+                {field.state.value === "member"
+                  ? "Member"
+                  : field.state.value === "admin"
+                    ? "Admin"
+                    : "Owner"}
               </Select.Trigger>
               <Select.Content>
                 <Select.Item value="member">Member</Select.Item>
@@ -169,10 +150,12 @@
               type="single"
               name={field.name}
               onValueChange={(value) => field.handleChange(value)}
-              disabled={isInviting}
+              disabled={isUpdating || allPolicies.length === 0}
             >
               <Select.Trigger class="w-full">
-                {field.state.value ?? "Select an attendance policy"}
+                {allPolicies.length === 0
+                  ? "No attendance policy"
+                  : (field.state.value ?? "Select an attendance policy")}
               </Select.Trigger>
               <Select.Content>
                 {#each allPolicies as p (p.id)}
@@ -191,11 +174,11 @@
 
       <Dialog.Footer>
         <Dialog.Close class={buttonVariants({ variant: "outline" })}>Cancel</Dialog.Close>
-        <Button type="submit" disabled={isInviting} class="w-17">
-          {#if isInviting}
+        <Button type="submit" disabled={isUpdating} class="w-17">
+          {#if isUpdating}
             <Loader2Icon class="size-4 animate-spin" />
           {:else}
-            Invite
+            Submit
           {/if}
         </Button>
       </Dialog.Footer>

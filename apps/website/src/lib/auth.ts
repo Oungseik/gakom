@@ -79,9 +79,17 @@ export const auth = betterAuth({
       teams: { enabled: true },
       schema: {
         invitation: {
-          additionalFields: { position: { type: "string", required: true, input: true } },
+          additionalFields: {
+            position: { type: "string", required: true, input: true },
+            attendancePolicyId: { type: "string", required: false, input: true },
+          },
         },
-        member: { additionalFields: { position: { type: "string", required: true, input: true } } },
+        member: {
+          additionalFields: {
+            position: { type: "string", required: true, input: true },
+            attendancePolicyId: { type: "string", required: false, input: true },
+          },
+        },
       },
       sendInvitationEmail: async ({ id, email }) => {
         const inviteLink = `${getBaseURL()}/accept-invitation/${id}`;
@@ -96,7 +104,10 @@ export const auth = betterAuth({
         afterAcceptInvitation: async ({ invitation, member: m }) => {
           await db
             .update(member)
-            .set({ position: invitation.position })
+            .set({
+              position: invitation.position,
+              attendancePolicyId: invitation.attendancePolicyId,
+            })
             .where(
               and(
                 eq(member.userId, m.userId),

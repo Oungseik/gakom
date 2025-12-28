@@ -7,7 +7,7 @@
     clockOutSec: number;
   };
 
-  const { policy }: { policy?: Policy } = $props();
+  const { policy }: { policy?: Policy | null } = $props();
 </script>
 
 {#if policy}

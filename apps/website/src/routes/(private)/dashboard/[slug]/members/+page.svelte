@@ -2,7 +2,6 @@
   import UserPlusIcon from "@lucide/svelte/icons/user-plus";
   import { Button } from "@repo/ui/button";
   import { Label } from "@repo/ui/label";
-  import { ScrollArea, Scrollbar } from "@repo/ui/scroll-area";
   import { Spinner } from "@repo/ui/spinner";
   import * as Tabs from "@repo/ui/tabs";
   import { createInfiniteQuery } from "@tanstack/svelte-query";
@@ -96,7 +95,11 @@
       {:else if allMembers.length > 0}
         <DataTable
           {columns}
-          data={allMembers.map((m) => ({ ...m, organizationId: data.currentOrganization.id }))}
+          data={allMembers.map((m) => ({
+            ...m,
+            organizationId: data.currentOrganization.id,
+            slug: params.slug,
+          }))}
         />
 
         {#if members.hasNextPage}

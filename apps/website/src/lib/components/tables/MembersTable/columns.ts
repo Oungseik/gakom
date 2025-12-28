@@ -13,6 +13,7 @@ import DataTableUserId from "./DataTableUserId.svelte";
 
 export type Member = {
   organizationId: string;
+  slug: string;
   userId: string;
   name: string;
   email: string;
@@ -25,6 +26,7 @@ export type Member = {
   joinedAt: Date;
   leftAt?: Date | null;
   attendancePolicy?: {
+    id: string;
     name: string;
     timezone: TimeZone;
     clockInSec: number;
@@ -111,6 +113,11 @@ export const columns: ColumnDef<Member>[] = [
         userId: row.original.userId,
         organizationId: row.original.organizationId,
         email: row.original.email,
+        name: row.original.name,
+        slug: row.original.slug,
+        role: row.original.role as "admin" | "member",
+        position: row.original.position,
+        attendancePolicyId: row.original.attendancePolicy?.id,
       });
     },
   },

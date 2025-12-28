@@ -9,10 +9,23 @@
   import { toast } from "svelte-sonner";
 
   import { authClient } from "$lib/auth_client";
+  import UpdateMemberDialog from "$lib/components/dialogs/UpdateMemberDialog.svelte";
   import { orpc } from "$lib/orpc_client";
 
-  let { email, organizationId }: { userId: string; organizationId: string; email: string } =
-    $props();
+  type Props = {
+    userId: string;
+    email: string;
+    organizationId: string;
+    slug: string;
+    name: string;
+    position?: string | null;
+    role: "member" | "admin";
+    attendancePolicyId?: string | null;
+  };
+
+  let { email, slug, organizationId, position, ...member }: Props = $props();
+  let open = $state(false);
+
   const queryClient = useQueryClient();
 
   function handleRemoveMember() {
@@ -38,6 +51,7 @@
 </script>
 
 <ConfirmDeleteDialog />
+<UpdateMemberDialog bind:open {...{ email, slug, position, ...member }} />
 
 <DropdownMenu.Root>
   <DropdownMenu.Trigger>
@@ -49,7 +63,11 @@
     {/snippet}
   </DropdownMenu.Trigger>
   <DropdownMenu.Content>
-    <DropdownMenu.Item>
+    <DropdownMenu.Item
+      onclick={() => {
+        open = true;
+      }}
+    >
       <SquarePenIcon size="4" /> Edit
     </DropdownMenu.Item>
     <DropdownMenu.Item onclick={handleRemoveMember} variant="destructive">
