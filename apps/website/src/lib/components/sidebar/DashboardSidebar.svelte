@@ -1,6 +1,6 @@
 <script lang="ts">
-  import CalendarCheck_2Icon from "@lucide/svelte/icons/calendar-check-2";
   import ClipboardClockIcon from "@lucide/svelte/icons/clipboard-clock";
+  import LayoutDashboardIcon from "@lucide/svelte/icons/layout-dashboard";
   import UsersIcon from "@lucide/svelte/icons/users";
   import * as Sidebar from "@repo/ui/sidebar";
   import type { ComponentProps } from "svelte";
@@ -44,9 +44,9 @@
 
   const data = $derived([
     {
-      name: "Attendances",
-      url: `/dashboard/${activeOrganization.slug}/attendances`,
-      icon: CalendarCheck_2Icon,
+      name: "Dashboard",
+      url: `/dashboard/${activeOrganization.slug}`,
+      icon: LayoutDashboardIcon,
     },
     {
       name: "Members",
