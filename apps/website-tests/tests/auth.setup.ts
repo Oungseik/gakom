@@ -1,10 +1,10 @@
-import { expect, test } from "@playwright/test";
+import { expect, test as setup } from "@playwright/test";
 import path from "path";
 import { config } from "./config";
 
 const authFile = path.join("playwright/.auth/user.json");
 
-test("seed the environment and login", async ({ page }) => {
+setup("authentication", async ({ page }) => {
   await page.goto(`${config.baseUrl}/signin`);
   await page.getByRole("textbox", { name: "Email" }).fill(config.orgOwner.email);
   await page.getByRole("textbox", { name: "Password" }).fill(config.orgOwner.password);

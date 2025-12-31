@@ -1,9 +1,9 @@
 export const config = {
-  baseUrl: "http://localhost:4173",
+  baseUrl: process.env.BASE_URL!,
 
   /** verified account which already created organization  */
-  accountWithOrg: {
-    email: "mhemaungthuwin@gmail.com",
-    password: "Oung123@",
+  orgOwner: {
+    email: process.env.ORG_OWNER_EMAIL!,
+    password: process.env.ORG_OWNER_PASSW!,
   },
 };
