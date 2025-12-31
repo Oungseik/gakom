@@ -14,7 +14,4 @@ setup("authentication", async ({ page }) => {
     expect(page.url()).toEqual(`${config.baseUrl}/app/crossworks`);
   }).toPass({ intervals: [2000, 4000, 8000] });
   await page.context().storageState({ path: authFile });
-
-  const url = new URL("/dashboard", config.baseUrl);
-  await page.goto(url.toString());
 });
