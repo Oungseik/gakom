@@ -1,4 +1,5 @@
 <script lang="ts">
+  import AppWindowIcon from "@lucide/svelte/icons/app-window";
   import ClipboardClockIcon from "@lucide/svelte/icons/clipboard-clock";
   import LayoutDashboardIcon from "@lucide/svelte/icons/layout-dashboard";
   import UsersIcon from "@lucide/svelte/icons/users";
@@ -6,6 +7,7 @@
   import type { ComponentProps } from "svelte";
 
   import NavManagement from "$lib/components/navigation/NavManagement.svelte";
+  import NavSecondary from "$lib/components/navigation/NavSecondary.svelte";
   import NavUser from "$lib/components/navigation/NavUser.svelte";
   import OrganizationSwitcher from "$lib/components/switchers/OrganizationSwitcher.svelte";
 
@@ -67,6 +69,12 @@
   </Sidebar.Header>
   <Sidebar.Content>
     <NavManagement features={data} />
+    <NavSecondary
+      class="mt-auto"
+      items={[
+        { url: `/app/${activeOrganization.slug}`, icon: AppWindowIcon, title: "Application" },
+      ]}
+    />
   </Sidebar.Content>
   <Sidebar.Footer>
     <NavUser {user} />
