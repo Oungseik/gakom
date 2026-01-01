@@ -73,7 +73,7 @@
 </script>
 
 <Dialog.Root bind:open>
-  <Dialog.Content class="sm:max-w-[425px]">
+  <Dialog.Content>
     <Dialog.Header>
       <Dialog.Title>Update {member.name}</Dialog.Title>
     </Dialog.Header>
@@ -153,17 +153,27 @@
               disabled={isUpdating || allPolicies.length === 0}
             >
               <Select.Trigger class="w-full">
-                {allPolicies.length === 0
-                  ? "No attendance policy"
-                  : (field.state.value ?? "Select an attendance policy")}
+                <span>
+                  {#if field.state.value}
+                    {@const p = allPolicies.find((p) => p.id === field.state.value)}
+                    {p?.name}
+                    {#if p}
+                      <span class="text-muted-foreground"
+                        >({formatTime(p.clockIn)} - {formatTime(p.clockOut)})</span
+                      >
+                    {/if}
+                  {:else}
+                    Select an attendance policy
+                  {/if}
+                </span>
               </Select.Trigger>
               <Select.Content>
                 {#each allPolicies as p (p.id)}
-                  <Select.Item value={p.id}
-                    >{p.name}
-                    (<span>{formatTime(p.clockIn)}</span><span
-                      class="text-muted-foreground font-medium">-</span
-                    ><span>{formatTime(p.clockOut)}</span>)
+                  <Select.Item value={p.id}>
+                    {p.name}
+                    <span class="text-muted-foreground"
+                      >({formatTime(p.clockIn)} - {formatTime(p.clockOut)})</span
+                    >
                   </Select.Item>
                 {/each}
               </Select.Content>

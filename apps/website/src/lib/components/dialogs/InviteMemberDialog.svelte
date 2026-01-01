@@ -68,7 +68,7 @@
 </script>
 
 <Dialog.Root bind:open>
-  <Dialog.Content class="sm:max-w-[425px]">
+  <Dialog.Content>
     <Dialog.Header>
       <Dialog.Title>Invite member</Dialog.Title>
     </Dialog.Header>
