@@ -9,7 +9,6 @@
   import * as Sidebar from "@repo/ui/sidebar";
   import { useSidebar } from "@repo/ui/sidebar";
 
-  import { page } from "$app/state";
   import { authClient } from "$lib/auth_client";
   import { getNameIntials } from "$lib/utils";
 
@@ -20,9 +19,7 @@
 
   async function handleLogout() {
     await authClient.signOut();
-    window.location.href = "/signin".concat(
-      page.url.pathname === "/" ? "" : `?return_url=${page.url.href}`
-    );
+    window.location.href = "/signin";
   }
 </script>
 

@@ -1,4 +1,4 @@
-import { eq, member, organization } from "@repo/db";
+import { count, eq, member, organization } from "@repo/db";
 import { error, type Handle, redirect } from "@sveltejs/kit";
 import { sequence } from "@sveltejs/kit/hooks";
 import { svelteKitHandler } from "better-auth/svelte-kit";
@@ -61,6 +61,21 @@ const authHandle: Handle = async ({ event, resolve }) => {
     return redirect(303, "/verify-account");
   }
 
+  // pass the access dashboard with no organization, and let the +layout.server.ts handle the error
+  const slug = pathname.split("/").at(2);
+  if (!slug || pathname.startsWith("/account")) {
+    return resolve(event);
+  }
+
+  const result = await db
+    .select({ count: count() })
+    .from(organization)
+    .where(eq(organization.slug, slug));
+
+  if (!result.at(0)?.count) {
+    return resolve(event);
+  }
+
   const organizations = await db
     .select({
       id: organization.id,
@@ -76,19 +91,15 @@ const authHandle: Handle = async ({ event, resolve }) => {
     .where(eq(member.userId, session.user.id));
 
   event.locals.organizations = organizations;
-  const slug = pathname.split("/").at(2);
-
-  if (!slug || pathname.startsWith("/account")) {
-    return resolve(event);
-  }
 
   const role = organizations.find((org) => org.slug === slug)?.role;
-
-  if (!role) {
-    return error(403, { message: "You don't have enough permission to access this organization." });
+  if (pathname.startsWith("/dashboard") && role === "member") {
+    return error(403, {
+      message: "You don't have enough permission to the organization dashboard.",
+    });
   }
 
-  if (pathname.startsWith("/dashboard") && role === "member") {
+  if (!role) {
     return error(403, { message: "You don't have enough permission to access this organization." });
   }
 
