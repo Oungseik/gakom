@@ -49,6 +49,7 @@
         email: value.email,
         role: value.role,
         position: value.position,
+        attendancePolicyId: value.attendancePolicyId,
         resend: true,
       });
 
@@ -172,15 +173,27 @@
               disabled={isInviting}
             >
               <Select.Trigger class="w-full">
-                {field.state.value ?? "Select an attendance policy"}
+                <span>
+                  {#if field.state.value}
+                    {@const p = allPolicies.find((p) => p.id === field.state.value)}
+                    {p?.name}
+                    {#if p}
+                      <span class="text-muted-foreground"
+                        >({formatTime(p.clockIn)} - {formatTime(p.clockOut)})</span
+                      >
+                    {/if}
+                  {:else}
+                    Select an attendance policy
+                  {/if}
+                </span>
               </Select.Trigger>
               <Select.Content>
                 {#each allPolicies as p (p.id)}
-                  <Select.Item value={p.id}
-                    >{p.name}
-                    (<span>{formatTime(p.clockIn)}</span><span
-                      class="text-muted-foreground font-medium">-</span
-                    ><span>{formatTime(p.clockOut)}</span>)
+                  <Select.Item value={p.id}>
+                    {p.name}
+                    <span class="text-muted-foreground"
+                      >({formatTime(p.clockIn)} - {formatTime(p.clockOut)})</span
+                    >
                   </Select.Item>
                 {/each}
               </Select.Content>

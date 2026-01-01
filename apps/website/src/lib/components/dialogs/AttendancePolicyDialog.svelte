@@ -58,14 +58,14 @@
     defaultValues,
     onSubmit: async ({ value }) => {
       isSubmitting = true;
-      if (!timezone) {
+      if (!value.timezone) {
         isSubmitting = false;
         return;
       }
 
       const data = {
         ...value,
-        timezone,
+        timezone: value.timezone,
         clockIn: timeToSeconds(value.clockIn),
         clockOut: timeToSeconds(value.clockOut),
       };
