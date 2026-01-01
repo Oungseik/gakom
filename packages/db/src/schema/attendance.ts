@@ -41,17 +41,19 @@ export const attendance = sqliteTable(
     id: text("id")
       .primaryKey()
       .$defaultFn(() => crypto.randomUUID()),
+    type: text("type", { enum: ["CHECK_IN", "CHECK_OUT"] }).notNull(),
     userId: text("user_id")
       .notNull()
       .references(() => user.id, { onDelete: "cascade" }),
     attendancePolicyId: text("attendance_policy_id")
       .notNull()
       .references(() => attendancePolicy.id, { onDelete: "cascade" }),
-    checkedInAt: integer("checked_in_at", { mode: "timestamp_ms" }),
-    checkedOutAt: integer("checked_out_at", { mode: "timestamp_ms" }),
     latitude: real("latitude").notNull(),
     longitude: real("longitude").notNull(),
     accuracy: real("accuracy").notNull(),
+    updatedAt: integer("updated_at", { mode: "timestamp_ms" })
+      .default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)
+      .$onUpdate(() => /* @__PURE__ */ new Date()),
   },
   (table) => [
     index("attendance_user_id_idx").on(table.userId),

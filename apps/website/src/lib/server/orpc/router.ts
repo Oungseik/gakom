@@ -10,6 +10,8 @@ import { deleteAttendancePolicyHandler } from "./handlers/organizations/attendan
 import { getAttendancePolicyHandler } from "./handlers/organizations/attendancePolicies/get";
 import { listAttendancePoliciesHandler } from "./handlers/organizations/attendancePolicies/list";
 import { updateAttendancePolicyHandler } from "./handlers/organizations/attendancePolicies/update";
+import { checkInHandler } from "./handlers/organizations/attendences/check_in";
+import { checkOutHandler } from "./handlers/organizations/attendences/check_out";
 import { listInvitationsHandler } from "./handlers/organizations/invitations/list";
 import { listMembersHandler } from "./handlers/organizations/members/list";
 import { updateMemberHandler } from "./handlers/organizations/members/update";
@@ -21,7 +23,10 @@ export const router = os.router({
     upload: uploadImageHandler,
   },
   organizations: {
-    attendances: {},
+    attendances: {
+      checkIn: checkInHandler,
+      checkOut: checkOutHandler,
+    },
     attendancesPolicies: {
       create: createAttendancePolicyHandler,
       count: countAttendancePoliciesHandler,

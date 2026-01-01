@@ -69,6 +69,32 @@ CREATE TABLE `jwks` (
 	`expires_at` integer
 );
 --> statement-breakpoint
+CREATE TABLE `attendance` (
+	`id` text PRIMARY KEY,
+	`type` text NOT NULL,
+	`user_id` text NOT NULL,
+	`attendance_policy_id` text NOT NULL,
+	`latitude` real NOT NULL,
+	`longitude` real NOT NULL,
+	`accuracy` real NOT NULL,
+	`updated_at` integer DEFAULT (cast(unixepoch('subsecond') * 1000 as integer)),
+	CONSTRAINT `fk_attendance_user_id_user_id_fk` FOREIGN KEY (`user_id`) REFERENCES `user`(`id`) ON DELETE cascade,
+	CONSTRAINT `fk_attendance_attendance_policy_id_attendance_policy_id_fk` FOREIGN KEY (`attendance_policy_id`) REFERENCES `attendance_policy`(`id`) ON DELETE cascade
+);
+--> statement-breakpoint
+CREATE TABLE `attendance_policy` (
+	`id` text PRIMARY KEY,
+	`name` text NOT NULL,
+	`timezone` text NOT NULL,
+	`clock_in_sec` integer NOT NULL,
+	`clock_out_sec` integer NOT NULL,
+	`work_days` text DEFAULT '["MON","TUE","WED","THU","FRI"]' NOT NULL,
+	`organization_id` text NOT NULL,
+	`created_at` integer DEFAULT (cast(unixepoch('subsecond') * 1000 as integer)) NOT NULL,
+	`updated_at` integer DEFAULT (cast(unixepoch('subsecond') * 1000 as integer)) NOT NULL,
+	CONSTRAINT `fk_attendance_policy_organization_id_organization_id_fk` FOREIGN KEY (`organization_id`) REFERENCES `organization`(`id`) ON DELETE cascade
+);
+--> statement-breakpoint
 CREATE TABLE `image` (
 	`object_path` text PRIMARY KEY,
 	`filename` text NOT NULL,
@@ -86,10 +112,12 @@ CREATE TABLE `invitation` (
 	`position` text NOT NULL,
 	`status` text DEFAULT 'pending' NOT NULL,
 	`expires_at` integer NOT NULL,
+	`attendance_policy_id` text,
 	`created_at` integer DEFAULT (cast(unixepoch('subsecond') * 1000 as integer)) NOT NULL,
 	`inviter_id` text NOT NULL,
 	`team_id` text,
 	CONSTRAINT `fk_invitation_organization_id_organization_id_fk` FOREIGN KEY (`organization_id`) REFERENCES `organization`(`id`) ON DELETE cascade,
+	CONSTRAINT `fk_invitation_attendance_policy_id_attendance_policy_id_fk` FOREIGN KEY (`attendance_policy_id`) REFERENCES `attendance_policy`(`id`),
 	CONSTRAINT `fk_invitation_inviter_id_user_id_fk` FOREIGN KEY (`inviter_id`) REFERENCES `user`(`id`) ON DELETE cascade,
 	CONSTRAINT `fk_invitation_team_id_team_id_fk` FOREIGN KEY (`team_id`) REFERENCES `team`(`id`) ON DELETE cascade
 );
@@ -98,12 +126,14 @@ CREATE TABLE `member` (
 	`id` text PRIMARY KEY,
 	`organization_id` text NOT NULL,
 	`user_id` text NOT NULL,
+	`attendance_policy_id` text,
 	`role` text DEFAULT 'member' NOT NULL,
 	`position` text,
 	`created_at` integer DEFAULT (cast(unixepoch('subsecond') * 1000 as integer)) NOT NULL,
 	`left_at` integer,
 	CONSTRAINT `fk_member_organization_id_organization_id_fk` FOREIGN KEY (`organization_id`) REFERENCES `organization`(`id`) ON DELETE cascade,
-	CONSTRAINT `fk_member_user_id_user_id_fk` FOREIGN KEY (`user_id`) REFERENCES `user`(`id`) ON DELETE cascade
+	CONSTRAINT `fk_member_user_id_user_id_fk` FOREIGN KEY (`user_id`) REFERENCES `user`(`id`) ON DELETE cascade,
+	CONSTRAINT `fk_member_attendance_policy_id_attendance_policy_id_fk` FOREIGN KEY (`attendance_policy_id`) REFERENCES `attendance_policy`(`id`)
 );
 --> statement-breakpoint
 CREATE TABLE `organization` (
@@ -143,12 +173,16 @@ CREATE INDEX `two_factor_secret_idx` ON `two_factor` (`secret`);--> statement-br
 CREATE INDEX `user_email_idx` ON `user` (`email`);--> statement-breakpoint
 CREATE INDEX `user_country_code_idx` ON `user` (`country_code`);--> statement-breakpoint
 CREATE INDEX `verification_identifier_idx` ON `verification` (`identifier`);--> statement-breakpoint
+CREATE INDEX `attendance_user_id_idx` ON `attendance` (`user_id`);--> statement-breakpoint
+CREATE INDEX `attendance_attendance_policy_id_idx` ON `attendance` (`attendance_policy_id`);--> statement-breakpoint
+CREATE INDEX `attendance_policy_organization_id_idx` ON `attendance_policy` (`organization_id`);--> statement-breakpoint
 CREATE INDEX `image_uploader_id_idx` ON `image` (`uploader_id`);--> statement-breakpoint
 CREATE INDEX `invitation_organization_id_idx` ON `invitation` (`organization_id`);--> statement-breakpoint
 CREATE INDEX `invitation_email_idx` ON `invitation` (`email`);--> statement-breakpoint
 CREATE INDEX `invitation_team_id_idx` ON `invitation` (`team_id`);--> statement-breakpoint
 CREATE INDEX `member_organization_id_idx` ON `member` (`organization_id`);--> statement-breakpoint
 CREATE INDEX `member_user_id_idx` ON `member` (`user_id`);--> statement-breakpoint
+CREATE INDEX `member_attendance_policy_id_idx` ON `member` (`attendance_policy_id`);--> statement-breakpoint
 CREATE INDEX `organization_slug_idx` ON `organization` (`slug`);--> statement-breakpoint
 CREATE INDEX `team_organization_id_idx` ON `team` (`organization_id`);--> statement-breakpoint
 CREATE INDEX `team_member_team_id_idx` ON `team_memeber` (`team_id`);--> statement-breakpoint
