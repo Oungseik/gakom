@@ -41,17 +41,17 @@ export function getBaseURL() {
 
 // Function to get role badge color based on role
 export function getRoleBadgeClass(role: "owner" | "admin" | "member"): string {
-    return role === "owner"?
-       "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400": 
-     role == "admin" ?
-       "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400": 
-       "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300";
+  return role === "owner"
+    ? "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400"
+    : role === "admin"
+      ? "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400"
+      : "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300";
 }
 
-export function getStatusBadgeClass(status: "ENABLED" | "DISABLED" ): string {
-    return status === "ENABLED"?
-       "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400" :
-       "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400";
+export function getStatusBadgeClass(status: "ENABLED" | "DISABLED"): string {
+  return status === "ENABLED"
+    ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400"
+    : "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400";
 }
 
 export function formatDate(date: Date): string {
@@ -98,5 +98,11 @@ export function formatTime(seconds: number) {
   return `${hours12.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")} ${period}`;
 }
 
+export const noop = () => {};
 
-export const noop = () => {}
+export function getNameIntials(name: string) {
+  const split = name.split(" ");
+  const firstWord = split.at(0)?.at(0)?.toUpperCase();
+  const secondWord = split.at(1)?.at(0)?.toUpperCase() ?? split.at(0)?.at(1)?.toUpperCase();
+  return { firstWord, secondWord };
+}

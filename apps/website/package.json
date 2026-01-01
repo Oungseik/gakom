@@ -54,6 +54,7 @@
   "dependencies": {
     "@fontsource/inter": "^5.2.8",
     "@inlang/paraglide-js": "^2.7.1",
+    "@internationalized/date": "^3.10.1",
     "@lucide/svelte": "^0.555.0",
     "@orpc/client": "^1.13.1",
     "@orpc/server": "^1.13.1",

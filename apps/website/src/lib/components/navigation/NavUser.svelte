@@ -11,13 +11,12 @@
 
   import { page } from "$app/state";
   import { authClient } from "$lib/auth_client";
+  import { getNameIntials } from "$lib/utils";
 
   let { user }: { user: { name: string; email: string; image?: string | null } } = $props();
   const sidebar = useSidebar();
 
-  const name = $derived(user.name.split(" "));
-  const firstWord = $derived(name.at(0)?.at(0)?.toUpperCase());
-  const secondWord = $derived(name.at(1)?.at(0)?.toUpperCase());
+  const { firstWord, secondWord } = $derived(getNameIntials(user.name));
 
   async function handleLogout() {
     await authClient.signOut();
