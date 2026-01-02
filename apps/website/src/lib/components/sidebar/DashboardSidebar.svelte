@@ -1,12 +1,15 @@
 <script lang="ts">
   import AppWindowIcon from "@lucide/svelte/icons/app-window";
+  import CalendarDaysIcon from "@lucide/svelte/icons/calendar-days";
   import ClipboardClockIcon from "@lucide/svelte/icons/clipboard-clock";
+  import FileChartColumnIncreasingIcon from "@lucide/svelte/icons/file-chart-column-increasing";
   import LayoutDashboardIcon from "@lucide/svelte/icons/layout-dashboard";
+  import SettingsIcon from "@lucide/svelte/icons/settings";
   import UsersIcon from "@lucide/svelte/icons/users";
   import * as Sidebar from "@repo/ui/sidebar";
   import type { ComponentProps } from "svelte";
 
-  import NavManagement from "$lib/components/navigation/NavManagement.svelte";
+  import NavMain from "$lib/components/navigation/NavMain.svelte";
   import NavSecondary from "$lib/components/navigation/NavSecondary.svelte";
   import NavUser from "$lib/components/navigation/NavUser.svelte";
   import OrganizationSwitcher from "$lib/components/switchers/OrganizationSwitcher.svelte";
@@ -55,11 +58,18 @@
       url: `/dashboard/${activeOrganization.slug}/members`,
       icon: UsersIcon,
     },
+    { name: "Leave", url: `/dashboard/${activeOrganization.slug}/leave`, icon: CalendarDaysIcon },
     {
       name: "Attendance Policies",
       url: `/dashboard/${activeOrganization.slug}/attendances/policies`,
       icon: ClipboardClockIcon,
     },
+    {
+      name: "Reports",
+      url: `/dashboard/${activeOrganization.slug}/reports`,
+      icon: FileChartColumnIncreasingIcon,
+    },
+    { name: "Settings", url: `/dashboard/${activeOrganization.slug}/settings`, icon: SettingsIcon },
   ]);
 </script>
 
@@ -68,11 +78,15 @@
     <OrganizationSwitcher {orgs} {activeOrganization} onCreateOrganization={() => (open = true)} />
   </Sidebar.Header>
   <Sidebar.Content>
-    <NavManagement features={data} />
+    <NavMain features={data} />
     <NavSecondary
       class="mt-auto"
       items={[
-        { url: `/app/${activeOrganization.slug}`, icon: AppWindowIcon, title: "Application" },
+        {
+          url: `/app/${activeOrganization.slug}`,
+          icon: AppWindowIcon,
+          title: "Got to Application",
+        },
       ]}
     />
   </Sidebar.Content>
