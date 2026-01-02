@@ -2,7 +2,7 @@ import { defineRelations } from "drizzle-orm";
 import { attendance, attendancePolicy } from "./attendance";
 import { account, session, twoFactor, user } from "./core";
 import { image } from "./image";
-import { leave, leaveRequest } from "./leave";
+import { leave, leaveBalance, leaveBalanceAdjustment, leaveRequest } from "./leave";
 import { invitation, member, organization, team, teamMember } from "./organization";
 
 export const relations = defineRelations(
@@ -21,6 +21,8 @@ export const relations = defineRelations(
     attendance,
     leave,
     leaveRequest,
+    leaveBalance,
+    leaveBalanceAdjustment,
   },
   (r) => ({
     user: {
@@ -44,7 +46,7 @@ export const relations = defineRelations(
       invitations: r.many.invitation(),
       teams: r.many.team(),
       attendancePolicies: r.many.attendancePolicy(),
-      leaves: r.many.leave(),
+      leave: r.many.leave(),
     },
     member: {
       organization: r.one.organization({ from: r.member.organizationId, to: r.organization.id }),
@@ -58,6 +60,8 @@ export const relations = defineRelations(
         from: r.member.id,
         to: r.leaveRequest.reviewerId,
       }),
+      leaveBalance: r.one.leaveBalance({ from: r.member.id, to: r.leaveBalance.memberId }),
+      leaveBalanceAdjustments: r.many.leaveBalanceAdjustment(),
     },
     invitation: {
       organization: r.one.organization({
@@ -98,11 +102,34 @@ export const relations = defineRelations(
     leave: {
       organization: r.one.organization({ from: r.leave.organizationId, to: r.organization.id }),
       leaveRequests: r.many.leaveRequest(),
+      leaveBalances: r.many.leaveBalance(),
+      leaveBalanceAdjustments: r.many.leaveBalanceAdjustment(),
     },
     leaveRequest: {
       leave: r.one.leave({ from: r.leaveRequest.leaveId, to: r.leave.id }),
       member: r.one.member({ from: r.leaveRequest.memberId, to: r.member.id }),
       reviewer: r.one.member({ from: r.leaveRequest.reviewerId, to: r.member.id }),
+      leaveBalanceAdjustment: r.one.leaveBalanceAdjustment({
+        from: r.leaveRequest.id,
+        to: r.leaveBalanceAdjustment.requestId,
+      }),
+    },
+    leaveBalance: {
+      member: r.one.member({ from: r.leaveBalance.memberId, to: r.member.id }),
+      leave: r.one.leave({ from: r.leaveBalance.leaveId, to: r.leave.id }),
+      leaveBalanceAdjustments: r.many.leaveBalance(),
+    },
+    leaveBalanceAdjustment: {
+      balance: r.one.leaveBalance({
+        from: r.leaveBalanceAdjustment.balanceId,
+        to: r.leaveBalance.id,
+      }),
+      member: r.one.member({ from: r.leaveBalanceAdjustment.memberId, to: r.member.id }),
+      leave: r.one.leave({ from: r.leaveBalanceAdjustment.leaveId, to: r.leave.id }),
+      request: r.one.leaveRequest({
+        from: r.leaveBalanceAdjustment.requestId,
+        to: r.leaveRequest.id,
+      }),
     },
   }),
 );
