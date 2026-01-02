@@ -1,0 +1,71 @@
+import { and, desc, eq, gte, leave, leaveRequest, lte, member, organization, user } from "@repo/db";
+import { z } from "zod";
+import { db } from "$lib/server/db";
+import { organizationMiddleware, os } from "$lib/server/orpc/base";
+
+const input = z.object({
+  cursor: z.number().optional(),
+  pageSize: z.number(),
+  slug: z.string(),
+  status: z.enum(["PENDING", "APPROVED", "REJECTED", "CANCELLED"]).optional(),
+  memberId: z.string().optional(),
+  startDate: z.number().optional(),
+  endDate: z.number().optional(),
+});
+
+export const listLeaveRequestsHandler = os
+  .route({ method: "GET" })
+  .input(input)
+  .use(organizationMiddleware(["admin", "owner"]))
+  .handler(async ({ context, input }) => {
+    const items = await db
+      .select({
+        organizationId: organization.id,
+        slug: organization.slug,
+        userId: user.id,
+        username: user.name,
+        position: member.position,
+        image: user.image,
+        id: leaveRequest.id,
+        memberId: leaveRequest.memberId,
+        leaveId: leaveRequest.leaveId,
+        name: leave.name,
+        startDate: leaveRequest.startDate,
+        endDate: leaveRequest.endDate,
+        status: leaveRequest.status,
+        reason: leaveRequest.reason,
+        reviewerId: leaveRequest.reviewerId,
+        reviewedAt: leaveRequest.reviewedAt,
+        createdAt: leaveRequest.createdAt,
+        updatedAt: leaveRequest.updatedAt,
+      })
+      .from(leaveRequest)
+      .innerJoin(leave, eq(leaveRequest.leaveId, leave.id))
+      .innerJoin(organization, eq(leave.organizationId, organization.id))
+      .innerJoin(member, eq(leaveRequest.memberId, member.id))
+      .innerJoin(user, eq(member.userId, user.id))
+      .where(
+        and(
+          eq(leave.organizationId, context.organization.id),
+          input.status ? eq(leaveRequest.status, input.status) : undefined,
+          input.memberId ? eq(leaveRequest.memberId, input.memberId) : undefined,
+          input.startDate ? gte(leaveRequest.startDate, new Date(input.startDate)) : undefined,
+          input.endDate ? lte(leaveRequest.endDate, new Date(input.endDate)) : undefined,
+        ),
+      )
+      .orderBy(desc(leaveRequest.createdAt))
+      .offset(input.cursor ?? 0)
+      .limit(input.pageSize + 1);
+
+    let nextCursor: typeof input.cursor;
+    if (items.length > input.pageSize) {
+      items.pop();
+      nextCursor = (input.cursor ?? 0) + input.pageSize;
+    }
+
+    return {
+      items,
+      nextCursor,
+      pageSize: input.pageSize,
+    };
+  });

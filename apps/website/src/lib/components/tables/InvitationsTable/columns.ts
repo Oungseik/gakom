@@ -1,9 +1,9 @@
 import { renderComponent } from "@repo/ui/data-table";
 import type { ColumnDef } from "@tanstack/table-core";
 import { formatDate } from "$lib/utils";
+import DataTableStatus from "../common/DataTableStatus.svelte";
 import DataTableActions from "./DataTableActions.svelte";
 import DataTableRole from "./DataTableRole.svelte";
-import DataTableStatus from "./DataTableStatus.svelte";
 
 export type Invitation = {
   id: string;

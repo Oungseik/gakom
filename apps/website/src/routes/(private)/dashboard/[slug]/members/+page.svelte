@@ -88,7 +88,7 @@
     </div>
 
     <Tabs.Content value="members">
-      {#if members.isFetching && !members.data}
+      {#if members.isLoading}
         <div class="flex h-40 w-full items-center justify-center">
           <Spinner class="size-10" />
         </div>
@@ -124,7 +124,7 @@
     </Tabs.Content>
 
     <Tabs.Content value="invitations">
-      {#if invitations.isFetching}
+      {#if invitations.isLoading}
         <div class="flex h-40 w-full items-center justify-center">
           <Spinner class="size-10" />
         </div>

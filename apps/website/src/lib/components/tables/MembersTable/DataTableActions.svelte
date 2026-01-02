@@ -44,6 +44,7 @@
           );
         } else {
           queryClient.invalidateQueries({ queryKey: orpc.organizations.members.key() });
+          queryClient.invalidateQueries({ queryKey: orpc.organizations.leaveRequests.key() });
         }
       },
     });

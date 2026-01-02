@@ -53,12 +53,12 @@
       url: `/dashboard/${activeOrganization.slug}`,
       icon: LayoutDashboardIcon,
     },
+    { name: "Leave", url: `/dashboard/${activeOrganization.slug}/leave`, icon: CalendarDaysIcon },
     {
       name: "Members",
       url: `/dashboard/${activeOrganization.slug}/members`,
       icon: UsersIcon,
     },
-    { name: "Leave", url: `/dashboard/${activeOrganization.slug}/leave`, icon: CalendarDaysIcon },
     {
       name: "Attendance Policies",
       url: `/dashboard/${activeOrganization.slug}/attendances/policies`,

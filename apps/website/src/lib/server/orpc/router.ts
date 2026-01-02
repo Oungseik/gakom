@@ -15,6 +15,7 @@ import { checkOutHandler } from "./handlers/organizations/attendences/check_out"
 import { listInvitationsHandler } from "./handlers/organizations/invitations/list";
 import { createLeaveHandler } from "./handlers/organizations/leave/create";
 import { cancelLeaveRequestHandler } from "./handlers/organizations/leaveRequests/cancel";
+import { listLeaveRequestsHandler } from "./handlers/organizations/leaveRequests/list";
 import { listMembersHandler } from "./handlers/organizations/members/list";
 import { updateMemberHandler } from "./handlers/organizations/members/update";
 
@@ -37,9 +38,16 @@ export const router = os.router({
       list: listAttendancePoliciesHandler,
       delete: deleteAttendancePolicyHandler,
     },
-    members: { list: listMembersHandler, update: updateMemberHandler },
+    members: {
+      list: listMembersHandler,
+      update: updateMemberHandler,
+    },
     invitations: { list: listInvitationsHandler },
-    leaveRequests: { cancel: cancelLeaveRequestHandler },
+    leaveRequests: {
+      cancel: cancelLeaveRequestHandler,
+      list: listLeaveRequestsHandler,
+      stats: {},
+    },
     leave: { create: createLeaveHandler },
   },
 });

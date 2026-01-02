@@ -35,7 +35,7 @@
   );
 </script>
 
-<ScrollArea class="grid h-full w-full grid-cols-1 overflow-auto">
+<ScrollArea class="grid w-full grid-cols-1 overflow-auto">
   <div class="overflow-x-auto rounded-md border">
     <Table.Root>
       <Table.Header>
