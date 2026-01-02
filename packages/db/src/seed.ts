@@ -21,11 +21,13 @@
  *   CLEAR_DB - Set to "true" to clear all data before seeding
  */
 
+import { eq } from "drizzle-orm";
 import { connect } from "./index";
-import { user, account } from "./schema/core";
-import { organization, member, invitation } from "./schema/organization";
-import { attendancePolicy, attendance } from "./schema/attendance";
 import type { Day } from "./schema/attendance";
+import { attendance, attendancePolicy } from "./schema/attendance";
+import { account, user } from "./schema/core";
+import { leave, leaveRequest } from "./schema/leave";
+import { invitation, member, organization } from "./schema/organization";
 
 // Database connection
 const DATABASE_URL = process.env.DATABASE_URL || "file:../../databases/gakom.db";
@@ -80,6 +82,8 @@ async function main() {
     await db.delete(account);
     await db.delete(organization);
     await db.delete(user);
+    await db.delete(leaveRequest);
+    await db.delete(leave);
     console.log("✨ Database cleared!");
   }
 
@@ -296,11 +300,116 @@ async function main() {
     }
   }
 
-  console.log(`✅ Seeding complete!`);
-  console.log(`   - 1 organization created`);
+  // 7. Create Leave Types
+  console.log("🏖️ Creating leave types...");
+  const leaveTypes = [
+    {
+      id: crypto.randomUUID(),
+      name: "Annual Leave",
+      days: 10,
+    },
+    {
+      id: crypto.randomUUID(),
+      name: "Sick Leave",
+      days: 5,
+    },
+    {
+      id: crypto.randomUUID(),
+      name: "Personal Leave",
+      days: 10,
+    },
+  ];
+
+  for (const leaveTypeData of leaveTypes) {
+    await db.insert(leave).values({
+      id: leaveTypeData.id,
+      name: leaveTypeData.name,
+      days: leaveTypeData.days,
+      organizationId: orgId,
+    });
+  }
+
+  // 8. Create Leave Requests
+  console.log("📝 Creating leave requests...");
+  const memberIds: { userId: string; memberId: string; policyId: string }[] = [];
+
+  // First collect member IDs
+  for (const memberRecord of memberRecords) {
+    const [memberData] = await db
+      .select({ id: member.id })
+      .from(member)
+      .where(eq(member.userId, memberRecord.userId));
+
+    if (memberData) {
+      memberIds.push({
+        userId: memberRecord.userId,
+        memberId: memberData.id,
+        policyId: memberRecord.policyId,
+      });
+    }
+  }
+
+  let leaveRequestsCount = 0;
+  // Generate leave requests for each member
+  for (const memberData of memberIds) {
+    const numRequests = Math.floor(Math.random() * 3) + 1; // 1-3 leave requests per member
+
+    for (let i = 0; i < numRequests; i++) {
+      leaveRequestsCount += 1;
+      const leaveTypeIndex = Math.floor(Math.random() * leaveTypes.length);
+      const leaveTypeData = leaveTypes[leaveTypeIndex];
+
+      // Random start date within the last 3 months
+      const startDaysAgo = Math.floor(Math.random() * 80);
+      const startDate = daysAgo(startDaysAgo);
+      const duration = Math.floor(Math.random() * 3) + 1; // 1-3 days duration
+      const endDate = new Date(startDate);
+      endDate.setDate(endDate.getDate() + duration);
+
+      // Random status with weighted probability
+      const statusRoll = Math.random();
+      let status: "PENDING" | "APPROVED" | "REJECTED" | "CANCELLED" = "PENDING";
+      let reviewerId: string | undefined;
+      let reviewedAt: Date | undefined;
+
+      if (statusRoll > 0.7) {
+        status = "APPROVED";
+        // First member (admin) reviews requests
+        if (memberIds.length > 0) {
+          reviewerId = memberIds[0].memberId;
+          reviewedAt = new Date();
+        }
+      } else if (statusRoll > 0.85) {
+        status = "REJECTED";
+        if (memberIds.length > 0) {
+          reviewerId = memberIds[0].memberId;
+          reviewedAt = new Date();
+        }
+      } else if (statusRoll > 0.95) {
+        status = "CANCELLED";
+      }
+
+      await db.insert(leaveRequest).values({
+        id: crypto.randomUUID(),
+        memberId: memberData.memberId,
+        leaveId: leaveTypeData.id,
+        startDate: startDate,
+        endDate: endDate,
+        status: status,
+        reason: `${leaveTypeData.name} request for ${duration} day(s)`,
+        reviewerId: reviewerId,
+        reviewedAt: reviewedAt,
+      });
+    }
+  }
+
+  console.log("✅ Seeding complete!");
+  console.log("   - 1 organization created");
   console.log(`   - ${userIds.length} users created`);
   console.log(`   - ${userIds.length} accounts created`);
   console.log(`   - ${policies.length} attendance policies created`);
+  console.log(`   - ${leaveTypes.length} leave types created`);
+  console.log(`   - ${leaveRequestsCount} leave requests created`);
   console.log(`   - ${memberRecords.length} members created`);
   console.log(`   - ${invitations.length} invitations created`);
   console.log(`   - ${attendanceCount} attendance records created`);

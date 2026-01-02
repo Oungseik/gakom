@@ -3,6 +3,7 @@ import { drizzle } from "drizzle-orm/bun-sqlite";
 import { attendance, attendancePolicy } from "./schema/attendance";
 import { account, session, twoFactor, user, verification } from "./schema/core";
 import { image } from "./schema/image";
+import { leave, leaveRequest } from "./schema/leave";
 import { invitation, member, organization, team, teamMember } from "./schema/organization";
 import { relations } from "./schema/relations";
 
@@ -24,6 +25,8 @@ export function connect(url: string) {
       teamMember,
       attendancePolicy,
       attendance,
+      leaveRequest,
+      leave,
     },
     relations,
   });
@@ -33,5 +36,6 @@ export * from "drizzle-orm";
 export * from "./schema/attendance";
 export * from "./schema/core";
 export * from "./schema/image";
+export * from "./schema/leave";
 export * from "./schema/organization";
 export * from "./schema/relations";

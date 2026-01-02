@@ -2,6 +2,7 @@ import { defineRelations } from "drizzle-orm";
 import { attendance, attendancePolicy } from "./attendance";
 import { account, session, twoFactor, user } from "./core";
 import { image } from "./image";
+import { leave, leaveRequest } from "./leave";
 import { invitation, member, organization, team, teamMember } from "./organization";
 
 export const relations = defineRelations(
@@ -18,6 +19,8 @@ export const relations = defineRelations(
     image,
     attendancePolicy,
     attendance,
+    leave,
+    leaveRequest,
   },
   (r) => ({
     user: {
@@ -41,6 +44,7 @@ export const relations = defineRelations(
       invitations: r.many.invitation(),
       teams: r.many.team(),
       attendancePolicies: r.many.attendancePolicy(),
+      leaves: r.many.leave(),
     },
     member: {
       organization: r.one.organization({ from: r.member.organizationId, to: r.organization.id }),
@@ -48,6 +52,11 @@ export const relations = defineRelations(
       attendancePolicy: r.one.attendancePolicy({
         from: r.member.attendancePolicyId,
         to: r.attendancePolicy.id,
+      }),
+      leaveRequests: r.many.leaveRequest({ from: r.member.id, to: r.leaveRequest.memberId }),
+      reviewedLeaveRequests: r.many.leaveRequest({
+        from: r.member.id,
+        to: r.leaveRequest.reviewerId,
       }),
     },
     invitation: {
@@ -85,6 +94,15 @@ export const relations = defineRelations(
         from: r.attendance.attendancePolicyId,
         to: r.attendancePolicy.id,
       }),
+    },
+    leave: {
+      organization: r.one.organization({ from: r.leave.organizationId, to: r.organization.id }),
+      leaveRequests: r.many.leaveRequest(),
+    },
+    leaveRequest: {
+      leave: r.one.leave({ from: r.leaveRequest.leaveId, to: r.leave.id }),
+      member: r.one.member({ from: r.leaveRequest.memberId, to: r.member.id }),
+      reviewer: r.one.member({ from: r.leaveRequest.reviewerId, to: r.member.id }),
     },
   }),
 );
