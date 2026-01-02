@@ -106,3 +106,77 @@ export function getNameIntials(name: string) {
   const secondWord = split.at(1)?.at(0)?.toUpperCase() ?? split.at(0)?.at(1)?.toUpperCase();
   return { firstWord, secondWord };
 }
+
+export function getDaysDifference(date1: Date, date2: Date) {
+  const oneDay = 1000 * 60 * 60 * 24;
+  const differenceMs = Math.abs(date1.getTime() - date2.getTime());
+  const differenceDays = Math.floor(differenceMs / oneDay);
+  return differenceDays;
+}
+
+/**
+ * Calculate the leave year number based on member's join date.
+ *
+ * Leave year 0 starts from the join date and ends one day before the next anniversary.
+ * Leave year 1 starts from the first anniversary, and so on.
+ *
+ * @param joinedDate - The date when the member joined the organization
+ * @param currentDate - The current date to calculate the leave year for
+ * @returns The leave year number (0, 1, 2, ...)
+ *
+ * @example
+ * // Joined Dec 15, 2025
+ * getLeaveYearNumber(new Date('2025-12-15'), new Date('2026-01-01')) // returns 0
+ * getLeaveYearNumber(new Date('2025-12-15'), new Date('2026-12-15')) // returns 1
+ * getLeaveYearNumber(new Date('2025-12-15'), new Date('2027-12-15')) // returns 2
+ */
+export function getLeaveYearNumber(joinedDate: Date, currentDate: Date): number {
+  const joinedYear = joinedDate.getUTCFullYear();
+  const currentYear = currentDate.getUTCFullYear();
+  const joinedMonth = joinedDate.getUTCMonth();
+  const joinedDay = joinedDate.getUTCDate();
+  const currentMonth = currentDate.getUTCMonth();
+  const currentDay = currentDate.getUTCDate();
+
+  // Calculate the difference in years
+  let yearsDiff = currentYear - joinedYear;
+
+  // If current month/day is before the joined month/day,
+  // we're still in the previous leave year
+  if (currentMonth < joinedMonth || (currentMonth === joinedMonth && currentDay < joinedDay)) {
+    yearsDiff -= 1;
+  }
+
+  return yearsDiff;
+}
+
+/**
+ * Get the start and end dates for a specific leave year.
+ *
+ * @param joinedDate - The date when the member joined the organization
+ * @param leaveYearNumber - The leave year number (0, 1, 2, ...)
+ * @returns Object with startDate and endDate as Date objects
+ *
+ * @example
+ * // Joined Dec 15, 2025
+ * getLeaveYearDates(new Date('2025-12-15'), 0)
+ * // returns { startDate: 2025-12-15, endDate: 2026-12-14 }
+ */
+export function getLeaveYearDates(
+  joinedDate: Date,
+  leaveYearNumber: number,
+): {
+  startDate: Date;
+  endDate: Date;
+} {
+  const startDate = new Date(joinedDate);
+  startDate.setUTCFullYear(startDate.getUTCFullYear() + leaveYearNumber);
+  startDate.setUTCHours(0, 0, 0, 0);
+
+  const endDate = new Date(startDate);
+  endDate.setUTCFullYear(endDate.getUTCFullYear() + 1);
+  endDate.setUTCDate(endDate.getUTCDate() - 1);
+  endDate.setUTCHours(23, 59, 59, 999);
+
+  return { startDate, endDate };
+}

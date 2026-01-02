@@ -117,7 +117,10 @@ export const relations = defineRelations(
     leaveBalance: {
       member: r.one.member({ from: r.leaveBalance.memberId, to: r.member.id }),
       leave: r.one.leave({ from: r.leaveBalance.leaveId, to: r.leave.id }),
-      leaveBalanceAdjustments: r.many.leaveBalance(),
+      leaveBalanceAdjustments: r.many.leaveBalanceAdjustment({
+        from: r.leaveBalance.id,
+        to: r.leaveBalanceAdjustment.balanceId,
+      }),
     },
     leaveBalanceAdjustment: {
       balance: r.one.leaveBalance({

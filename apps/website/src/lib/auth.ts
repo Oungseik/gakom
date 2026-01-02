@@ -1,4 +1,4 @@
-import { and, eq, member } from "@repo/db";
+import { and, eq, leave, leaveBalance, member } from "@repo/db";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { emailOTP, organization, twoFactor } from "better-auth/plugins";
@@ -102,18 +102,41 @@ export const auth = betterAuth({
       },
       organizationHooks: {
         afterAcceptInvitation: async ({ invitation, member: m }) => {
-          await db
-            .update(member)
-            .set({
-              position: invitation.position,
-              attendancePolicyId: invitation.attendancePolicyId,
-            })
-            .where(
-              and(
-                eq(member.userId, m.userId),
-                eq(member.organizationId, invitation.organizationId),
-              ),
+          await db.transaction(async (tx) => {
+            const updateMemberPromise = tx
+              .update(member)
+              .set({
+                position: invitation.position,
+                attendancePolicyId: invitation.attendancePolicyId,
+              })
+              .where(
+                and(
+                  eq(member.userId, m.userId),
+                  eq(member.organizationId, invitation.organizationId),
+                ),
+              );
+
+            const leaveTypes = await tx
+              .select({
+                id: leave.id,
+                days: leave.days,
+              })
+              .from(leave)
+              .where(eq(leave.organizationId, member.organizationId));
+
+            const leaveInitializePromises = leaveTypes.map((leaveType) =>
+              tx.insert(leaveBalance).values({
+                memberId: m.id,
+                leaveId: leaveType.id,
+                totalDays: leaveType.days,
+                usedDays: 0,
+                pendingDays: 0,
+                year: 0, // First leave year since joining
+              }),
             );
+
+            await Promise.all([updateMemberPromise, ...leaveInitializePromises]);
+          });
         },
       },
     }),
