@@ -120,5 +120,6 @@ export const leaveBalanceAdjustment = sqliteTable(
   (table) => [
     index("leave_balance_adjustment_balance_id_idx").on(table.balanceId),
     index("leave_balance_adjustment_member_id_idx").on(table.memberId),
+    index("leave_balance_adjustment_leave_request_id_idx").on(table.requestId),
   ],
 );
