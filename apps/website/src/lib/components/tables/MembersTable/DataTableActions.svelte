@@ -5,10 +5,9 @@
   import { Button } from "@repo/ui/button";
   import { ConfirmDeleteDialog, confirmDelete } from "@repo/ui/confirm-delete-dialog";
   import * as DropdownMenu from "@repo/ui/dropdown-menu";
-  import { useQueryClient } from "@tanstack/svelte-query";
+  import { createMutation, useQueryClient } from "@tanstack/svelte-query";
   import { toast } from "svelte-sonner";
 
-  import { authClient } from "$lib/auth_client";
   import UpdateMemberDialog from "$lib/components/dialogs/UpdateMemberDialog.svelte";
   import { orpc } from "$lib/orpc_client";
 
@@ -27,25 +26,26 @@
   let open = $state(false);
 
   const queryClient = useQueryClient();
+  const removeMember = createMutation(() => orpc.organizations.members.remove.mutationOptions());
 
   function handleRemoveMember() {
     confirmDelete({
       title: "Remove member",
       description: "Are you sure want to remove the member from the organization",
       onConfirm: async () => {
-        const { error } = await authClient.organization.removeMember({
-          organizationId,
-          memberIdOrEmail: email,
-        });
-
-        if (error) {
-          toast.error(
-            error.message ?? "Something went wrong while remove member from the organization"
-          );
-        } else {
-          queryClient.invalidateQueries({ queryKey: orpc.organizations.members.key() });
-          queryClient.invalidateQueries({ queryKey: orpc.organizations.leaveRequests.key() });
-        }
+        removeMember.mutate(
+          { slug, userId: member.userId },
+          {
+            onError: (error) =>
+              toast.error(
+                error.message ?? "Something went wrong while remove member from the organization"
+              ),
+            onSuccess: () => {
+              queryClient.invalidateQueries({ queryKey: orpc.organizations.members.key() });
+              queryClient.invalidateQueries({ queryKey: orpc.organizations.leaveRequests.key() });
+            },
+          }
+        );
       },
     });
   }

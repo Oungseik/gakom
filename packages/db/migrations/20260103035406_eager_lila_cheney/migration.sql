@@ -1,0 +1,1 @@
+ALTER TABLE `member` ADD `status` text DEFAULT 'ACTIVE';

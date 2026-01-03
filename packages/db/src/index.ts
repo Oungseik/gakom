@@ -33,6 +33,7 @@ export function connect(url: string) {
 }
 
 export * from "drizzle-orm";
+export { alias } from "drizzle-orm/sqlite-core";
 export * from "./schema/attendance";
 export * from "./schema/core";
 export * from "./schema/image";

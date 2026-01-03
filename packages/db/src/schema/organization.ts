@@ -33,6 +33,7 @@ export const member = sqliteTable(
     attendancePolicyId: text("attendance_policy_id").references(() => attendancePolicy.id),
     role: text("role").default("member").notNull(),
     position: text("position"),
+    status: text("status", { enum: ["ACTIVE", "DEACTIVATED"] }).default("ACTIVE"),
     createdAt: integer("created_at", { mode: "timestamp_ms" })
       .default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)
       .notNull(),

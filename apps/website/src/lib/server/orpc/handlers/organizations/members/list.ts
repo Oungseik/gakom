@@ -42,6 +42,7 @@ export const listMembersHandler = os
           )
         : undefined,
       input.filter?.role ? like(member.role, input.filter.role) : undefined,
+      eq(member.status, "ACTIVE"),
     );
 
     const items = await db

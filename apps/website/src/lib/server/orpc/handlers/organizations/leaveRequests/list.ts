@@ -1,4 +1,16 @@
-import { and, desc, eq, gte, leave, leaveRequest, lte, member, organization, user } from "@repo/db";
+import {
+  alias,
+  and,
+  desc,
+  eq,
+  gte,
+  leave,
+  leaveRequest,
+  lte,
+  member,
+  organization,
+  user,
+} from "@repo/db";
 import { z } from "zod";
 import { db } from "$lib/server/db";
 import { organizationMiddleware, os } from "$lib/server/orpc/base";
@@ -18,6 +30,9 @@ export const listLeaveRequestsHandler = os
   .input(input)
   .use(organizationMiddleware(["admin", "owner"]))
   .handler(async ({ context, input }) => {
+    const reviewer = alias(member, "reviewer");
+    const reviewerUser = alias(user, "reviewer_user");
+
     const items = await db
       .select({
         organizationId: organization.id,
@@ -35,6 +50,9 @@ export const listLeaveRequestsHandler = os
         status: leaveRequest.status,
         reason: leaveRequest.reason,
         reviewerId: leaveRequest.reviewerId,
+        reviewerName: reviewerUser.name,
+        reviewerImage: reviewerUser.image,
+        reviewerPosition: reviewer.position,
         reviewedAt: leaveRequest.reviewedAt,
         createdAt: leaveRequest.createdAt,
         updatedAt: leaveRequest.updatedAt,
@@ -44,9 +62,12 @@ export const listLeaveRequestsHandler = os
       .innerJoin(organization, eq(leave.organizationId, organization.id))
       .innerJoin(member, eq(leaveRequest.memberId, member.id))
       .innerJoin(user, eq(member.userId, user.id))
+      .leftJoin(reviewer, eq(leaveRequest.reviewerId, reviewer.id))
+      .leftJoin(reviewerUser, eq(reviewer.userId, reviewerUser.id))
       .where(
         and(
           eq(leave.organizationId, context.organization.id),
+          eq(member.status, "ACTIVE"),
           input.status ? eq(leaveRequest.status, input.status) : undefined,
           input.memberId ? eq(leaveRequest.memberId, input.memberId) : undefined,
           input.startDate ? gte(leaveRequest.startDate, new Date(input.startDate)) : undefined,

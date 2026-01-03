@@ -18,6 +18,9 @@ export type LeaveRequest = {
   status: "approved" | "cancelled" | "pending" | "rejected";
   startDate: Date;
   endDate: Date;
+  reviewerName?: string | null;
+  reviewerImage?: string | null;
+  reviewerPosition?: string | null;
   createdAt: Date;
 };
 
@@ -42,27 +45,14 @@ export const columns: ColumnDef<LeaveRequest>[] = [
   },
   {
     id: "info",
-    header: "Personal Info",
+    header: "Requester",
     cell: ({ row }) =>
       renderComponent(DataTableMemberInfo, {
         name: row.original.username,
         position: row.original.position,
         image: row.original.image,
+        hideImage: true,
       }),
-  },
-  {
-    accessorKey: "name",
-    header: "Leave Type",
-  },
-  {
-    id: "dates",
-    header: "Date & Duration",
-    cell: ({ row }) => {
-      return renderComponent(DataTableDateAndDuration, {
-        startDate: row.original.startDate,
-        endDate: row.original.endDate,
-      });
-    },
   },
   {
     id: "requestedAt",
@@ -72,10 +62,40 @@ export const columns: ColumnDef<LeaveRequest>[] = [
     },
   },
   {
+    accessorKey: "name",
+    header: "Leave Type",
+  },
+  {
+    id: "dates",
+    header: "Duration & Date",
+    cell: ({ row }) => {
+      return renderComponent(DataTableDateAndDuration, {
+        startDate: row.original.startDate,
+        endDate: row.original.endDate,
+      });
+    },
+  },
+  {
     accessorKey: "status",
     header: "Status",
     cell: ({ row }) => {
       return renderComponent(DataTableStatus, { status: row.original.status });
+    },
+  },
+  {
+    id: "reviewer",
+    header: "Reviewer",
+    cell: ({ row }) => {
+      return (
+        row.original.reviewerName &&
+        row.original.reviewerPosition &&
+        renderComponent(DataTableMemberInfo, {
+          name: row.original.reviewerName,
+          position: row.original.reviewerPosition,
+          image: row.original.image,
+          hideImage: true,
+        })
+      );
     },
   },
   {
