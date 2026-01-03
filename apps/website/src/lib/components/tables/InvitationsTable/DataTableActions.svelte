@@ -1,7 +1,7 @@
 <script lang="ts">
+  import CircleXIcon from "@lucide/svelte/icons/circle-x";
   import EllipsisIcon from "@lucide/svelte/icons/ellipsis";
   import MailIcon from "@lucide/svelte/icons/mail";
-  import XIcon from "@lucide/svelte/icons/x";
   import { Button } from "@repo/ui/button";
   import * as DropdownMenu from "@repo/ui/dropdown-menu";
   import { useQueryClient } from "@tanstack/svelte-query";
@@ -59,7 +59,7 @@
         </Button>
       {/snippet}
     </DropdownMenu.Trigger>
-    <DropdownMenu.Content>
+    <DropdownMenu.Content align="end">
       <DropdownMenu.Item onclick={handleResendInvitation}>
         <MailIcon size={16} class="mr-2" /> Resend Invitation
       </DropdownMenu.Item>
@@ -68,7 +68,7 @@
         variant="destructive"
         disabled={status === "canceled"}
       >
-        <XIcon size={16} class="mr-2" /> Cancel Invitation
+        <CircleXIcon size={16} class="mr-2" /> Cancel Invitation
       </DropdownMenu.Item>
     </DropdownMenu.Content>
   </DropdownMenu.Root>

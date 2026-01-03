@@ -22,7 +22,7 @@
       </Button>
     {/snippet}
   </DropdownMenu.Trigger>
-  <DropdownMenu.Content>
+  <DropdownMenu.Content align="end">
     <DropdownMenu.Item onclick={handleApproveLeaveRequest}>
       <CircleCheckBigIcon size="4" /> Approve
     </DropdownMenu.Item>

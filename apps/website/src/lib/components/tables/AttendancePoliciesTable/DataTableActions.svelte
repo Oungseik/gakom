@@ -61,7 +61,7 @@
       </Button>
     {/snippet}
   </DropdownMenu.Trigger>
-  <DropdownMenu.Content>
+  <DropdownMenu.Content align="end">
     <DropdownMenu.Item onclick={() => onEdit(policy)}>
       <SquarePenIcon size={16} class="mr-2" /> Edit
     </DropdownMenu.Item>

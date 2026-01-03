@@ -63,7 +63,7 @@
       </Button>
     {/snippet}
   </DropdownMenu.Trigger>
-  <DropdownMenu.Content>
+  <DropdownMenu.Content align="end">
     <DropdownMenu.Item
       onclick={() => {
         open = true;
