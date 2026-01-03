@@ -1,13 +1,5 @@
 import { ORPCError } from "@orpc/server";
-import {
-  and,
-  eq,
-  leave,
-  leaveBalance,
-  leaveBalanceAdjustment,
-  leaveRequest,
-  member,
-} from "@repo/db";
+import { eq, leave, leaveBalance, leaveBalanceAdjustment, leaveRequest, member } from "@repo/db";
 import { z } from "zod";
 import { db } from "$lib/server/db";
 import { organizationMiddleware, os } from "$lib/server/orpc/base";
@@ -18,12 +10,11 @@ const input = z.object({
   id: z.string(),
 });
 
-export const cancelLeaveRequestHandler = os
+export const rejectLeaveRequestHandler = os
   .input(input)
-  .use(organizationMiddleware(["admin", "owner", "member"]))
+  .use(organizationMiddleware(["admin", "owner"]))
   .handler(async ({ context, input }) => {
-    /** the person who call the API */
-    const canceler = (
+    const reviewer = (
       await db
         .select({
           id: member.id,
@@ -34,24 +25,25 @@ export const cancelLeaveRequestHandler = os
         .limit(1)
     ).at(0);
 
-    if (!canceler) {
+    if (!reviewer) {
       throw new ORPCError("NOT_FOUND", { message: "Member not found." });
     }
 
+    // Get the leave request with leave policy
     const leaveReq = (
       await db
         .select({
           id: leaveRequest.id,
           memberId: leaveRequest.memberId,
+          leaveId: leaveRequest.leaveId,
           status: leaveRequest.status,
           startDate: leaveRequest.startDate,
           endDate: leaveRequest.endDate,
-          leaveId: leaveRequest.leaveId,
           organizationId: leave.organizationId,
         })
         .from(leaveRequest)
         .innerJoin(leave, eq(leaveRequest.leaveId, leave.id))
-        .where(and(eq(leaveRequest.id, input.id), eq(leaveRequest.memberId, canceler.id)))
+        .where(eq(leaveRequest.id, input.id))
         .limit(1)
     ).at(0);
 
@@ -61,22 +53,42 @@ export const cancelLeaveRequestHandler = os
 
     if (leaveReq.organizationId !== context.organization.id) {
       throw new ORPCError("FORBIDDEN", {
-        message: "You don't have permission to cancel this request.",
+        message: "You don't have permission to reject this request.",
       });
     }
 
-    const cancellable = checkCancellable(leaveReq);
-    if (!cancellable) {
-      throw new ORPCError("BAD_REQUEST", { message: "Unable to cancel this leave request" });
+    // Verify the request is in PENDING or APPROVED status
+    if (leaveReq.status !== "PENDING" && leaveReq.status !== "APPROVED") {
+      throw new ORPCError("BAD_REQUEST", {
+        message: `Cannot reject a leave request with status ${leaveReq.status}.`,
+      });
     }
 
-    const leaveYearNumber = getLeaveYearNumber(canceler.createdAt, new Date());
     const daysApart = getDaysDifference(leaveReq.endDate, leaveReq.startDate) + 1;
 
     await db.transaction(async (tx) => {
+      // Get the member who created the request
+      const requester = (
+        await tx
+          .select({
+            id: member.id,
+            createdAt: member.createdAt,
+          })
+          .from(member)
+          .where(eq(member.id, leaveReq.memberId))
+          .limit(1)
+      ).at(0);
+
+      if (!requester) {
+        throw new ORPCError("NOT_FOUND", { message: "Requester not found." });
+      }
+
+      const leaveYearNumber = getLeaveYearNumber(requester.createdAt, leaveReq.startDate);
+
+      // Get leave balance
       const balance = await tx.query.leaveBalance.findFirst({
         where: {
-          memberId: canceler.id,
+          memberId: requester.id,
           leaveId: leaveReq.leaveId,
           year: leaveYearNumber,
         },
@@ -84,58 +96,43 @@ export const cancelLeaveRequestHandler = os
 
       if (!balance) {
         throw new ORPCError("INTERNAL_SERVER_ERROR", {
-          message: "Failed to cancel leave. Please report bug.",
+          message: "Leave balance not found. Please report this bug.",
         });
       }
 
+      await tx
+        .update(leaveRequest)
+        .set({
+          status: "REJECTED",
+          reviewerId: reviewer.id,
+          reviewedAt: new Date(),
+        })
+        .where(eq(leaveRequest.id, leaveReq.id));
+
       // Update leave balance based on current status
       if (leaveReq.status === "PENDING") {
-        if (balance.pendingDays < daysApart) {
-          throw new ORPCError("INTERNAL_SERVER_ERROR", {
-            message: "Failed to cancel leave. Please report bug.",
-          });
-        }
         await tx
           .update(leaveBalance)
           .set({ pendingDays: balance.pendingDays - daysApart })
           .where(eq(leaveBalance.id, balance.id));
       } else if (leaveReq.status === "APPROVED") {
-        if (balance.usedDays < daysApart) {
-          throw new ORPCError("INTERNAL_SERVER_ERROR", {
-            message: "Failed to cancel leave. Please report bug.",
-          });
-        }
         await tx
           .update(leaveBalance)
           .set({ usedDays: balance.usedDays - daysApart })
           .where(eq(leaveBalance.id, balance.id));
       }
 
-      await tx
-        .update(leaveRequest)
-        .set({ status: "CANCELLED" })
-        .where(eq(leaveRequest.id, leaveReq.id));
-
-      // Create balance adjustment record
       await tx.insert(leaveBalanceAdjustment).values({
         balanceId: balance.id,
-        memberId: canceler.id,
+        memberId: requester.id,
         leaveId: leaveReq.leaveId,
         adjustmentType: "ADJUSTMENT",
         days: -daysApart,
-        reason: `Leave request cancelled (was ${leaveReq.status})`,
+        reason: `Leave request rejected (was ${leaveReq.status})`,
         requestId: leaveReq.id,
+        adjustedBy: reviewer.id,
       });
     });
+
+    return { success: true };
   });
-
-function checkCancellable(param: {
-  endDate: Date;
-  status: "PENDING" | "APPROVED" | "CANCELLED" | "REJECTED";
-}): boolean {
-  const now = new Date().getTime();
-
-  return (
-    param.endDate.getTime() > now && !(param.status === "CANCELLED" || param.status === "REJECTED")
-  );
-}

@@ -14,8 +14,11 @@ import { checkInHandler } from "./handlers/organizations/attendences/check_in";
 import { checkOutHandler } from "./handlers/organizations/attendences/check_out";
 import { listInvitationsHandler } from "./handlers/organizations/invitations/list";
 import { createLeaveHandler } from "./handlers/organizations/leave/create";
+import { approveLeaveRequestHandler } from "./handlers/organizations/leaveRequests/approve";
 import { cancelLeaveRequestHandler } from "./handlers/organizations/leaveRequests/cancel";
+import { createLeaveRequestHandler } from "./handlers/organizations/leaveRequests/create";
 import { listLeaveRequestsHandler } from "./handlers/organizations/leaveRequests/list";
+import { rejectLeaveRequestHandler } from "./handlers/organizations/leaveRequests/reject";
 import { listMembersHandler } from "./handlers/organizations/members/list";
 import { removeMemberHandler } from "./handlers/organizations/members/remove";
 import { updateMemberHandler } from "./handlers/organizations/members/update";
@@ -46,8 +49,11 @@ export const router = os.router({
     },
     invitations: { list: listInvitationsHandler },
     leaveRequests: {
-      cancel: cancelLeaveRequestHandler,
       list: listLeaveRequestsHandler,
+      approve: approveLeaveRequestHandler,
+      create: createLeaveRequestHandler,
+      cancel: cancelLeaveRequestHandler,
+      reject: rejectLeaveRequestHandler,
       stats: {},
     },
     leave: { create: createLeaveHandler },
