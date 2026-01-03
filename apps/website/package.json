@@ -27,7 +27,7 @@
     "@tailwindcss/vite": "^4.1.18",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/svelte": "^5.3.1",
-    "@trivago/prettier-plugin-sort-imports": "^6.0.0",
+    "@trivago/prettier-plugin-sort-imports": "^6.0.1",
     "@types/bun": "^1.3.5",
     "@types/node": "^24.10.4",
     "@types/nodemailer": "^7.0.4",
@@ -47,7 +47,7 @@
     "svelte-meta-tags": "^4.5.0",
     "tailwindcss": "^4.1.18",
     "typescript": "^5.9.3",
-    "typescript-eslint": "^8.50.1",
+    "typescript-eslint": "^8.51.0",
     "vite": "npm:rolldown-vite@^7.3.0",
     "vitest": "^4.0.16"
   },
@@ -56,15 +56,15 @@
     "@inlang/paraglide-js": "^2.7.1",
     "@internationalized/date": "^3.10.1",
     "@lucide/svelte": "^0.555.0",
-    "@orpc/client": "^1.13.1",
-    "@orpc/server": "^1.13.1",
-    "@orpc/tanstack-query": "^1.13.1",
+    "@orpc/client": "^1.13.2",
+    "@orpc/server": "^1.13.2",
+    "@orpc/tanstack-query": "^1.13.2",
     "@repo/db": "workspace:*",
     "@repo/ui": "workspace:*",
-    "@tanstack/svelte-form": "^1.27.6",
-    "@tanstack/svelte-query": "^6.0.10",
+    "@tanstack/svelte-form": "^1.27.7",
+    "@tanstack/svelte-query": "^6.0.14",
     "@tanstack/table-core": "^8.21.3",
-    "better-auth": "^1.4.9",
+    "better-auth": "^1.4.10",
     "clsx": "^2.1.1",
     "dotenv": "^17.2.3",
     "libphonenumber-js": "^1.12.33",
@@ -74,6 +74,6 @@
     "runed": "^0.37.1",
     "sharp": "^0.34.5",
     "svelte-sonner": "^1.0.7",
-    "zod": "^4.2.1"
+    "zod": "^4.3.4"
   }
 }
