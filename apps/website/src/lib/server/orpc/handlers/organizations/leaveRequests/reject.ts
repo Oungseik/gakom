@@ -21,7 +21,7 @@ export const rejectLeaveRequestHandler = os
           createdAt: member.createdAt,
         })
         .from(member)
-        .where(eq(member.id, context.session.user.id))
+        .where(eq(member.userId, context.session.user.id))
         .limit(1)
     ).at(0);
 

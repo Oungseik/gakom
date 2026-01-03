@@ -4,13 +4,45 @@
   import EllipsisIcon from "@lucide/svelte/icons/ellipsis";
   import { Button } from "@repo/ui/button";
   import * as DropdownMenu from "@repo/ui/dropdown-menu";
+  import { createMutation, useQueryClient } from "@tanstack/svelte-query";
+  import { toast } from "svelte-sonner";
 
-  type Props = {};
+  import { orpc } from "$lib/orpc_client";
 
-  let {}: Props = $props();
+  type Props = { id: string; slug: string };
 
-  function handleApproveLeaveRequest() {}
-  function handleRejectLeaveRequest() {}
+  let { id, slug }: Props = $props();
+
+  const queryClient = useQueryClient();
+  const approveRequest = createMutation(() =>
+    orpc.organizations.leaveRequests.approve.mutationOptions()
+  );
+  const rejectLeaveRequest = createMutation(() =>
+    orpc.organizations.leaveRequests.reject.mutationOptions()
+  );
+
+  function handleApproveLeaveRequest() {
+    approveRequest.mutate(
+      { id, slug },
+      {
+        onError: (error) => toast.error(error.message),
+        onSuccess: () => {
+          queryClient.invalidateQueries({ queryKey: orpc.organizations.leaveRequests.key() });
+        },
+      }
+    );
+  }
+  function handleRejectLeaveRequest() {
+    rejectLeaveRequest.mutate(
+      { id, slug },
+      {
+        onError: (error) => toast.error(error.message),
+        onSuccess: () => {
+          queryClient.invalidateQueries({ queryKey: orpc.organizations.leaveRequests.key() });
+        },
+      }
+    );
+  }
 </script>
 
 <DropdownMenu.Root>

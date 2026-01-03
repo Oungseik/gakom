@@ -40,6 +40,12 @@ function daysAgo(days: number): Date {
   return date;
 }
 
+function daysAhead(days: number): Date {
+  const date = new Date();
+  date.setDate(date.getDate() + days);
+  return date;
+}
+
 // Helper function to check if a date is a workday according to policy
 function isWorkday(date: Date, workdays: Day[]): boolean {
   const dayNames: Day[] = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
@@ -361,7 +367,7 @@ async function main() {
 
       // Random start date within the last 3 months
       const startDaysAgo = Math.floor(Math.random() * 80);
-      const startDate = daysAgo(startDaysAgo);
+      const startDate = daysAhead(startDaysAgo);
       const duration = Math.floor(Math.random() * 3) + 1; // 1-3 days duration
       const endDate = new Date(startDate);
       endDate.setDate(endDate.getDate() + duration);

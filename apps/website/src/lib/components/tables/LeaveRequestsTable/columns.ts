@@ -8,6 +8,7 @@ import DataTableActions from "./DataTableActions.svelte";
 import DataTableDateAndDuration from "./DataTableDateAndDuration.svelte";
 
 export type LeaveRequest = {
+  id: string;
   organizationId: string;
   slug: string;
   userId: string;
@@ -101,7 +102,10 @@ export const columns: ColumnDef<LeaveRequest>[] = [
   {
     id: "actions",
     cell: ({ row }) => {
-      return renderComponent(DataTableActions, {});
+      return renderComponent(DataTableActions, {
+        id: row.original.id,
+        slug: row.original.slug,
+      });
     },
   },
 ];
