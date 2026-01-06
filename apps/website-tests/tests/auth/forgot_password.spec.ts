@@ -6,6 +6,4 @@ test("forgot password", async ({ page }) => {
 
   await page.goto(forgotPasswordURL);
   expect(page.url()).toEqual(forgotPasswordURL);
-
-
 });

@@ -19,6 +19,7 @@ import { cancelLeaveRequestHandler } from "./handlers/organizations/leaveRequest
 import { createLeaveRequestHandler } from "./handlers/organizations/leaveRequests/create";
 import { listLeaveRequestsHandler } from "./handlers/organizations/leaveRequests/list";
 import { rejectLeaveRequestHandler } from "./handlers/organizations/leaveRequests/reject";
+import { getStatsHandler } from "./handlers/organizations/leaveRequests/stats/get";
 import { listMembersHandler } from "./handlers/organizations/members/list";
 import { removeMemberHandler } from "./handlers/organizations/members/remove";
 import { updateMemberHandler } from "./handlers/organizations/members/update";
@@ -54,7 +55,7 @@ export const router = os.router({
       create: createLeaveRequestHandler,
       cancel: cancelLeaveRequestHandler,
       reject: rejectLeaveRequestHandler,
-      stats: {},
+      stats: { get: getStatsHandler },
     },
     leave: { create: createLeaveHandler },
   },
