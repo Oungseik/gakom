@@ -21,12 +21,12 @@
  *   CLEAR_DB - Set to "true" to clear all data before seeding
  */
 
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { connect } from "./index";
 import type { Day } from "./schema/attendance";
 import { attendance, attendancePolicy } from "./schema/attendance";
 import { account, user } from "./schema/core";
-import { leave, leaveRequest } from "./schema/leave";
+import { leave, leaveBalance, leaveBalanceAdjustment, leaveRequest } from "./schema/leave";
 import { invitation, member, organization } from "./schema/organization";
 
 // Database connection
@@ -82,14 +82,16 @@ async function main() {
   if (process.env.CLEAR_DB === "true") {
     console.log("🗑️  Clearing existing data...");
     await db.delete(attendance);
+    await db.delete(leaveBalanceAdjustment);
+    await db.delete(leaveRequest);
+    await db.delete(leaveBalance);
     await db.delete(invitation);
     await db.delete(member);
     await db.delete(attendancePolicy);
+    await db.delete(leave);
     await db.delete(account);
     await db.delete(organization);
     await db.delete(user);
-    await db.delete(leaveRequest);
-    await db.delete(leave);
     console.log("✨ Database cleared!");
   }
 
@@ -188,28 +190,62 @@ async function main() {
     });
   }
 
-  // 4. Create Members
+  // 4. Create Members with varied join dates (for tenure calculation)
   console.log("👔 Creating members...");
-  const memberRecords: { userId: string; policyId: string; policyData: (typeof policies)[0] }[] =
-    [];
+  const memberRecords: {
+    userId: string;
+    memberId: string;
+    policyId: string;
+    policyData: (typeof policies)[0];
+    createdAt: Date;
+  }[] = [];
+
+  // Member tenure configurations (0-3 years)
+  const memberTenures = [
+    { yearsAgo: 3, monthsAgo: 0 }, // 3 years tenure
+    { yearsAgo: 2, monthsAgo: 6 }, // 2.5 years tenure
+    { yearsAgo: 2, monthsAgo: 0 }, // 2 years tenure
+    { yearsAgo: 1, monthsAgo: 6 }, // 1.5 years tenure
+    { yearsAgo: 1, monthsAgo: 0 }, // 1 year tenure
+    { yearsAgo: 0, monthsAgo: 9 }, // 0.75 years tenure
+    { yearsAgo: 0, monthsAgo: 6 }, // 0.5 years tenure
+    { yearsAgo: 0, monthsAgo: 3 }, // 0.25 years tenure
+    { yearsAgo: 0, monthsAgo: 1 }, // ~1 month tenure
+    { yearsAgo: 0, monthsAgo: 0 }, // Just joined
+  ];
+
+  function calculateJoinDate(yearsAgo: number, monthsAgo: number): Date {
+    const date = new Date();
+    date.setFullYear(date.getFullYear() - yearsAgo);
+    date.setMonth(date.getMonth() - monthsAgo);
+    date.setDate(1);
+    date.setHours(9, 0, 0, 0);
+    return date;
+  }
 
   for (let i = 0; i < userIds.length; i++) {
-    const policyIndex = i % 3; // Distribute members across 3 policies
+    const policyIndex = i % 3;
     const policy = policies[policyIndex];
+    const tenure = memberTenures[i] || memberTenures[memberTenures.length - 1];
+    const joinDate = calculateJoinDate(tenure.yearsAgo, tenure.monthsAgo);
 
+    const memberId = crypto.randomUUID();
     await db.insert(member).values({
-      id: crypto.randomUUID(),
+      id: memberId,
       organizationId: orgId,
       userId: userIds[i].id,
       attendancePolicyId: policy.id,
       role: userIds[i].role,
       position: i === 0 ? "CEO" : i < 3 ? "Manager" : "Employee",
+      createdAt: joinDate,
     });
 
     memberRecords.push({
       userId: userIds[i].id,
+      memberId: memberId,
       policyId: policy.id,
       policyData: policy,
+      createdAt: joinDate,
     });
   }
 
@@ -335,9 +371,19 @@ async function main() {
     });
   }
 
-  // 8. Create Leave Requests
+  // 8. Create Leave Requests and track approved ones for adjustments
   console.log("📝 Creating leave requests...");
-  const memberIds: { userId: string; memberId: string; policyId: string }[] = [];
+  const memberIds: {
+    userId: string;
+    memberId: string;
+    policyId: string;
+  }[] = [];
+  const approvedLeaveRequests: {
+    memberId: string;
+    leaveId: string;
+    days: number;
+    requestId: string;
+  }[] = [];
 
   // First collect member IDs
   for (const memberRecord of memberRecords) {
@@ -384,6 +430,13 @@ async function main() {
         if (memberIds.length > 0) {
           reviewerId = memberIds[0].memberId;
           reviewedAt = new Date();
+          // Track approved request for later adjustment
+          approvedLeaveRequests.push({
+            memberId: memberData.memberId,
+            leaveId: leaveTypeData.id,
+            days: duration,
+            requestId: "", // Will be filled after insert
+          });
         }
       } else if (statusRoll > 0.85) {
         status = "REJECTED";
@@ -395,8 +448,9 @@ async function main() {
         status = "CANCELLED";
       }
 
+      const requestId = crypto.randomUUID();
       await db.insert(leaveRequest).values({
-        id: crypto.randomUUID(),
+        id: requestId,
         memberId: memberData.memberId,
         leaveId: leaveTypeData.id,
         startDate: startDate,
@@ -406,6 +460,77 @@ async function main() {
         reviewerId: reviewerId,
         reviewedAt: reviewedAt,
       });
+
+      // Update the last approved request with its ID
+      if (status === "APPROVED" && approvedLeaveRequests.length > 0) {
+        approvedLeaveRequests[approvedLeaveRequests.length - 1].requestId = requestId;
+      }
+    }
+  }
+
+  // 9. Create Leave Balances based on member tenure
+  console.log("📊 Creating leave balances...");
+  let leaveBalancesCount = 0;
+
+  for (const memberRecord of memberRecords) {
+    // Calculate tenure years (0, 1, 2, 3) based on createdAt and current date
+    const currentDate = new Date();
+    const joinDate = memberRecord.createdAt;
+    const tenureYears = Math.floor(
+      (currentDate.getTime() - joinDate.getTime()) / (365.25 * 24 * 60 * 60 * 1000),
+    );
+
+    // For each leave type, create a balance for current tenure year
+    for (const leaveTypeData of leaveTypes) {
+      const year = tenureYears;
+      // Base days + 1 extra day per year of tenure
+      const totalDays = leaveTypeData.days + year;
+
+      await db.insert(leaveBalance).values({
+        id: crypto.randomUUID(),
+        memberId: memberRecord.memberId,
+        leaveId: leaveTypeData.id,
+        totalDays: totalDays,
+        usedDays: 0,
+        pendingDays: 0,
+        year: year,
+      });
+
+      leaveBalancesCount++;
+    }
+  }
+
+  // 10. Create Leave Balance Adjustments for approved requests
+  console.log("📝 Creating leave balance adjustments...");
+  let leaveBalanceAdjustmentsCount = 0;
+
+  for (const approvedRequest of approvedLeaveRequests) {
+    // Find the appropriate leave balance
+    const [balanceRecord] = await db
+      .select()
+      .from(leaveBalance)
+      .where(
+        and(
+          eq(leaveBalance.memberId, approvedRequest.memberId),
+          eq(leaveBalance.leaveId, approvedRequest.leaveId),
+        ),
+      );
+
+    if (balanceRecord) {
+      // Create usage adjustment for the approved leave request
+      await db.insert(leaveBalanceAdjustment).values({
+        id: crypto.randomUUID(),
+        balanceId: balanceRecord.id,
+        memberId: approvedRequest.memberId,
+        leaveId: approvedRequest.leaveId,
+        adjustmentType: "USAGE",
+        days: approvedRequest.days,
+        reason: "Leave usage for approved request",
+        adjustedBy: memberIds[0]?.memberId,
+        requestId: approvedRequest.requestId,
+      });
+
+      leaveBalanceAdjustmentsCount++;
     }
   }
 
@@ -415,7 +540,9 @@ async function main() {
   console.log(`   - ${userIds.length} accounts created`);
   console.log(`   - ${policies.length} attendance policies created`);
   console.log(`   - ${leaveTypes.length} leave types created`);
+  console.log(`   - ${leaveBalancesCount} leave balances created`);
   console.log(`   - ${leaveRequestsCount} leave requests created`);
+  console.log(`   - ${leaveBalanceAdjustmentsCount} leave balance adjustments created`);
   console.log(`   - ${memberRecords.length} members created`);
   console.log(`   - ${invitations.length} invitations created`);
   console.log(`   - ${attendanceCount} attendance records created`);
