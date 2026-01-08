@@ -43,7 +43,8 @@
       "!bts.jsonc",
       "!**/.expo",
       "!**/.wrangler",
-      "!flake.lock"
+      "!flake.lock",
+      "!**/migrations"
     ]
   },
   "formatter": {

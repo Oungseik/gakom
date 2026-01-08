@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { index, integer, real, sqliteTable, text } from "drizzle-orm/sqlite-core";
+import { index, integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
 import { TIMEZONES } from "../timezone";
 import { user } from "./core";
 import { organization } from "./organization";
@@ -35,28 +35,40 @@ export const attendancePolicy = sqliteTable(
   (table) => [index("attendance_policy_organization_id_idx").on(table.organizationId)],
 );
 
+export type AttendanceLocation = { latitude: number; longitude: number; accuracy: number };
+
 export const attendance = sqliteTable(
   "attendance",
   {
     id: text("id")
       .primaryKey()
       .$defaultFn(() => crypto.randomUUID()),
-    type: text("type", { enum: ["CHECK_IN", "CHECK_OUT"] }).notNull(),
     userId: text("user_id")
       .notNull()
       .references(() => user.id, { onDelete: "cascade" }),
+    organizationId: text("organization_id")
+      .notNull()
+      .references(() => organization.id, { onDelete: "cascade" }),
     attendancePolicyId: text("attendance_policy_id")
       .notNull()
       .references(() => attendancePolicy.id, { onDelete: "cascade" }),
-    latitude: real("latitude").notNull(),
-    longitude: real("longitude").notNull(),
-    accuracy: real("accuracy").notNull(),
+    date: text("date").notNull(),
+    checkInAt: integer("check_in_at", { mode: "timestamp_ms" }),
+    checkOutAt: integer("check_out_at", { mode: "timestamp_ms" }),
+    checkInLocation: text("check_in_location", { mode: "json" }).$type<AttendanceLocation>(),
+    checkOutLocation: text("check_out_location", { mode: "json" }).$type<AttendanceLocation>(),
+    workedSeconds: integer("worked_seconds").default(0),
+    status: text("status", { enum: ["PRESENT", "LATE", "EARLY_LEAVE", "ABSENT", "INCOMPLETE"] })
+      .default("ABSENT")
+      .notNull(),
     updatedAt: integer("updated_at", { mode: "timestamp_ms" })
       .default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)
-      .$onUpdate(() => /* @__PURE__ */ new Date()),
+      .$onUpdate(() => /* @__PURE__ */ new Date())
+      .notNull(),
   },
   (table) => [
-    index("attendance_user_id_idx").on(table.userId),
-    index("attendance_attendance_policy_id_idx").on(table.attendancePolicyId),
+    index("attendance_user_date_idx").on(table.userId, table.date),
+    index("attendance_org_date_idx").on(table.organizationId, table.date),
+    index("attendance_status_idx").on(table.status),
   ],
 );
