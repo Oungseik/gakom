@@ -51,32 +51,32 @@
     {#if stats.data}
       <div class="grid grid-cols-1 gap-6 md:grid-cols-3">
         <Card.Card>
-          <Card.Content class="flex items-center justify-between pt-6">
+          <Card.Content class="flex items-center justify-between pt-4">
             <div>
               <p class="text-muted-foreground mb-1 text-sm">Pending Requests</p>
               <p class="text-2xl font-bold">{stats.data.totalPendingRequests}</p>
             </div>
-            <CheckIcon class="size-10 text-amber-500" />
+            <CheckIcon class="size-6 text-amber-500" />
           </Card.Content>
         </Card.Card>
 
         <Card.Card>
-          <Card.Content class="flex items-center justify-between pt-6">
+          <Card.Content class="flex items-center justify-between pt-4">
             <div>
               <p class="text-muted-foreground mb-1 text-sm">Approved Today</p>
               <p class="text-2xl font-bold">{stats.data.totalApprovedToday}</p>
             </div>
-            <CalendarIcon class="size-10 text-emerald-500" />
+            <CalendarIcon class="size-6 text-emerald-500" />
           </Card.Content>
         </Card.Card>
 
         <Card.Card>
-          <Card.Content class="flex items-center justify-between pt-6">
+          <Card.Content class="flex items-center justify-between pt-4">
             <div>
               <p class="text-muted-foreground mb-1 text-sm">On Leave Today</p>
               <p class="text-2xl font-bold">{stats.data.totalOnLeaveToday}</p>
             </div>
-            <ClockIcon class="text-primary size-10" />
+            <ClockIcon class="text-primary size-6" />
           </Card.Content>
         </Card.Card>
       </div>

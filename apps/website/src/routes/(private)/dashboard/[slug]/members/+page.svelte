@@ -4,9 +4,10 @@
   import { Label } from "@repo/ui/label";
   import { Spinner } from "@repo/ui/spinner";
   import * as Tabs from "@repo/ui/tabs";
-  import { createInfiniteQuery } from "@tanstack/svelte-query";
+  import { createInfiniteQuery, createQuery } from "@tanstack/svelte-query";
   import { useSearchParams } from "runed/kit";
 
+  import MemberStatisticsCard from "$lib/components/cards/MemberStatisticsCard.svelte";
   import DashboardContainer from "$lib/components/containers/DashboardContainer.svelte";
   import InviteMemberDialog from "$lib/components/dialogs/InviteMemberDialog.svelte";
   import DashboardHeader from "$lib/components/headers/DashboardHeader.svelte";
@@ -55,6 +56,19 @@
     { id: "members", label: "Members" },
     { id: "invitations", label: "Invitations" },
   ]);
+
+  const stats = createQuery(() =>
+    orpc.organizations.members.stats.get.queryOptions({ input: { slug: params.slug } })
+  );
+
+  const thisMonthTrend = $derived(
+    stats.data?.lastMonthJoins
+      ? Math.round(
+          ((stats.data.thisMonthJoins - stats.data.lastMonthJoins) / stats.data.lastMonthJoins) *
+            100
+        )
+      : undefined
+  );
 </script>
 
 <DashboardHeader
@@ -65,6 +79,32 @@
 />
 
 <DashboardContainer>
+  {#if stats.isPending}
+    <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
+      {#each Array(5) as _}
+        <div class="bg-muted h-32 animate-pulse rounded-lg"></div>
+      {/each}
+    </div>
+  {:else if stats.data}
+    {@const data = stats.data}
+    <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
+      <MemberStatisticsCard title="Total Members" value={data.totalMembers} icon="users" />
+      <MemberStatisticsCard
+        title="New This Month"
+        value={data.thisMonthJoins}
+        icon="user-plus"
+        trend={thisMonthTrend}
+      />
+      <MemberStatisticsCard
+        title="Joined Last Month"
+        value={data.lastMonthJoins}
+        icon="user-plus"
+      />
+      <MemberStatisticsCard title="Active Members" value={data.activeMembers} icon="users" />
+      <MemberStatisticsCard title="Deactivated" value={data.deactivatedMembers} icon="user-minus" />
+    </div>
+  {/if}
+
   <Tabs.Root bind:value={searchParams.tab} class="w-full flex-col justify-start gap-6">
     <div class="flex items-center justify-between">
       <Label for="view-selector" class="sr-only">View</Label>

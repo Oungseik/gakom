@@ -21,6 +21,7 @@ import { rejectLeaveRequestHandler } from "./handlers/organizations/leaveRequest
 import { getStatsHandler } from "./handlers/organizations/leaveRequests/stats/get";
 import { listMembersHandler } from "./handlers/organizations/members/list";
 import { removeMemberHandler } from "./handlers/organizations/members/remove";
+import { getStatisticsHandler } from "./handlers/organizations/members/stats/get";
 import { updateMemberHandler } from "./handlers/organizations/members/update";
 
 export const router = os.router({
@@ -46,6 +47,7 @@ export const router = os.router({
       list: listMembersHandler,
       update: updateMemberHandler,
       remove: removeMemberHandler,
+      stats: { get: getStatisticsHandler },
     },
     invitations: { list: listInvitationsHandler },
     leaveRequests: {

@@ -6,7 +6,7 @@
   type Props = {
     name: string;
     email?: string;
-    position?: string;
+    position?: string | null;
     image?: string | null;
     hideImage?: boolean;
   };
