@@ -14,9 +14,10 @@
   {/if}
   <div>
     <span
-      class="inline-flex items-center rounded-md px-2 py-0.5 text-xs font-medium capitalize ring-1 ring-gray-500/10 ring-inset {getRoleBadgeClass(
-        role
-      )}"
+      class={[
+        "inline-flex items-center rounded-md px-2 py-0.5 text-xs font-medium capitalize ring-1 ring-gray-500/10 ring-inset",
+        getRoleBadgeClass(role),
+      ]}
     >
       {role}
     </span>
