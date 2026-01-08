@@ -23,7 +23,7 @@
 
 import { and, eq } from "drizzle-orm";
 import { connect } from "./index";
-import type { Day } from "./schema/attendance";
+import type { AttendanceLocation, Day } from "./schema/attendance";
 import { attendance, attendancePolicy } from "./schema/attendance";
 import { account, user } from "./schema/core";
 import { leave, leaveBalance, leaveBalanceAdjustment, leaveRequest } from "./schema/leave";
@@ -73,6 +73,18 @@ function hashPassword(password: string): string {
   // In production, use bcrypt or similar
   // For seeding purposes, we'll store a simple hash indicator
   return `hashed_${password}`;
+}
+
+// Helper function to convert date to policy timezone and return local date string
+function getDateInTimezone(date: Date, timezone: string): string {
+  const options: Intl.DateTimeFormatOptions = {
+    timeZone: timezone,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  };
+  const formatter = new Intl.DateTimeFormat("en-CA", options);
+  return formatter.format(date);
 }
 
 async function main() {
@@ -308,37 +320,67 @@ async function main() {
         continue;
       }
 
-      // Generate CHECK_IN
-      const checkInTime = addMinutesVariance(policy.clockInSec, 30);
+      // Generate check-in and check-out times with variance
+      let checkInTime = addMinutesVariance(policy.clockInSec, 30);
+      let checkOutTime = addMinutesVariance(policy.clockOutSec, 30);
+
+      // Apply status distribution
+      const statusRoll = Math.random();
+      let status: "PRESENT" | "LATE" | "EARLY_LEAVE";
+
+      if (statusRoll < 0.7) {
+        // 70% PRESENT - already on time
+        status = "PRESENT";
+      } else if (statusRoll < 0.9) {
+        // 20% LATE - add 15-60 minutes late
+        checkInTime += (15 + Math.random() * 45) * 60;
+        status = "LATE";
+      } else {
+        // 10% EARLY_LEAVE - subtract 15-60 minutes from checkout
+        checkOutTime -= (15 + Math.random() * 45) * 60;
+        status = "EARLY_LEAVE";
+      }
+
       const checkInTimestamp = createTimestamp(date, checkInTime);
-
-      await db.insert(attendance).values({
-        id: crypto.randomUUID(),
-        type: "CHECK_IN",
-        userId: memberRecord.userId,
-        attendancePolicyId: policy.id,
-        latitude: baseLatitude + (Math.random() * 0.01 - 0.005),
-        longitude: baseLongitude + (Math.random() * 0.01 - 0.005),
-        accuracy: 10 + Math.random() * 40, // 10-50 meters
-        updatedAt: checkInTimestamp,
-      });
-
-      // Generate CHECK_OUT
-      const checkOutTime = addMinutesVariance(policy.clockOutSec, 30);
       const checkOutTimestamp = createTimestamp(date, checkOutTime);
 
-      await db.insert(attendance).values({
-        id: crypto.randomUUID(),
-        type: "CHECK_OUT",
-        userId: memberRecord.userId,
-        attendancePolicyId: policy.id,
+      // Calculate worked seconds
+      const workedSeconds = Math.floor(
+        (checkOutTimestamp.getTime() - checkInTimestamp.getTime()) / 1000,
+      );
+
+      // Get date string in policy timezone
+      const dateInTimezone = getDateInTimezone(date, policy.timezone);
+
+      // Generate location data
+      const checkInLocation: AttendanceLocation = {
         latitude: baseLatitude + (Math.random() * 0.01 - 0.005),
         longitude: baseLongitude + (Math.random() * 0.01 - 0.005),
-        accuracy: 10 + Math.random() * 40, // 10-50 meters
+        accuracy: 10 + Math.random() * 40,
+      };
+
+      const checkOutLocation: AttendanceLocation = {
+        latitude: baseLatitude + (Math.random() * 0.01 - 0.005),
+        longitude: baseLongitude + (Math.random() * 0.01 - 0.005),
+        accuracy: 10 + Math.random() * 40,
+      };
+
+      await db.insert(attendance).values({
+        id: crypto.randomUUID(),
+        userId: memberRecord.userId,
+        organizationId: orgId,
+        attendancePolicyId: policy.id,
+        date: dateInTimezone,
+        checkInAt: checkInTimestamp,
+        checkOutAt: checkOutTimestamp,
+        checkInLocation,
+        checkOutLocation,
+        workedSeconds,
+        status,
         updatedAt: checkOutTimestamp,
       });
 
-      attendanceCount += 2;
+      attendanceCount += 1;
     }
   }
 
@@ -545,7 +587,7 @@ async function main() {
   console.log(`   - ${leaveBalanceAdjustmentsCount} leave balance adjustments created`);
   console.log(`   - ${memberRecords.length} members created`);
   console.log(`   - ${invitations.length} invitations created`);
-  console.log(`   - ${attendanceCount} attendance records created`);
+  console.log(`   - ${attendanceCount} daily attendance records created`);
 
   process.exit(0);
 }
