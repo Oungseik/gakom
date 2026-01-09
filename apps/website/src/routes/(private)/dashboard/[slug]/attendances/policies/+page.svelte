@@ -45,8 +45,7 @@
 <DashboardHeader
   breadcrumbItems={[
     { desc: "Dashboard", href: `/dashboard/${params.slug}` },
-    { desc: "Attendances", href: `/dashboard/${params.slug}/attendances` },
-    { desc: "Policies", href: `/dashboard/${params.slug}/attendances/policies` },
+    { desc: "Attendance Policies", href: `/dashboard/${params.slug}/attendances/policies` },
   ]}
 />
 
