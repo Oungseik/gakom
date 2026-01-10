@@ -50,22 +50,28 @@
     <LeaveStatistics data={stats.data} />
   {/if}
 
-  <DataTable
-    {columns}
-    data={allLeaveRequests.map((datum) => ({
-      ...datum,
-      status: datum.status.toLowerCase() as "pending" | "rejected" | "approved" | "cancelled",
-    }))}
-    loading={leaveRequests.isLoading}
-  />
-
-  {#if leaveRequests.hasNextPage}
-    <div class="flex items-center justify-center py-4">
-      <LoadMoreBtn
-        onclick={() => leaveRequests.fetchNextPage()}
-        loading={leaveRequests.isFetchingNextPage}
-        disabled={leaveRequests.isFetchingNextPage}
-      />
+  <section>
+    <div class="my-4">
+      <h1 class="text-muted-foreground">Leave requests</h1>
     </div>
-  {/if}
+
+    <DataTable
+      {columns}
+      data={allLeaveRequests.map((datum) => ({
+        ...datum,
+        status: datum.status.toLowerCase() as "pending" | "rejected" | "approved" | "cancelled",
+      }))}
+      loading={leaveRequests.isLoading}
+    />
+
+    {#if leaveRequests.hasNextPage}
+      <div class="flex items-center justify-center py-4">
+        <LoadMoreBtn
+          onclick={() => leaveRequests.fetchNextPage()}
+          loading={leaveRequests.isFetchingNextPage}
+          disabled={leaveRequests.isFetchingNextPage}
+        />
+      </div>
+    {/if}
+  </section>
 </DashboardContainer>
