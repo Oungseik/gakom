@@ -2,22 +2,21 @@
   import UserPlusIcon from "@lucide/svelte/icons/user-plus";
   import { Button } from "@repo/ui/button";
   import { Label } from "@repo/ui/label";
-  import { Spinner } from "@repo/ui/spinner";
   import * as Tabs from "@repo/ui/tabs";
   import { createInfiniteQuery, createQuery } from "@tanstack/svelte-query";
   import { useSearchParams } from "runed/kit";
 
+  import LoadMoreBtn from "$lib/components/buttons/LoadMoreBtn.svelte";
   import MemberStatisticsCard from "$lib/components/cards/MemberStatisticsCard.svelte";
   import DashboardContainer from "$lib/components/containers/DashboardContainer.svelte";
   import InviteMemberDialog from "$lib/components/dialogs/InviteMemberDialog.svelte";
   import DashboardHeader from "$lib/components/headers/DashboardHeader.svelte";
-  import InvitationsDataTable from "$lib/components/tables/InvitationsTable/DataTable.svelte";
   import {
     type Invitation,
     columns as invitationColumns,
   } from "$lib/components/tables/InvitationsTable/columns";
-  import DataTable from "$lib/components/tables/MembersTable/DataTable.svelte";
   import { columns } from "$lib/components/tables/MembersTable/columns";
+  import DataTable from "$lib/components/tables/common/DataTable.svelte";
   import { orpc } from "$lib/orpc_client";
   import { membersTabSchema } from "$lib/searchParams";
 
@@ -128,73 +127,45 @@
     </div>
 
     <Tabs.Content value="members">
-      {#if members.isLoading}
-        <div class="flex h-40 w-full items-center justify-center">
-          <Spinner class="size-10" />
-        </div>
-      {:else if allMembers.length > 0}
-        <DataTable
-          {columns}
-          data={allMembers.map((m) => ({
-            ...m,
-            organizationId: data.currentOrganization.id,
-            slug: params.slug,
-          }))}
-        />
+      <DataTable
+        {columns}
+        data={allMembers.map((m) => ({
+          ...m,
+          organizationId: data.currentOrganization.id,
+          slug: params.slug,
+        }))}
+        loading={members.isLoading}
+      />
 
-        {#if members.hasNextPage}
-          <div class="flex items-center justify-center py-4">
-            <Button
-              variant="outline"
-              onclick={() => members.fetchNextPage()}
-              disabled={members.isFetchingNextPage}
-            >
-              {#if members.isFetchingNextPage}
-                <Spinner class="mr-2 size-4" />
-                Loading...
-              {:else}
-                Load More
-              {/if}
-            </Button>
-          </div>
-        {/if}
-      {:else}
-        <DataTable {columns} data={[]} />
+      {#if members.hasNextPage}
+        <div class="flex items-center justify-center py-4">
+          <LoadMoreBtn
+            onclick={() => members.fetchNextPage()}
+            loading={members.isFetchingNextPage}
+            disabled={members.isFetchingNextPage}
+          />
+        </div>
       {/if}
     </Tabs.Content>
 
     <Tabs.Content value="invitations">
-      {#if invitations.isLoading}
-        <div class="flex h-40 w-full items-center justify-center">
-          <Spinner class="size-10" />
-        </div>
-      {:else if allInvitations.length > 0}
-        <InvitationsDataTable
-          columns={invitationColumns}
-          data={allInvitations.map((inv) => ({
-            ...inv,
-            organizationId: data.currentOrganization.id,
-          }))}
-        />
+      <DataTable
+        columns={invitationColumns}
+        data={allInvitations.map((inv) => ({
+          ...inv,
+          organizationId: data.currentOrganization.id,
+        }))}
+        loading={invitations.isLoading}
+      />
 
-        {#if invitations.hasNextPage}
-          <div class="flex items-center justify-center py-4">
-            <Button
-              variant="outline"
-              onclick={() => invitations.fetchNextPage()}
-              disabled={invitations.isFetchingNextPage}
-            >
-              {#if invitations.isFetchingNextPage}
-                <Spinner class="mr-2 size-4" />
-                Loading...
-              {:else}
-                Load More
-              {/if}
-            </Button>
-          </div>
-        {/if}
-      {:else}
-        <InvitationsDataTable columns={invitationColumns} data={[]} />
+      {#if invitations.hasNextPage}
+        <div class="flex items-center justify-center py-4">
+          <LoadMoreBtn
+            onclick={() => invitations.fetchNextPage()}
+            loading={invitations.isFetchingNextPage}
+            disabled={invitations.isFetchingNextPage}
+          />
+        </div>
       {/if}
     </Tabs.Content>
   </Tabs.Root>
