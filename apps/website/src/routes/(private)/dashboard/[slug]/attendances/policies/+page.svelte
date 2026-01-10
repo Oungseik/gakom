@@ -1,19 +1,18 @@
 <script lang="ts">
   import PlusIcon from "@lucide/svelte/icons/plus";
   import { Button } from "@repo/ui/button";
-  import { Spinner } from "@repo/ui/spinner";
   import { createInfiniteQuery } from "@tanstack/svelte-query";
 
+  import LoadMoreBtn from "$lib/components/buttons/LoadMoreBtn.svelte";
   import DashboardContainer from "$lib/components/containers/DashboardContainer.svelte";
   import AttendancePolicyDialog from "$lib/components/dialogs/AttendancePolicyDialog.svelte";
   import DashboardHeader from "$lib/components/headers/DashboardHeader.svelte";
-  import DataTable from "$lib/components/tables/AttendancePoliciesTable/DataTable.svelte";
   import {
     type AttendancePolicy,
     columns,
   } from "$lib/components/tables/AttendancePoliciesTable/columns";
+  import DataTable from "$lib/components/tables/common/DataTable.svelte";
   import { orpc } from "$lib/orpc_client";
-  import { noop } from "$lib/utils";
 
   import type { PageProps } from "./$types";
 
@@ -26,6 +25,7 @@
       initialPageParam: 0,
       input: (cursor) => ({ pageSize: 10, cursor, slug: params.slug }),
       getNextPageParam: (lastPage) => lastPage.nextCursor,
+      enabled: !!params.slug,
     })
   );
 
@@ -57,36 +57,22 @@
     </Button>
   </div>
 
-  {#if policies.isLoading}
-    <div class="flex h-40 w-full items-center justify-center">
-      <Spinner class="size-10" />
-    </div>
-  {:else if allPolicies.length > 0}
-    <DataTable
-      columns={columns(handleEdit)}
-      data={allPolicies.map((p) => ({
-        ...p,
-        organizationId: params.slug,
-      }))}
-    />
-  {:else}
-    <DataTable columns={columns(noop)} data={[]} />
-  {/if}
+  <DataTable
+    columns={columns(handleEdit)}
+    data={allPolicies.map((p) => ({
+      ...p,
+      organizationId: params.slug,
+    }))}
+    loading={policies.isLoading}
+  />
 
   {#if policies.hasNextPage}
     <div class="flex items-center justify-center py-4">
-      <Button
-        variant="outline"
+      <LoadMoreBtn
         onclick={() => policies.fetchNextPage()}
+        loading={policies.isFetchingNextPage}
         disabled={policies.isFetchingNextPage}
-      >
-        {#if policies.isFetchingNextPage}
-          <Spinner class="mr-2 size-4" />
-          Loading...
-        {:else}
-          Load More
-        {/if}
-      </Button>
+      />
     </div>
   {/if}
 </DashboardContainer>

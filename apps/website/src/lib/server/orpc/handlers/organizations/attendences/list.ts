@@ -1,4 +1,16 @@
-import { attendance, attendancePolicy, desc, eq, member, organization, user } from "@repo/db";
+import {
+  and,
+  attendance,
+  attendancePolicy,
+  desc,
+  eq,
+  inArray,
+  like,
+  member,
+  or,
+  organization,
+  user,
+} from "@repo/db";
 import { z } from "zod";
 import { db } from "$lib/server/db";
 import { organizationMiddleware, os } from "$lib/server/orpc/base";
@@ -7,6 +19,20 @@ const input = z.object({
   slug: z.string(),
   cursor: z.number().optional(),
   pageSize: z.number().optional().default(10),
+  filter: z
+    .object({
+      search: z.string().optional(),
+      status: z
+        .array(z.enum(["PRESENT", "LATE", "EARLY_LEAVE", "ABSENT", "INCOMPLETE"]))
+        .optional(),
+      date: z
+        .string()
+        .regex(/^\d{4}-\d{2}-\d{2}$/, {
+          message: "Date must be in YYYY-MM-DD format",
+        })
+        .optional(),
+    })
+    .optional(),
 });
 
 export const listHandler = os
@@ -15,6 +41,7 @@ export const listHandler = os
   .use(organizationMiddleware(["admin", "owner"]))
   .handler(async ({ input, context }) => {
     const limit = input.pageSize + 1;
+    const filter = input.filter;
 
     const items = await db
       .select({
@@ -46,7 +73,16 @@ export const listHandler = os
       .innerJoin(attendancePolicy, eq(attendance.attendancePolicyId, attendancePolicy.id))
       .innerJoin(member, eq(attendance.userId, member.userId))
       .innerJoin(organization, eq(member.organizationId, organization.id))
-      .where(eq(organization.id, context.organization.id))
+      .where(
+        and(
+          eq(organization.id, context.organization.id),
+          filter?.status ? inArray(attendance.status, filter.status) : undefined,
+          filter?.search
+            ? or(like(user.name, `%${filter.search}%`), like(user.email, `%${filter.search}%`))
+            : undefined,
+          filter?.date ? eq(attendance.date, filter.date) : undefined,
+        ),
+      )
       .orderBy(desc(attendance.date), desc(attendance.checkInAt))
       .limit(limit);
 

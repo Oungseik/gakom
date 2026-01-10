@@ -8,8 +8,8 @@
   import DashboardHeader from "$lib/components/headers/DashboardHeader.svelte";
   import SkeletonStatsCard from "$lib/components/skeletons/SkeletonStatsCard.svelte";
   import AttendanceStatistics from "$lib/components/statistics/AttendanceStatistics.svelte";
-  import DataTable from "$lib/components/tables/AttendanceTable/DataTable.svelte";
   import { columns } from "$lib/components/tables/AttendanceTable/columns";
+  import DataTable from "$lib/components/tables/common/DataTable.svelte";
   import { orpc } from "$lib/orpc_client";
   import { attendancesFilterSchema } from "$lib/searchParams";
 

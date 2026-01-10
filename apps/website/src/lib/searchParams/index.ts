@@ -7,3 +7,13 @@ export const returnUrlSchema = createSearchParamsSchema({
 export const membersTabSchema = createSearchParamsSchema({
   tab: { type: "string", default: "members" },
 });
+
+export const attendancesFilterSchema = createSearchParamsSchema({
+  search: { type: "string" },
+  status: {
+    type: "array",
+    arrayType: "" as "PRESENT" | "LATE" | "EARLY_LEAVE" | "ABSENT" | "INCOMPLETE",
+    default: [],
+  },
+  date: { type: "string" },
+});

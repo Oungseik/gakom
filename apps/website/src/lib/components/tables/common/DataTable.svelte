@@ -4,12 +4,16 @@
   import * as Table from "@repo/ui/table";
   import { type ColumnDef, type RowSelectionState, getCoreRowModel } from "@tanstack/table-core";
 
+  import DataTableRowLoading from "../common/DataTableRowLoading.svelte";
+  import DataTableRowNoResults from "../common/DataTableRowNoResults.svelte";
+
   type DataTableProps<TData, TValue> = {
+    loading?: boolean;
     columns: ColumnDef<TData, TValue>[];
     data: TData[];
   };
 
-  let { data, columns }: DataTableProps<TData, TValue> = $props();
+  let { data, columns, loading }: DataTableProps<TData, TValue> = $props();
   let rowSelection = $state<RowSelectionState>({});
 
   const table = $derived(
@@ -64,9 +68,11 @@
             {/each}
           </Table.Row>
         {:else}
-          <Table.Row>
-            <Table.Cell colspan={columns.length} class="h-24 text-center">No results.</Table.Cell>
-          </Table.Row>
+          {#if loading}
+            <DataTableRowLoading colspan={columns.length} />
+          {:else}
+            <DataTableRowNoResults colspan={columns.length} />
+          {/if}
         {/each}
       </Table.Body>
     </Table.Root>

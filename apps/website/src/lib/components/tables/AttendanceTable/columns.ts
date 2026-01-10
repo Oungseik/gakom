@@ -1,8 +1,9 @@
+import type { AttendanceLocation } from "@repo/db";
 import { renderComponent } from "@repo/ui/data-table";
 import type { ColumnDef } from "@tanstack/table-core";
-import type { AttendanceLocation } from "@repo/db";
 import DataTableMemberInfo from "../common/DataTableMemberInfo.svelte";
 import DataTableStatus from "./DataTableStatus.svelte";
+import DataTableTimezone from "./DataTableTimezone.svelte";
 
 export type AttendanceItem = {
   id: string;
@@ -58,11 +59,11 @@ export const columns: ColumnDef<AttendanceItem>[] = [
       if (!item.checkInAt) return "-";
       const formatterOptions: Intl.DateTimeFormatOptions = {
         timeZone: item.policy.timezone,
-        hour: '2-digit',
-        minute: '2-digit',
+        hour: "2-digit",
+        minute: "2-digit",
         hour12: false,
       };
-      const formatter = new Intl.DateTimeFormat('en-US', formatterOptions);
+      const formatter = new Intl.DateTimeFormat("en-US", formatterOptions);
       return formatter.format(item.checkInAt);
     },
   },
@@ -74,11 +75,11 @@ export const columns: ColumnDef<AttendanceItem>[] = [
       if (!item.checkOutAt) return "-";
       const formatterOptions: Intl.DateTimeFormatOptions = {
         timeZone: item.policy.timezone,
-        hour: '2-digit',
-        minute: '2-digit',
+        hour: "2-digit",
+        minute: "2-digit",
         hour12: false,
       };
-      const formatter = new Intl.DateTimeFormat('en-US', formatterOptions);
+      const formatter = new Intl.DateTimeFormat("en-US", formatterOptions);
       return formatter.format(item.checkOutAt);
     },
   },
@@ -92,6 +93,11 @@ export const columns: ColumnDef<AttendanceItem>[] = [
       const minutes = Math.floor((item.workedSeconds % 3600) / 60);
       return `${hours}h ${minutes}m`;
     },
+  },
+  {
+    accessorKey: "policy",
+    header: "Attendance Timezone",
+    cell: ({ row }) => renderComponent(DataTableTimezone, row.original.policy),
   },
   {
     accessorKey: "status",
