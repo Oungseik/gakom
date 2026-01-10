@@ -154,13 +154,14 @@
 }
 
 @layer base {
-  body::-webkit-scrollbar {
-    height: 0;
+  html {
+    overflow-y: scroll; /* Forces the vertical scrollbar to always be visible */
   }
 
   .overflow-x-auto::-webkit-scrollbar {
     height: 0;
   }
+
   * {
     @apply border-border outline-ring/50;
   }
