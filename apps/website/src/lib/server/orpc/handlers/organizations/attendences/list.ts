@@ -4,7 +4,9 @@ import {
   attendancePolicy,
   desc,
   eq,
+  gte,
   inArray,
+  lte,
   like,
   member,
   or,
@@ -25,7 +27,13 @@ const input = z.object({
       status: z
         .array(z.enum(["PRESENT", "LATE", "EARLY_LEAVE", "ABSENT", "INCOMPLETE"]))
         .optional(),
-      date: z
+      dateFrom: z
+        .string()
+        .regex(/^\d{4}-\d{2}-\d{2}$/, {
+          message: "Date must be in YYYY-MM-DD format",
+        })
+        .optional(),
+      dateTo: z
         .string()
         .regex(/^\d{4}-\d{2}-\d{2}$/, {
           message: "Date must be in YYYY-MM-DD format",
@@ -42,6 +50,7 @@ export const listHandler = os
   .handler(async ({ input, context }) => {
     const limit = input.pageSize + 1;
     const filter = input.filter;
+
 
     const items = await db
       .select({
@@ -80,7 +89,8 @@ export const listHandler = os
           filter?.search
             ? or(like(user.name, `%${filter.search}%`), like(user.email, `%${filter.search}%`))
             : undefined,
-          filter?.date ? eq(attendance.date, filter.date) : undefined,
+          filter?.dateFrom ? gte(attendance.date, filter.dateFrom) : undefined,
+          filter?.dateTo ? lte(attendance.date, filter.dateTo) : undefined,
         ),
       )
       .orderBy(desc(attendance.date), desc(attendance.checkInAt))

@@ -9,11 +9,12 @@ export const membersTabSchema = createSearchParamsSchema({
 });
 
 export const attendancesFilterSchema = createSearchParamsSchema({
-  search: { type: "string" },
+  search: { type: "string", default: undefined },
   status: {
     type: "array",
     arrayType: "" as "PRESENT" | "LATE" | "EARLY_LEAVE" | "ABSENT" | "INCOMPLETE",
     default: [],
   },
-  date: { type: "string" },
+  dateFrom: { type: "string", default: undefined },
+  dateTo: { type: "string", default: undefined },
 });
