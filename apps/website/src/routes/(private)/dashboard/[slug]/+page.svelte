@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { type CalendarDate } from "@internationalized/date";
   import CalendarIcon from "@lucide/svelte/icons/calendar";
   import FilterIcon from "@lucide/svelte/icons/filter";
   import SearchIcon from "@lucide/svelte/icons/search";
@@ -29,8 +30,8 @@
   const searchParams = useSearchParams(attendancesFilterSchema);
   const debounceSearch = new Debounced(() => searchParams.search, 500);
   const debounceStatus = new Debounced(() => searchParams.status, 1000);
-  const debounceDateFrom = new Debounced(() => searchParams.dateFrom, 1000);
-  const debounceDateTo = new Debounced(() => searchParams.dateTo, 1000);
+
+  let date: { start: CalendarDate; end: CalendarDate } | undefined = $state();
 
   const attendances = createInfiniteQuery(() =>
     orpc.organizations.attendances.list.infiniteOptions({
@@ -41,8 +42,8 @@
         pageSize: 10,
         filter: {
           search: debounceSearch.current || undefined,
-          dateFrom: debounceDateFrom.current || undefined,
-          dateTo: debounceDateTo.current || undefined,
+          dateFrom: date?.start?.toString(),
+          dateTo: date?.end?.toString(),
           status: debounceStatus.current.length ? debounceStatus.current : undefined,
         },
       }),
@@ -103,7 +104,11 @@
             </Button>
           </Popover.Trigger>
           <Popover.Content class="w-124 p-0">
-            <RangeCalendar numberOfMonths={2} class="rounded-lg border shadow-sm" />
+            <RangeCalendar
+              numberOfMonths={2}
+              class="rounded-lg border shadow-sm"
+              bind:value={date}
+            />
           </Popover.Content>
         </Popover.Root>
 
