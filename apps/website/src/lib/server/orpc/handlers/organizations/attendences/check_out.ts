@@ -1,12 +1,11 @@
 import { ORPCError } from "@orpc/server";
-import { and, attendance, attendancePolicy, eq } from "@repo/db";
+import { and, attendance, attendancePolicy, eq, member } from "@repo/db";
 import { z } from "zod";
 import { db } from "$lib/server/db";
 import { organizationMiddleware, os } from "$lib/server/orpc/base";
 
 const input = z.object({
   slug: z.string(),
-  attendancePolicyId: z.string(),
   latitude: z.number(),
   longitude: z.number(),
   accuracy: z.number(),
@@ -18,6 +17,28 @@ export const checkOutHandler = os
   .handler(async ({ context, input }) => {
     const now = new Date();
 
+    const [memberRecord] = await db
+      .select({
+        id: member.id,
+        attendancePolicyId: member.attendancePolicyId,
+      })
+      .from(member)
+      .where(
+        and(
+          eq(member.userId, context.session.user.id),
+          eq(member.organizationId, context.organization.id),
+          eq(member.status, "ACTIVE"),
+        ),
+      );
+
+    if (!memberRecord) {
+      throw new ORPCError("NOT_FOUND", { message: "Member record not found" });
+    }
+
+    if (!memberRecord.attendancePolicyId) {
+      throw new ORPCError("FORBIDDEN", { message: "No attendance policy assigned" });
+    }
+
     const [policy] = await db
       .select({
         timezone: attendancePolicy.timezone,
@@ -25,7 +46,7 @@ export const checkOutHandler = os
         clockOutSec: attendancePolicy.clockOutSec,
       })
       .from(attendancePolicy)
-      .where(eq(attendancePolicy.id, input.attendancePolicyId));
+      .where(eq(attendancePolicy.id, memberRecord.attendancePolicyId));
 
     if (!policy) {
       throw new ORPCError("NOT_FOUND", { message: "Attendance policy not found" });
@@ -60,8 +81,7 @@ export const checkOutHandler = os
       .from(attendance)
       .where(
         and(
-          eq(attendance.userId, context.session.user.id),
-          eq(attendance.attendancePolicyId, input.attendancePolicyId),
+          eq(attendance.memberId, memberRecord.id),
           eq(attendance.date, dateInTimezone),
           eq(attendance.status, "INCOMPLETE"),
         ),
@@ -83,7 +103,7 @@ export const checkOutHandler = os
     const isEarlyLeave = currentSeconds < policy.clockOutSec;
 
     let status: "PRESENT" | "LATE" | "EARLY_LEAVE";
-    if (isLate) {
+    if (existingRecord.status === "LATE") {
       status = "LATE";
     } else if (isEarlyLeave) {
       status = "EARLY_LEAVE";
