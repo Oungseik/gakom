@@ -2,7 +2,7 @@ import { sql } from "drizzle-orm";
 import { index, integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
 import { TIMEZONES } from "../timezone";
 import { user } from "./core";
-import { organization } from "./organization";
+import { member, organization } from "./organization";
 
 export type Day = "SUN" | "MON" | "TUE" | "WED" | "THU" | "FRI" | "SAT";
 
@@ -46,6 +46,9 @@ export const attendance = sqliteTable(
     userId: text("user_id")
       .notNull()
       .references(() => user.id, { onDelete: "cascade" }),
+    memberId: text("member_id")
+      .notNull()
+      .references(() => member.id, { onDelete: "cascade" }),
     organizationId: text("organization_id")
       .notNull()
       .references(() => organization.id, { onDelete: "cascade" }),
@@ -68,6 +71,7 @@ export const attendance = sqliteTable(
   },
   (table) => [
     index("attendance_user_date_idx").on(table.userId, table.date),
+    index("attendance_member_date_idx").on(table.memberId, table.date),
     index("attendance_org_date_idx").on(table.organizationId, table.date),
     index("attendance_status_idx").on(table.status),
   ],

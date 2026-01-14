@@ -94,6 +94,7 @@ export const relations = defineRelations(
     },
     attendance: {
       user: r.one.user({ from: r.attendance.userId, to: r.user.id }),
+      member: r.one.member({ from: r.attendance.memberId, to: r.member.id }),
       attendancePolicy: r.one.attendancePolicy({
         from: r.attendance.attendancePolicyId,
         to: r.attendancePolicy.id,
