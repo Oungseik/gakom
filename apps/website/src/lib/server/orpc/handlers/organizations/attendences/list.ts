@@ -6,8 +6,8 @@ import {
   eq,
   gte,
   inArray,
-  lte,
   like,
+  lte,
   member,
   or,
   organization,
@@ -51,7 +51,6 @@ export const listHandler = os
     const limit = input.pageSize + 1;
     const filter = input.filter;
 
-
     const items = await db
       .select({
         id: attendance.id,
@@ -94,13 +93,14 @@ export const listHandler = os
         ),
       )
       .orderBy(desc(attendance.date), desc(attendance.checkInAt))
+      .offset(input.cursor ?? 0)
       .limit(limit);
 
     let nextCursor: number | undefined;
     if (items.length > input.pageSize) {
       const nextItem = items.pop();
       if (nextItem?.checkInAt) {
-        nextCursor = nextItem.checkInAt.getTime();
+        nextCursor = (input.cursor ?? 0) + input.pageSize;
       }
     }
 
