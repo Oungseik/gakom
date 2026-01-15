@@ -205,6 +205,7 @@ async function main() {
   // 4. Create Members with varied join dates (for tenure calculation)
   console.log("👔 Creating members...");
   const memberRecords: {
+    id: string;
     userId: string;
     memberId: string;
     policyId: string;
@@ -253,6 +254,7 @@ async function main() {
     });
 
     memberRecords.push({
+      id: memberId,
       userId: userIds[i].id,
       memberId: memberId,
       policyId: policy.id,
@@ -368,6 +370,7 @@ async function main() {
       await db.insert(attendance).values({
         id: crypto.randomUUID(),
         userId: memberRecord.userId,
+        memberId: memberRecord.id,
         organizationId: orgId,
         attendancePolicyId: policy.id,
         date: dateInTimezone,
