@@ -13,6 +13,7 @@
   import DashboardHeader from "$lib/components/headers/DashboardHeader.svelte";
   import {
     type Invitation,
+    type InvitationStatus,
     columns as invitationColumns,
   } from "$lib/components/tables/InvitationsTable/columns";
   import { columns } from "$lib/components/tables/MembersTable/columns";
@@ -151,8 +152,9 @@
     <Tabs.Content value="invitations">
       <DataTable
         columns={invitationColumns}
-        data={allInvitations.map((inv) => ({
-          ...inv,
+        data={allInvitations.map((invitation) => ({
+          ...invitation,
+          status: invitation.status.toUpperCase() as InvitationStatus,
           organizationId: data.currentOrganization.id,
         }))}
         loading={invitations.isLoading}

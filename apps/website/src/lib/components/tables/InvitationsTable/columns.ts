@@ -5,12 +5,14 @@ import DataTableStatus from "../common/DataTableStatus.svelte";
 import DataTableActions from "./DataTableActions.svelte";
 import DataTableRole from "./DataTableRole.svelte";
 
+export type InvitationStatus = "PENDING" | "ACCEPTED" | "REJECTED" | "CANCELED";
+
 export type Invitation = {
   id: string;
   email: string;
   role: "member" | "admin";
   position: string;
-  status: "pending" | "accepted" | "rejected" | "canceled";
+  status: InvitationStatus;
   expiresAt: Date;
   createdAt: Date;
   organizationId: string;

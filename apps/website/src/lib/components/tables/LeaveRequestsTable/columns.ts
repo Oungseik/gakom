@@ -7,6 +7,8 @@ import DataTableStatus from "../common/DataTableStatus.svelte";
 import DataTableActions from "./DataTableActions.svelte";
 import DataTableDateAndDuration from "./DataTableDateAndDuration.svelte";
 
+export type LeaveRequestStatus = "APPROVED" | "CANCELLED" | "PENDING" | "REJECTED";
+
 export type LeaveRequest = {
   id: string;
   organizationId: string;
@@ -16,7 +18,7 @@ export type LeaveRequest = {
   position?: string | null;
   image?: string | null;
   name: string;
-  status: "approved" | "cancelled" | "pending" | "rejected";
+  status: LeaveRequestStatus;
   startDate: Date;
   endDate: Date;
   reviewerName?: string | null;

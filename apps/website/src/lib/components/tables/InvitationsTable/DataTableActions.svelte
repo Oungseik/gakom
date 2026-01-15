@@ -19,7 +19,7 @@
     email: string;
     position: string;
     role: "admin" | "member";
-    status: "pending" | "accepted" | "rejected" | "canceled";
+    status: "PENDING" | "ACCEPTED" | "REJECTED" | "CANCELED";
   } = $props();
 
   const queryClient = useQueryClient();
@@ -46,7 +46,7 @@
     toast.success(`Cancelled invitation for ${props.email}`);
   }
 
-  const canTakeAction = $derived(status !== "accepted");
+  const canTakeAction = $derived(status !== "ACCEPTED");
 </script>
 
 {#if canTakeAction}
@@ -66,7 +66,7 @@
       <DropdownMenu.Item
         onclick={handleCancelInvitation}
         variant="destructive"
-        disabled={status === "canceled"}
+        disabled={status === "CANCELED"}
       >
         <CircleXIcon size={16} class="mr-2" /> Cancel Invitation
       </DropdownMenu.Item>
