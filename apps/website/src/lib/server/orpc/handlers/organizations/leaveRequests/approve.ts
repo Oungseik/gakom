@@ -57,7 +57,7 @@ export const approveLeaveRequestHandler = os
       });
     }
 
-    if (leaveReq.status !== "PENDING") {
+    if (leaveReq.status !== "PENDING" && leaveReq.status !== "REJECTED") {
       throw new ORPCError("BAD_REQUEST", {
         message: `Cannot approve a leave request with status ${leaveReq.status}.`,
       });
