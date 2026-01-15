@@ -31,7 +31,7 @@
 <Card.Card>
   <Card.Content class="flex items-center justify-between pt-4">
     <div>
-      <p class="text-muted-foreground mb-1 text-sm">Late Arrivals Today</p>
+      <p class="text-muted-foreground mb-1 text-sm">Late Arrivals</p>
       <p class="text-2xl font-bold">{data.lateArrivals}</p>
     </div>
     <ClockIcon class="size-6 text-red-500" />
@@ -41,7 +41,7 @@
 <Card.Card>
   <Card.Content class="flex items-center justify-between pt-4">
     <div>
-      <p class="text-muted-foreground mb-1 text-sm">Early Departures Today</p>
+      <p class="text-muted-foreground mb-1 text-sm">Early Departures</p>
       <p class="text-2xl font-bold">{data.earlyDepartures}</p>
     </div>
     <LogOutIcon class="size-6 text-orange-500" />
@@ -51,7 +51,7 @@
 <Card.Card>
   <Card.Content class="flex items-center justify-between pt-4">
     <div>
-      <p class="text-muted-foreground mb-1 text-sm">Members Present Today</p>
+      <p class="text-muted-foreground mb-1 text-sm">Members Present</p>
       <p class="text-2xl font-bold">{data.membersPresent}</p>
     </div>
     <UsersIcon class="size-6 text-emerald-500" />

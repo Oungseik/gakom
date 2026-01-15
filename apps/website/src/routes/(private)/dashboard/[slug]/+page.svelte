@@ -1,7 +1,6 @@
 <script lang="ts">
-  import { type CalendarDate } from "@internationalized/date";
   import CalendarIcon from "@lucide/svelte/icons/calendar";
-  import FilterIcon from "@lucide/svelte/icons/filter";
+  import ListFilterIcon from "@lucide/svelte/icons/list-filter";
   import SearchIcon from "@lucide/svelte/icons/search";
   import { Button } from "@repo/ui/button";
   import { Checkbox } from "@repo/ui/checkbox";
@@ -30,8 +29,8 @@
   const searchParams = useSearchParams(attendancesFilterSchema);
   const debounceSearch = new Debounced(() => searchParams.search, 500);
   const debounceStatus = new Debounced(() => searchParams.status, 1000);
-
-  let date: { start: CalendarDate; end: CalendarDate } | undefined = $state();
+  const debounceDateFrom = new Debounced(() => searchParams.dateFrom, 1000);
+  const debounceDateTo = new Debounced(() => searchParams.dateTo, 1000);
 
   const attendances = createInfiniteQuery(() =>
     orpc.organizations.attendances.list.infiniteOptions({
@@ -42,8 +41,8 @@
         pageSize: 10,
         filter: {
           search: debounceSearch.current || undefined,
-          dateFrom: date?.start?.toString(),
-          dateTo: date?.end?.toString(),
+          dateFrom: debounceDateFrom.current || undefined,
+          dateTo: debounceDateTo.current || undefined,
           status: debounceStatus.current.length ? debounceStatus.current : undefined,
         },
       }),
@@ -56,7 +55,13 @@
 
   const stats = createQuery(() =>
     orpc.organizations.attendances.stats.get.queryOptions({
-      input: { slug: params.slug },
+      input: {
+        slug: params.slug,
+        filter: {
+          dateFrom: debounceDateFrom.current || undefined,
+          dateTo: debounceDateTo.current || undefined,
+        },
+      },
       enabled: !!params.slug,
     })
   );
@@ -92,111 +97,129 @@
           />
         </div>
 
-        <Popover.Root>
-          <Popover.Trigger>
-            <Button variant="outline" size="sm">
-              <CalendarIcon class="size-4" />
-              {#if searchParams.dateFrom && searchParams.dateTo}
-                {searchParams.dateFrom} - {searchParams.dateTo}
-              {:else}
-                Date Range
-              {/if}
-            </Button>
-          </Popover.Trigger>
-          <Popover.Content class="w-124 p-0">
-            <RangeCalendar
-              numberOfMonths={2}
-              class="rounded-lg border shadow-sm"
-              bind:value={date}
-            />
-          </Popover.Content>
-        </Popover.Root>
+        <div>
+          <Popover.Root>
+            <Popover.Trigger>
+              <Button variant="outline" class="w-54">
+                <CalendarIcon class="size-4" />
+                {#if searchParams.dateFrom && searchParams.dateTo}
+                  {searchParams.dateFrom} - {searchParams.dateTo}
+                {:else}
+                  Date Range
+                {/if}
+              </Button>
+            </Popover.Trigger>
+            <Popover.Content class="w-124 p-0">
+              <RangeCalendar
+                numberOfMonths={2}
+                class="rounded-lg border shadow-sm"
+                onValueChange={({ start, end }) => {
+                  searchParams.update({
+                    dateFrom: start
+                      ? `${start.year}-${start.month.toString().padStart(2, "0")}-${start.day.toString().padStart(2, "0")}`
+                      : undefined,
+                    dateTo: end
+                      ? `${end.year}-${end.month.toString().padStart(2, "0")}-${end.day.toString().padStart(2, "0")}`
+                      : undefined,
+                  });
+                }}
+              />
+            </Popover.Content>
+          </Popover.Root>
+        </div>
 
-        <Popover.Root>
-          <Popover.Trigger>
-            <Button variant="outline" size="sm">
-              <FilterIcon class="size-4" />
-              Status
-            </Button>
-          </Popover.Trigger>
-          <Popover.Content align="start" class="w-52 p-4">
-            <div class="space-y-3">
-              <div class="flex items-center space-x-3">
-                <Checkbox
-                  id="present"
-                  checked={searchParams.status?.includes("PRESENT")}
-                  onCheckedChange={(v) => {
-                    if (v) {
-                      searchParams.status = [...(searchParams.status || []), "PRESENT"];
-                    } else {
-                      searchParams.status = searchParams.status?.filter((s) => s !== "PRESENT");
-                    }
-                  }}
-                />
-                <Label for="present" class="cursor-pointer text-sm font-medium">Present</Label>
+        <div>
+          <Popover.Root>
+            <Popover.Trigger>
+              <Button variant="outline">
+                <ListFilterIcon class="size-4" />
+                Status
+              </Button>
+            </Popover.Trigger>
+            <Popover.Content align="start" class="w-52 p-4">
+              <div class="space-y-3">
+                <div class="flex items-center space-x-3">
+                  <Checkbox
+                    id="present"
+                    checked={searchParams.status?.includes("PRESENT")}
+                    onCheckedChange={(v) => {
+                      if (v) {
+                        searchParams.status = [...(searchParams.status || []), "PRESENT"];
+                      } else {
+                        searchParams.status = searchParams.status?.filter((s) => s !== "PRESENT");
+                      }
+                    }}
+                  />
+                  <Label for="present" class="cursor-pointer text-sm font-medium">Present</Label>
+                </div>
+                <div class="flex items-center space-x-3">
+                  <Checkbox
+                    id="late"
+                    checked={searchParams.status?.includes("LATE")}
+                    onCheckedChange={(v) => {
+                      if (v) {
+                        searchParams.status = [...(searchParams.status || []), "LATE"];
+                      } else {
+                        searchParams.status = searchParams.status?.filter((s) => s !== "LATE");
+                      }
+                    }}
+                  />
+                  <Label for="late" class="cursor-pointer text-sm font-medium">Late</Label>
+                </div>
+                <div class="flex items-center space-x-3">
+                  <Checkbox
+                    id="early_leave"
+                    checked={searchParams.status?.includes("EARLY_LEAVE")}
+                    onCheckedChange={(v) => {
+                      if (v) {
+                        searchParams.status = [...(searchParams.status || []), "EARLY_LEAVE"];
+                      } else {
+                        searchParams.status = searchParams.status?.filter(
+                          (s) => s !== "EARLY_LEAVE"
+                        );
+                      }
+                    }}
+                  />
+                  <Label for="early_leave" class="cursor-pointer text-sm font-medium"
+                    >Early Leave</Label
+                  >
+                </div>
+                <div class="flex items-center space-x-3">
+                  <Checkbox
+                    id="absent"
+                    checked={searchParams.status?.includes("ABSENT")}
+                    onCheckedChange={(v) => {
+                      if (v) {
+                        searchParams.status = [...(searchParams.status || []), "ABSENT"];
+                      } else {
+                        searchParams.status = searchParams.status?.filter((s) => s !== "ABSENT");
+                      }
+                    }}
+                  />
+                  <Label for="absent" class="cursor-pointer text-sm font-medium">Absent</Label>
+                </div>
+                <div class="flex items-center space-x-3">
+                  <Checkbox
+                    id="incomplete"
+                    checked={searchParams.status?.includes("INCOMPLETE")}
+                    onCheckedChange={(v) => {
+                      if (v) {
+                        searchParams.status = [...(searchParams.status || []), "INCOMPLETE"];
+                      } else {
+                        searchParams.status = searchParams.status?.filter(
+                          (s) => s !== "INCOMPLETE"
+                        );
+                      }
+                    }}
+                  />
+                  <Label for="incomplete" class="cursor-pointer text-sm font-medium"
+                    >Incomplete</Label
+                  >
+                </div>
               </div>
-              <div class="flex items-center space-x-3">
-                <Checkbox
-                  id="late"
-                  checked={searchParams.status?.includes("LATE")}
-                  onCheckedChange={(v) => {
-                    if (v) {
-                      searchParams.status = [...(searchParams.status || []), "LATE"];
-                    } else {
-                      searchParams.status = searchParams.status?.filter((s) => s !== "LATE");
-                    }
-                  }}
-                />
-                <Label for="late" class="cursor-pointer text-sm font-medium">Late</Label>
-              </div>
-              <div class="flex items-center space-x-3">
-                <Checkbox
-                  id="early_leave"
-                  checked={searchParams.status?.includes("EARLY_LEAVE")}
-                  onCheckedChange={(v) => {
-                    if (v) {
-                      searchParams.status = [...(searchParams.status || []), "EARLY_LEAVE"];
-                    } else {
-                      searchParams.status = searchParams.status?.filter((s) => s !== "EARLY_LEAVE");
-                    }
-                  }}
-                />
-                <Label for="early_leave" class="cursor-pointer text-sm font-medium"
-                  >Early Leave</Label
-                >
-              </div>
-              <div class="flex items-center space-x-3">
-                <Checkbox
-                  id="absent"
-                  checked={searchParams.status?.includes("ABSENT")}
-                  onCheckedChange={(v) => {
-                    if (v) {
-                      searchParams.status = [...(searchParams.status || []), "ABSENT"];
-                    } else {
-                      searchParams.status = searchParams.status?.filter((s) => s !== "ABSENT");
-                    }
-                  }}
-                />
-                <Label for="absent" class="cursor-pointer text-sm font-medium">Absent</Label>
-              </div>
-              <div class="flex items-center space-x-3">
-                <Checkbox
-                  id="incomplete"
-                  checked={searchParams.status?.includes("INCOMPLETE")}
-                  onCheckedChange={(v) => {
-                    if (v) {
-                      searchParams.status = [...(searchParams.status || []), "INCOMPLETE"];
-                    } else {
-                      searchParams.status = searchParams.status?.filter((s) => s !== "INCOMPLETE");
-                    }
-                  }}
-                />
-                <Label for="incomplete" class="cursor-pointer text-sm font-medium">Incomplete</Label
-                >
-              </div>
-            </div>
-          </Popover.Content>
-        </Popover.Root>
+            </Popover.Content>
+          </Popover.Root>
+        </div>
       </div>
     </div>
 
