@@ -8,7 +8,6 @@ import {
   inArray,
   like,
   lte,
-  member,
   or,
   organization,
   user,
@@ -79,8 +78,7 @@ export const listHandler = os
       .from(attendance)
       .innerJoin(user, eq(attendance.userId, user.id))
       .innerJoin(attendancePolicy, eq(attendance.attendancePolicyId, attendancePolicy.id))
-      .innerJoin(member, eq(attendance.userId, member.userId))
-      .innerJoin(organization, eq(member.organizationId, organization.id))
+      .innerJoin(organization, eq(attendance.organizationId, organization.id))
       .where(
         and(
           eq(organization.id, context.organization.id),

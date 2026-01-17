@@ -23,7 +23,7 @@
   const policies = createInfiniteQuery(() =>
     orpc.organizations.attendancesPolicies.list.infiniteOptions({
       initialPageParam: 0,
-      input: (cursor) => ({ pageSize: 10, cursor, slug: params.slug }),
+      input: (cursor) => ({ pageSize: 20, cursor, slug: params.slug }),
       getNextPageParam: (lastPage) => lastPage.nextCursor,
       enabled: !!params.slug,
     })

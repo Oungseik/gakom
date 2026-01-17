@@ -1,13 +1,9 @@
 <script lang="ts">
-  import CalendarIcon from "@lucide/svelte/icons/calendar";
-  import ListFilterIcon from "@lucide/svelte/icons/list-filter";
-  import SearchIcon from "@lucide/svelte/icons/search";
+  import ListChecksIcon from "@lucide/svelte/icons/list-checks";
   import { Button } from "@repo/ui/button";
   import { Checkbox } from "@repo/ui/checkbox";
-  import { Input } from "@repo/ui/input";
   import { Label } from "@repo/ui/label";
   import * as Popover from "@repo/ui/popover";
-  import { RangeCalendar } from "@repo/ui/range-calendar";
   import { createInfiniteQuery, createQuery } from "@tanstack/svelte-query";
   import { Debounced } from "runed";
   import { useSearchParams } from "runed/kit";
@@ -15,6 +11,8 @@
   import LoadMoreBtn from "$lib/components/buttons/LoadMoreBtn.svelte";
   import DashboardContainer from "$lib/components/containers/DashboardContainer.svelte";
   import DashboardHeader from "$lib/components/headers/DashboardHeader.svelte";
+  import RangeCalendarPopover from "$lib/components/inputs/RangeCalendarPopover.svelte";
+  import Search from "$lib/components/inputs/Search.svelte";
   import SkeletonStatsCard from "$lib/components/skeletons/SkeletonStatsCard.svelte";
   import AttendanceStatistics from "$lib/components/statistics/AttendanceStatistics.svelte";
   import { columns } from "$lib/components/tables/AttendanceTable/columns";
@@ -38,7 +36,7 @@
       input: (cursor) => ({
         slug: params.slug,
         cursor,
-        pageSize: 10,
+        pageSize: 20,
         filter: {
           search: debounceSearch.current || undefined,
           dateFrom: debounceDateFrom.current || undefined,
@@ -70,9 +68,8 @@
 <DashboardHeader breadcrumbItems={[{ desc: "Dashboard", href: `/dashboard/${params.slug}` }]} />
 
 <DashboardContainer>
-  <section class="grid grid-cols-1 gap-6 md:grid-cols-3 lg:grid-cols-5">
+  <section class="grid grid-cols-1 gap-6 md:grid-cols-3 lg:grid-cols-4">
     {#if stats.isLoading}
-      <SkeletonStatsCard />
       <SkeletonStatsCard />
       <SkeletonStatsCard />
       <SkeletonStatsCard />
@@ -84,55 +81,33 @@
 
   <section>
     <div class="my-4 space-y-2">
-      <h1 class="text-muted-foreground text-lg font-medium">Attendances</h1>
+      <h1 class="text-muted-foreground">Attendances</h1>
 
       <div class="flex flex-wrap gap-2">
-        <div class="relative">
-          <SearchIcon class="text-muted-foreground absolute top-2.5 left-2.5 h-4 w-4" />
-          <Input
-            type="search"
-            placeholder="Search name or email..."
-            class="w-[200px] pl-9 sm:w-[300px]"
-            bind:value={searchParams.search}
+        <Search bind:value={searchParams.search} />
+
+        <div>
+          <RangeCalendarPopover
+            from={searchParams.dateFrom}
+            to={searchParams.dateTo}
+            onValueChange={({ start, end }) => {
+              searchParams.update({
+                dateFrom: start
+                  ? `${start.year}-${start.month.toString().padStart(2, "0")}-${start.day.toString().padStart(2, "0")}`
+                  : undefined,
+                dateTo: end
+                  ? `${end.year}-${end.month.toString().padStart(2, "0")}-${end.day.toString().padStart(2, "0")}`
+                  : undefined,
+              });
+            }}
           />
         </div>
 
         <div>
           <Popover.Root>
             <Popover.Trigger>
-              <Button variant="outline" class="w-54">
-                <CalendarIcon class="size-4" />
-                {#if searchParams.dateFrom && searchParams.dateTo}
-                  {searchParams.dateFrom} - {searchParams.dateTo}
-                {:else}
-                  Date Range
-                {/if}
-              </Button>
-            </Popover.Trigger>
-            <Popover.Content class="w-124 p-0">
-              <RangeCalendar
-                numberOfMonths={2}
-                class="rounded-lg border shadow-sm"
-                onValueChange={({ start, end }) => {
-                  searchParams.update({
-                    dateFrom: start
-                      ? `${start.year}-${start.month.toString().padStart(2, "0")}-${start.day.toString().padStart(2, "0")}`
-                      : undefined,
-                    dateTo: end
-                      ? `${end.year}-${end.month.toString().padStart(2, "0")}-${end.day.toString().padStart(2, "0")}`
-                      : undefined,
-                  });
-                }}
-              />
-            </Popover.Content>
-          </Popover.Root>
-        </div>
-
-        <div>
-          <Popover.Root>
-            <Popover.Trigger>
               <Button variant="outline">
-                <ListFilterIcon class="size-4" />
+                <ListChecksIcon class="size-4" />
                 Status
               </Button>
             </Popover.Trigger>

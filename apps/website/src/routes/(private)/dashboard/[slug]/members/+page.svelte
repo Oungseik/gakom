@@ -11,6 +11,7 @@
   import DashboardContainer from "$lib/components/containers/DashboardContainer.svelte";
   import InviteMemberDialog from "$lib/components/dialogs/InviteMemberDialog.svelte";
   import DashboardHeader from "$lib/components/headers/DashboardHeader.svelte";
+  import Search from "$lib/components/inputs/Search.svelte";
   import {
     type Invitation,
     type InvitationStatus,
@@ -20,6 +21,7 @@
   import DataTable from "$lib/components/tables/common/DataTable.svelte";
   import { orpc } from "$lib/orpc_client";
   import { membersTabSchema } from "$lib/searchParams";
+  import { membersFilterSchema } from "$lib/searchParams";
 
   import type { PageProps } from "./$types";
 
@@ -28,21 +30,23 @@
 
   type View = { id: string; label: string };
 
-  const searchParams = useSearchParams(membersTabSchema);
+  const tabParams = useSearchParams(membersTabSchema);
+  const membersFilterParams = useSearchParams(membersFilterSchema);
+
   const members = createInfiniteQuery(() =>
     orpc.organizations.members.list.infiniteOptions({
-      enabled: searchParams.tab === "members",
+      enabled: tabParams.tab === "members",
       initialPageParam: 0,
-      input: (cursor) => ({ pageSize: 10, cursor, slug: params.slug }),
+      input: (cursor) => ({ pageSize: 20, cursor, slug: params.slug }),
       getNextPageParam: (lastPage) => lastPage.nextCursor,
     })
   );
 
   const invitations = createInfiniteQuery(() =>
     orpc.organizations.invitations.list.infiniteOptions({
-      enabled: searchParams.tab === "invitations",
+      enabled: tabParams.tab === "invitations",
       initialPageParam: 0,
-      input: (cursor) => ({ pageSize: 10, cursor, slug: params.slug }),
+      input: (cursor) => ({ pageSize: 20, cursor, slug: params.slug }),
       getNextPageParam: (lastPage) => lastPage.nextCursor,
     })
   );
@@ -105,8 +109,8 @@
     </div>
   {/if}
 
-  <Tabs.Root bind:value={searchParams.tab} class="w-full flex-col justify-start gap-6">
-    <div class="flex items-center justify-between">
+  <Tabs.Root bind:value={tabParams.tab} class="w-full flex-col justify-start gap-6">
+    <section class="mt-4 flex items-center justify-between">
       <Label for="view-selector" class="sr-only">View</Label>
 
       <Tabs.List
@@ -125,51 +129,59 @@
           Invite</Button
         >
       </div>
-    </div>
+    </section>
 
-    <Tabs.Content value="members">
-      <DataTable
-        {columns}
-        data={allMembers.map((m) => ({
-          ...m,
-          organizationId: data.currentOrganization.id,
-          slug: params.slug,
-        }))}
-        loading={members.isLoading}
-      />
-
-      {#if members.hasNextPage}
-        <div class="flex items-center justify-center py-4">
-          <LoadMoreBtn
-            onclick={() => members.fetchNextPage()}
-            loading={members.isFetchingNextPage}
-            disabled={members.isFetchingNextPage}
-          />
+    <section class="space-y-2">
+      {#if tabParams.tab === "members"}
+        <div class="flex flex-wrap gap-2">
+          <Search bind:value={membersFilterParams.search} />
         </div>
-      {/if}
-    </Tabs.Content>
+      {:else}{/if}
 
-    <Tabs.Content value="invitations">
-      <DataTable
-        columns={invitationColumns}
-        data={allInvitations.map((invitation) => ({
-          ...invitation,
-          status: invitation.status.toUpperCase() as InvitationStatus,
-          organizationId: data.currentOrganization.id,
-        }))}
-        loading={invitations.isLoading}
-      />
+      <Tabs.Content value="members">
+        <DataTable
+          {columns}
+          data={allMembers.map((m) => ({
+            ...m,
+            organizationId: data.currentOrganization.id,
+            slug: params.slug,
+          }))}
+          loading={members.isLoading}
+        />
 
-      {#if invitations.hasNextPage}
-        <div class="flex items-center justify-center py-4">
-          <LoadMoreBtn
-            onclick={() => invitations.fetchNextPage()}
-            loading={invitations.isFetchingNextPage}
-            disabled={invitations.isFetchingNextPage}
-          />
-        </div>
-      {/if}
-    </Tabs.Content>
+        {#if members.hasNextPage}
+          <div class="flex items-center justify-center py-4">
+            <LoadMoreBtn
+              onclick={() => members.fetchNextPage()}
+              loading={members.isFetchingNextPage}
+              disabled={members.isFetchingNextPage}
+            />
+          </div>
+        {/if}
+      </Tabs.Content>
+
+      <Tabs.Content value="invitations">
+        <DataTable
+          columns={invitationColumns}
+          data={allInvitations.map((invitation) => ({
+            ...invitation,
+            status: invitation.status.toUpperCase() as InvitationStatus,
+            organizationId: data.currentOrganization.id,
+          }))}
+          loading={invitations.isLoading}
+        />
+
+        {#if invitations.hasNextPage}
+          <div class="flex items-center justify-center py-4">
+            <LoadMoreBtn
+              onclick={() => invitations.fetchNextPage()}
+              loading={invitations.isFetchingNextPage}
+              disabled={invitations.isFetchingNextPage}
+            />
+          </div>
+        {/if}
+      </Tabs.Content>
+    </section>
   </Tabs.Root>
 </DashboardContainer>
 

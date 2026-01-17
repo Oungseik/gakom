@@ -1,7 +1,7 @@
 import { createSearchParamsSchema } from "runed/kit";
 
 export const returnUrlSchema = createSearchParamsSchema({
-  return_url: { type: "string", default: undefined },
+  return_url: { type: "string" },
 });
 
 export const membersTabSchema = createSearchParamsSchema({
@@ -9,12 +9,32 @@ export const membersTabSchema = createSearchParamsSchema({
 });
 
 export const attendancesFilterSchema = createSearchParamsSchema({
-  search: { type: "string", default: undefined },
+  search: { type: "string" },
   status: {
     type: "array",
     arrayType: "" as "PRESENT" | "LATE" | "EARLY_LEAVE" | "ABSENT" | "INCOMPLETE",
     default: [],
   },
-  dateFrom: { type: "string", default: undefined },
-  dateTo: { type: "string", default: undefined },
+  dateFrom: { type: "string" },
+  dateTo: { type: "string" },
+});
+
+export const leaveRequestsFilterSchema = createSearchParamsSchema({
+  search: { type: "string" },
+  status: {
+    type: "array",
+    arrayType: "" as "PENDING" | "REJECTED" | "APPROVED" | "CANCELLED",
+    default: [],
+  },
+  duration: { type: "number" },
+  leave: { type: "string" },
+  dateFrom: { type: "string" },
+  dateTo: { type: "string" },
+});
+
+export const membersFilterSchema = createSearchParamsSchema({
+  search: { type: "string" },
+  role: { type: "string" },
+  dateFrom: { type: "string" },
+  dateTo: { type: "string" },
 });

@@ -171,6 +171,7 @@ async function main() {
       clockInSec: 9 * 3600, // 9:00 AM
       clockOutSec: 17 * 3600, // 5:00 PM
       workdays: ["MON", "TUE", "WED", "THU", "FRI"] as Day[],
+      organizationId: orgId,
     },
     {
       id: crypto.randomUUID(),
@@ -179,6 +180,7 @@ async function main() {
       clockInSec: 8 * 3600, // 8:00 AM
       clockOutSec: 16 * 3600, // 4:00 PM
       workdays: ["MON", "TUE", "WED", "THU", "FRI", "SAT"] as Day[],
+      organizationId: orgId,
     },
     {
       id: crypto.randomUUID(),
@@ -187,19 +189,12 @@ async function main() {
       clockInSec: 10 * 3600, // 10:00 AM
       clockOutSec: 18 * 3600, // 6:00 PM
       workdays: ["SUN", "MON", "TUE", "WED", "THU"] as Day[],
+      organizationId: orgId,
     },
   ];
 
   for (const policy of policies) {
-    await db.insert(attendancePolicy).values({
-      id: policy.id,
-      name: policy.name,
-      timezone: policy.timezone,
-      clockInSec: policy.clockInSec,
-      clockOutSec: policy.clockOutSec,
-      workdays: policy.workdays,
-      organizationId: orgId,
-    });
+    await db.insert(attendancePolicy).values(policy);
   }
 
   // 4. Create Members with varied join dates (for tenure calculation)
@@ -274,16 +269,19 @@ async function main() {
       email: "sarah.connor@example.com",
       role: "member",
       position: "Developer",
+      status: "pending",
     },
     {
       email: "kyle.reese@example.com",
       role: "member",
       position: "Designer",
+      status: "pending",
     },
     {
       email: "john.connor@example.com",
       role: "member",
       position: "Product Manager",
+      status: "canceled",
     },
   ];
 

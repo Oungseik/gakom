@@ -11,7 +11,6 @@
       totalPresent: number;
       lateArrivals: number;
       earlyDepartures: number;
-      membersPresent: number;
       pendingCheckouts: number;
     };
   };
@@ -45,16 +44,6 @@
       <p class="text-2xl font-bold">{data.earlyDepartures}</p>
     </div>
     <LogOutIcon class="size-6 text-orange-500" />
-  </Card.Content>
-</Card.Card>
-
-<Card.Card>
-  <Card.Content class="flex items-center justify-between pt-4">
-    <div>
-      <p class="text-muted-foreground mb-1 text-sm">Members Present</p>
-      <p class="text-2xl font-bold">{data.membersPresent}</p>
-    </div>
-    <UsersIcon class="size-6 text-emerald-500" />
   </Card.Content>
 </Card.Card>
 
