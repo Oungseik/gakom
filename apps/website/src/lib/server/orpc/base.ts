@@ -58,6 +58,7 @@ export const organizationMiddleware = (roles: string[]) =>
         id: organization.id,
         slug: organization.slug,
         role: member.role,
+        memberId: member.id,
       })
       .from(member)
       .innerJoin(organization, eq(member.organizationId, organization.id))
@@ -68,5 +69,11 @@ export const organizationMiddleware = (roles: string[]) =>
       throw new ORPCError("FORBIDDEN");
     }
 
-    return next({ context: { ...context, organization: currentOrganization } });
+    return next({
+      context: {
+        ...context,
+        organization: currentOrganization,
+        member: { role: currentOrganization.role, id: currentOrganization.memberId },
+      },
+    });
   });

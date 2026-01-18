@@ -45,7 +45,7 @@ const input = z.object({
 export const listHandler = os
   .route({ method: "GET" })
   .input(input)
-  .use(organizationMiddleware(["admin", "owner"]))
+  .use(organizationMiddleware(["admin", "owner", "member"]))
   .handler(async ({ input, context }) => {
     const limit = input.pageSize + 1;
     const filter = input.filter;
@@ -88,6 +88,9 @@ export const listHandler = os
             : undefined,
           filter?.dateFrom ? gte(attendance.date, filter.dateFrom) : undefined,
           filter?.dateTo ? lte(attendance.date, filter.dateTo) : undefined,
+          context.member.role === "member"
+            ? eq(attendance.userId, context.session.user.id)
+            : undefined,
         ),
       )
       .orderBy(desc(attendance.date), desc(attendance.checkInAt))
