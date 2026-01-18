@@ -4,7 +4,10 @@ import { TIMEZONES } from "../timezone";
 import { user } from "./core";
 import { member, organization } from "./organization";
 
+const status = ["PRESENT", "LATE", "EARLY_LEAVE", "ABSENT", "INCOMPLETE"] as const;
+
 export type Day = "SUN" | "MON" | "TUE" | "WED" | "THU" | "FRI" | "SAT";
+export type AttendanceStatus = (typeof status)[number];
 
 export const attendancePolicy = sqliteTable(
   "attendance_policy",
@@ -61,9 +64,7 @@ export const attendance = sqliteTable(
     checkInLocation: text("check_in_location", { mode: "json" }).$type<AttendanceLocation>(),
     checkOutLocation: text("check_out_location", { mode: "json" }).$type<AttendanceLocation>(),
     workedSeconds: integer("worked_seconds").default(0),
-    status: text("status", { enum: ["PRESENT", "LATE", "EARLY_LEAVE", "ABSENT", "INCOMPLETE"] })
-      .default("ABSENT")
-      .notNull(),
+    status: text("status", { enum: status }).default("ABSENT").notNull(),
     updatedAt: integer("updated_at", { mode: "timestamp_ms" })
       .default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)
       .$onUpdate(() => /* @__PURE__ */ new Date())

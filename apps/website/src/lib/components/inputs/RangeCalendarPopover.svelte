@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { type DateValue } from "@internationalized/date";
+  import { CalendarDate, type DateValue } from "@internationalized/date";
   import CalendarIcon from "@lucide/svelte/icons/calendar";
   import { Button } from "@repo/ui/button";
   import * as Popover from "@repo/ui/popover";
@@ -12,20 +12,34 @@
   };
 
   const { from, to, onValueChange }: Props = $props();
+  const start = $derived(from?.split("-"));
+  const end = $derived(to?.split("-"));
 </script>
 
 <Popover.Root>
   <Popover.Trigger>
-    <Button variant="outline" class="w-54">
+    <Button variant="outline">
       <CalendarIcon class="size-4" />
-      {#if from}
-        {from} - {to ?? "today"}
-      {:else}
-        Date Range
-      {/if}
+      Date Range
     </Button>
   </Popover.Trigger>
   <Popover.Content class="w-124 p-0">
-    <RangeCalendar numberOfMonths={2} class="rounded-lg border shadow-sm" {onValueChange} />
+    <RangeCalendar
+      value={{
+        start:
+          start &&
+          new CalendarDate(
+            Number(start.at(0) ?? 0),
+            Number(start.at(1) ?? 0),
+            Number(start.at(2) ?? 0)
+          ),
+        end:
+          end &&
+          new CalendarDate(Number(end.at(0) ?? 0), Number(end.at(1) ?? 0), Number(end.at(2) ?? 0)),
+      }}
+      numberOfMonths={2}
+      class="rounded-lg border shadow-sm"
+      {onValueChange}
+    />
   </Popover.Content>
 </Popover.Root>

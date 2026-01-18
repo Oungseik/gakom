@@ -26,8 +26,8 @@ export const leaveRequestsFilterSchema = createSearchParamsSchema({
     arrayType: "" as "PENDING" | "REJECTED" | "APPROVED" | "CANCELLED",
     default: [],
   },
-  duration: { type: "number" },
-  leave: { type: "string" },
+  duration: { type: "number", default: -1 },
+  leave: { type: "string", default: "all" },
   dateFrom: { type: "string" },
   dateTo: { type: "string" },
 });

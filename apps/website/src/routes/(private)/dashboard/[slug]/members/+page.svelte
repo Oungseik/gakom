@@ -62,7 +62,7 @@
   ]);
 
   const stats = createQuery(() =>
-    orpc.organizations.members.stats.get.queryOptions({ input: { slug: params.slug } })
+    orpc.organizations.members.stats.queryOptions({ input: { slug: params.slug } })
   );
 
   const thisMonthTrend = $derived(
