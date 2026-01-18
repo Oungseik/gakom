@@ -5,6 +5,7 @@
   import FileChartColumnIncreasingIcon from "@lucide/svelte/icons/file-chart-column-increasing";
   import LayoutDashboardIcon from "@lucide/svelte/icons/layout-dashboard";
   import SettingsIcon from "@lucide/svelte/icons/settings";
+  import UserSearchIcon from "@lucide/svelte/icons/user-search";
   import UsersIcon from "@lucide/svelte/icons/users";
   import * as Sidebar from "@repo/ui/sidebar";
   import type { ComponentProps } from "svelte";
@@ -19,7 +20,7 @@
   type User = {
     email: string;
     name: string;
-    logo?: string | null;
+    image?: string | null;
   };
 
   type Organization = {
@@ -65,6 +66,11 @@
       icon: ClipboardClockIcon,
     },
     {
+      name: "Recruits",
+      url: `/dashboard/${activeOrganization.slug}/recruits`,
+      icon: UserSearchIcon,
+    },
+    {
       name: "Reports",
       url: `/dashboard/${activeOrganization.slug}/reports`,
       icon: FileChartColumnIncreasingIcon,
@@ -85,7 +91,7 @@
         {
           url: `/app/${activeOrganization.slug}`,
           icon: AppWindowIcon,
-          title: "Got to Application",
+          title: "Application",
         },
       ]}
     />
