@@ -3,11 +3,12 @@ import {
   and,
   desc,
   eq,
-  gte,
+  inArray,
   leave,
   leaveRequest,
-  lte,
+  like,
   member,
+  or,
   organization,
   user,
 } from "@repo/db";
@@ -19,10 +20,25 @@ const input = z.object({
   cursor: z.number().optional(),
   pageSize: z.number(),
   slug: z.string(),
-  status: z.enum(["PENDING", "APPROVED", "REJECTED", "CANCELLED"]).optional(),
-  memberId: z.string().optional(),
-  startDate: z.number().optional(),
-  endDate: z.number().optional(),
+  filter: z
+    .object({
+      status: z.array(z.enum(["PENDING", "APPROVED", "REJECTED", "CANCELLED"])).optional(),
+      search: z.string().optional(),
+      duration: z.number().optional(),
+      dateFrom: z
+        .string()
+        .regex(/^\d{4}-\d{2}-\d{2}$/, {
+          message: "Date must be in YYYY-MM-DD format",
+        })
+        .optional(),
+      dateTo: z
+        .string()
+        .regex(/^\d{4}-\d{2}-\d{2}$/, {
+          message: "Date must be in YYYY-MM-DD format",
+        })
+        .optional(),
+    })
+    .optional(),
 });
 
 export const listLeaveRequestsHandler = os
@@ -32,6 +48,7 @@ export const listLeaveRequestsHandler = os
   .handler(async ({ context, input }) => {
     const reviewer = alias(member, "reviewer");
     const reviewerUser = alias(user, "reviewer_user");
+    const filter = input.filter;
 
     const items = await db
       .select({
@@ -66,10 +83,10 @@ export const listLeaveRequestsHandler = os
         and(
           eq(leave.organizationId, context.organization.id),
           eq(member.status, "ACTIVE"),
-          input.status ? eq(leaveRequest.status, input.status) : undefined,
-          input.memberId ? eq(leaveRequest.memberId, input.memberId) : undefined,
-          input.startDate ? gte(leaveRequest.startDate, new Date(input.startDate)) : undefined,
-          input.endDate ? lte(leaveRequest.endDate, new Date(input.endDate)) : undefined,
+          filter?.search
+            ? or(like(user.name, `%${filter.search}%`), like(member.position, `%${filter.search}%`))
+            : undefined,
+          filter?.status?.length ? inArray(leaveRequest.status, filter.status) : undefined,
         ),
       )
       .orderBy(desc(leaveRequest.createdAt))

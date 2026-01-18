@@ -5,6 +5,7 @@
   import RotateCcwIcon from "@lucide/svelte/icons/rotate-ccw";
   import { Button } from "@repo/ui/button";
   import { createInfiniteQuery, createQuery } from "@tanstack/svelte-query";
+  import { Debounced } from "runed";
   import { useSearchParams } from "runed/kit";
 
   import { page } from "$app/state";
@@ -32,10 +33,21 @@
     { value: "CANCELLED" as const, label: "Cancelled" },
   ];
 
+  const debounceSearch = new Debounced(() => searchParams.search, 1000);
+  const debounceStatus = new Debounced(() => searchParams.status, 1000);
+
   const leaveRequests = createInfiniteQuery(() =>
     orpc.organizations.leaveRequests.list.infiniteOptions({
       initialPageParam: 0,
-      input: (cursor) => ({ pageSize: 20, cursor, slug: params.slug }),
+      input: (cursor) => ({
+        pageSize: 20,
+        cursor,
+        slug: params.slug,
+        filter: {
+          search: debounceSearch.current ?? undefined,
+          status: debounceStatus.current ?? [],
+        },
+      }),
       getNextPageParam: (lastPage) => lastPage.nextCursor,
       enabled: !!params.slug,
     })
