@@ -1,79 +1,83 @@
 <script lang="ts">
-  import { Badge } from "@repo/ui/badge";
   import { Button } from "@repo/ui/button";
   import { Card } from "@repo/ui/card";
   import { Progress } from "@repo/ui/progress";
+  import { createMutation, createQuery } from "@tanstack/svelte-query";
 
   import { goto } from "$app/navigation";
-  import DashboardContainer from "$lib/components/containers/DashboardContainer.svelte";
-  import { formatTime } from "$lib/utils";
+  import AttendanceCheckInCheckoutCard from "$lib/components/cards/AttendanceCheckInCheckoutCard.svelte";
+  import { orpc } from "$lib/orpc_client";
 
   import type { PageProps } from "./$types";
 
-  const { data }: PageProps = $props();
+  const { data, params }: PageProps = $props();
+  let coords = $state({ latitude: 0, longitude: 0, accuracy: 0 });
 
-  const currentSlug = data.currentOrganization.slug;
+  const attendance = createQuery(() =>
+    orpc.organizations.attendances.get.queryOptions({
+      input: { slug: params.slug },
+      enabled: !!params.slug,
+    })
+  );
 
-  const attendance = $state<{
-    status: "not_checked_in" | "checked_in" | "checked_out";
-    checkInTime: string | null;
-    checkOutTime: string | null;
-  }>({
-    status: "not_checked_in",
-    checkInTime: null,
-    checkOutTime: null,
+  const checkIn = createMutation(() => orpc.organizations.attendances.checkIn.mutationOptions());
+  const checkOut = createMutation(() => orpc.organizations.attendances.checkOut.mutationOptions());
+
+  $effect(() => {
+    if ("geolocation" in navigator) {
+      navigator.geolocation.getCurrentPosition(
+        ({ coords: c }) => {
+          coords = {
+            latitude: c.latitude,
+            longitude: c.longitude,
+            accuracy: c.accuracy,
+          };
+        },
+        (e) => {
+          // TODO handle this error
+          console.error(e);
+        }
+      );
+    } else {
+    }
   });
 
-  const handleAttendanceAction = () => {
-    if (attendance.status === "not_checked_in") {
-      attendance.status = "checked_in";
-      attendance.checkInTime = formatTime(new Date().getTime() / 1000);
-    } else if (attendance.status === "checked_in") {
-      attendance.status = "checked_out";
-      attendance.checkOutTime = formatTime(new Date().getTime() / 1000);
-    } else {
-      attendance.status = "not_checked_in";
-      attendance.checkInTime = null;
-      attendance.checkOutTime = null;
-    }
-  };
+  // const attendance = $state<{
+  //   status: "not_checked_in" | "checked_in" | "checked_out";
+  //   checkInTime: string | null;
+  //   checkOutTime: string | null;
+  // }>({Applica
+  //   status: "not_checked_in",
+  //   checkInTime: null,
+  //   checkOutTime: null,
+  // });
 
-  const getTaskStatusBadgeClass = (status: "pending" | "in_progress" | "done") => {
-    switch (status) {
-      case "done":
-        return "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400";
-      case "in_progress":
-        return "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400";
-      case "pending":
-        return "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300";
-      default:
-        return "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400";
-    }
-  };
+  // const handleAttendanceAction = () => {
+  //   if (attendance.status === "not_checked_in") {
+  //     attendance.status = "checked_in";
+  //     attendance.checkInTime = formatTime(new Date().getTime() / 1000);
+  //   } else if (attendance.status === "checked_in") {
+  //     attendance.status = "checked_out";
+  //     attendance.checkOutTime = formatTime(new Date().getTime() / 1000);
+  //   } else {
+  //     attendance.status = "not_checked_in";
+  //     attendance.checkInTime = null;
+  //     attendance.checkOutTime = null;
+  //   }
+  // };
 
-  const mockTasks = $state([
-    {
-      id: "1",
-      title: "Complete quarterly report",
-      status: "in_progress" as const,
-      dueDate: "2025-01-20",
-      assignedBy: "Manager",
-    },
-    {
-      id: "2",
-      title: "Review team performance",
-      status: "pending" as const,
-      dueDate: "2025-01-22",
-      assignedBy: "Supervisor",
-    },
-    {
-      id: "3",
-      title: "Update project documentation",
-      status: "done" as const,
-      dueDate: "2025-01-18",
-      assignedBy: "Manager",
-    },
-  ]);
+  // const getTaskStatusBadgeClass = (status: "pending" | "in_progress" | "done") => {
+  //   switch (status) {
+  //     case "done":
+  //       return "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400";
+  //     case "in_progress":
+  //       return "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400";
+  //     case "pending":
+  //       return "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300";
+  //     default:
+  //       return "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400";
+  //   }
+  // };
 
   const mockLeave = $state({ pendingRequests: 2, balance: "12 days used of 28", progress: 0.43 });
 
@@ -97,56 +101,86 @@
   ]);
 </script>
 
-<DashboardContainer>
-  <Card class="p-6">
-    <div class="text-center">
-      <h2 class="mb-4 text-xl font-semibold">Today's Attendance</h2>
-      <p class="mb-4 text-lg text-gray-600 dark:text-gray-400">
-        {#if attendance.status === "not_checked_in"}
-          Not checked in yet
-        {:else if attendance.status === "checked_in"}
-          Checked in at {attendance.checkInTime}
-        {:else}
-          Checked out at {attendance.checkOutTime}
-        {/if}
-      </p>
-      <Button onclick={handleAttendanceAction} size="lg">
-        {#if attendance.status === "not_checked_in"}
-          Check In
-        {:else if attendance.status === "checked_in"}
-          Check Out
-        {:else}
-          Check In Again
-        {/if}
-      </Button>
-    </div>
-  </Card>
+<div class="flex flex-1 flex-col gap-4 p-4 lg:w-1/2">
+  <div>
+    <p class="text-xl font-bold lg:text-3xl">Welcome back, {data.user.name}!</p>
+    <p class="text-muted-foreground">
+      {new Date().toLocaleString("en-US", {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+        weekday: "long",
+      })}
+    </p>
+  </div>
 
-  <Card class="p-6">
-    <div class="mb-4 flex items-center justify-between">
-      <h2 class="text-xl font-semibold">Today's Tasks</h2>
-      <Button variant="link" onclick={() => goto(`/app/${currentSlug}/tasks`)}>View all</Button>
-    </div>
-    <div class="space-y-4">
-      {#each mockTasks as task}
-        <div class="flex items-center justify-between rounded-lg bg-gray-50 p-4 dark:bg-gray-800">
-          <div>
-            <h3 class="font-medium">{task.title}</h3>
-            <p class="text-sm text-gray-600 dark:text-gray-400">
-              Due {task.dueDate} by {task.assignedBy}
-            </p>
-          </div>
-          <Badge class={getTaskStatusBadgeClass(task.status)}>
-            {task.status === "in_progress"
-              ? "In Progress"
-              : task.status === "done"
-                ? "Done"
-                : "Pending"}
-          </Badge>
-        </div>
-      {/each}
-    </div>
-  </Card>
+  {#if attendance.isLoading}{:else if attendance.isError}{:else}
+    <AttendanceCheckInCheckoutCard
+      attendance={attendance.data?.attendance ?? null}
+      onCheckIn={() => {
+        checkIn.mutate(
+          { slug: params.slug, ...coords },
+          { onSuccess: () => {}, onError: () => {} }
+        );
+      }}
+      onCheckOut={() => {
+        checkOut.mutate(
+          { slug: params.slug, ...coords },
+          { onSuccess: () => {}, onError: () => {} }
+        );
+      }}
+    />
+  {/if}
+
+  <!-- <Card class="p-6"> -->
+  <!--   <div class="text-center"> -->
+  <!--     <h2 class="mb-4 text-xl font-semibold">Today's Attendance</h2> -->
+  <!--     <p class="mb-4 text-lg text-gray-600 dark:text-gray-400"> -->
+  <!--       {#if attendance.status === "not_checked_in"} -->
+  <!--         Not checked in yet -->
+  <!--       {:else if attendance.status === "checked_in"} -->
+  <!--         Checked in at {attendance.checkInTime} -->
+  <!--       {:else} -->
+  <!--         Checked out at {attendance.checkOutTime} -->
+  <!--       {/if} -->
+  <!--     </p> -->
+  <!--     <Button onclick={handleAttendanceAction} size="lg"> -->
+  <!--       {#if attendance.status === "not_checked_in"} -->
+  <!--         Check In -->
+  <!--       {:else if attendance.status === "checked_in"} -->
+  <!--         Check Out -->
+  <!--       {:else} -->
+  <!--         Check In Again -->
+  <!--       {/if} -->
+  <!--     </Button> -->
+  <!--   </div> -->
+  <!-- </Card> -->
+
+  <!-- <Card class="p-6"> -->
+  <!--   <div class="mb-4 flex items-center justify-between"> -->
+  <!--     <h2 class="text-xl font-semibold">Today's Tasks</h2> -->
+  <!--     <Button variant="link" onclick={() => goto(`/app/${currentSlug}/tasks`)}>View all</Button> -->
+  <!--   </div> -->
+  <!--   <div class="space-y-4"> -->
+  <!--     {#each mockTasks as task} -->
+  <!--       <div class="flex items-center justify-between rounded-lg bg-gray-50 p-4 dark:bg-gray-800"> -->
+  <!--         <div> -->
+  <!--           <h3 class="font-medium">{task.title}</h3> -->
+  <!--           <p class="text-sm text-gray-600 dark:text-gray-400"> -->
+  <!--             Due {task.dueDate} by {task.assignedBy} -->
+  <!--           </p> -->
+  <!--         </div> -->
+  <!--         <Badge class={getTaskStatusBadgeClass(task.status)}> -->
+  <!--           {task.status === "in_progress" -->
+  <!--             ? "In Progress" -->
+  <!--             : task.status === "done" -->
+  <!--               ? "Done" -->
+  <!--               : "Pending"} -->
+  <!--         </Badge> -->
+  <!--       </div> -->
+  <!--     {/each} -->
+  <!--   </div> -->
+  <!-- </Card> -->
 
   <Card class="p-6">
     <h2 class="mb-4 text-xl font-semibold">Leave Status</h2>
@@ -167,7 +201,7 @@
   <Card class="p-6">
     <div class="mb-4 flex items-center justify-between">
       <h2 class="text-xl font-semibold">Announcements</h2>
-      <Button variant="link" onclick={() => goto(`/app/${currentSlug}/announcements`)}
+      <Button variant="link" onclick={() => goto(`/app/${params.slug}/announcements`)}
         >View all</Button
       >
     </div>
@@ -193,4 +227,4 @@
       {/each}
     </div>
   </Card>
-</DashboardContainer>
+</div>

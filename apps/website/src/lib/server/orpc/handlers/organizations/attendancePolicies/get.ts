@@ -11,7 +11,7 @@ const input = z.object({
 export const getAttendancePolicyHandler = os
   .route({ method: "GET" })
   .input(input)
-  .use(organizationMiddleware(["owner", "admin", "member"]))
+  .use(organizationMiddleware())
   .handler(async ({ context, input, errors }) => {
     const item = await db
       .select({

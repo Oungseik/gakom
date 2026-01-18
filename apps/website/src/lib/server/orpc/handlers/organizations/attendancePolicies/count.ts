@@ -10,7 +10,7 @@ const input = z.object({
 export const countAttendancePoliciesHandler = os
   .route({ method: "GET" })
   .input(input)
-  .use(organizationMiddleware(["admin", "owner", "member"]))
+  .use(organizationMiddleware())
   .handler(async ({ context }) => {
     const result = await db
       .select({ count: count() })

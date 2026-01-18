@@ -79,13 +79,7 @@ export const checkOutHandler = os
     const [existingRecord] = await db
       .select()
       .from(attendance)
-      .where(
-        and(
-          eq(attendance.memberId, memberRecord.id),
-          eq(attendance.date, dateInTimezone),
-          eq(attendance.status, "INCOMPLETE"),
-        ),
-      );
+      .where(and(eq(attendance.memberId, memberRecord.id), eq(attendance.date, dateInTimezone)));
 
     if (!existingRecord) {
       throw new ORPCError("FORBIDDEN", { message: "No check-in record found for today" });
@@ -96,10 +90,6 @@ export const checkOutHandler = os
     }
 
     const workedSeconds = Math.floor((now.getTime() - existingRecord.checkInAt.getTime()) / 1000);
-
-    const checkInHour =
-      existingRecord.checkInAt.getHours() * 3600 + existingRecord.checkInAt.getMinutes() * 60;
-    const isLate = checkInHour > policy.clockInSec;
     const isEarlyLeave = currentSeconds < policy.clockOutSec;
 
     let status: "PRESENT" | "LATE" | "EARLY_LEAVE";

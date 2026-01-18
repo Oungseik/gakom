@@ -12,6 +12,7 @@ import { listAttendancePoliciesHandler } from "./handlers/organizations/attendan
 import { updateAttendancePolicyHandler } from "./handlers/organizations/attendancePolicies/update";
 import { checkInHandler } from "./handlers/organizations/attendences/check_in";
 import { checkOutHandler } from "./handlers/organizations/attendences/check_out";
+import { getAttendanceHandler } from "./handlers/organizations/attendences/get";
 import { listHandler } from "./handlers/organizations/attendences/list";
 import { getStatsHandler as getAttendanceStatsHandler } from "./handlers/organizations/attendences/stats";
 import { listInvitationsHandler } from "./handlers/organizations/invitations/list";
@@ -38,6 +39,7 @@ export const router = os.router({
       checkOut: checkOutHandler,
       list: listHandler,
       stats: getAttendanceStatsHandler,
+      get: getAttendanceHandler,
     },
     attendancesPolicies: {
       create: createAttendancePolicyHandler,

@@ -51,7 +51,7 @@ export const authMiddleware = os.middleware(async ({ context, next }) => {
 /**
  * Middleware to protect to get the organization information for specific role
  * */
-export const organizationMiddleware = (roles: string[]) =>
+export const organizationMiddleware = (roles: string[] = ["owner", "admin", "member"]) =>
   authMiddleware.concat(async ({ context, next }, input: { slug: string }) => {
     const organizations = await db
       .select({
