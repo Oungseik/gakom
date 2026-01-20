@@ -12,7 +12,7 @@
 
 <div class="flex flex-col gap-1">
   <div class="flex items-center gap-2 text-sm">
-    {timezone}
+    {timezone.replace("_", "")}
   </div>
   <div class="text-muted-foreground text-xs">
     <span>{formatTime(clockInSec)}</span>

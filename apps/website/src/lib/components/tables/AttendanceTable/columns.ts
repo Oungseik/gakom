@@ -2,6 +2,7 @@ import type { AttendanceLocation } from "@repo/db";
 import { renderComponent } from "@repo/ui/data-table";
 import type { ColumnDef } from "@tanstack/table-core";
 import DataTableMemberInfo from "../common/DataTableMemberInfo.svelte";
+import DataTableCheckInCheckOut from "./DataTableCheckInCheckOut.svelte";
 import DataTableStatus from "./DataTableStatus.svelte";
 import DataTableTimezone from "./DataTableTimezone.svelte";
 
@@ -52,35 +53,13 @@ export const columns: ColumnDef<AttendanceItem>[] = [
     },
   },
   {
-    accessorKey: "checkInAt",
-    header: "Check In",
+    header: "Check in - Check out",
     cell: ({ row }) => {
-      const item = row.original as AttendanceItem;
-      if (!item.checkInAt) return "-";
-      const formatterOptions: Intl.DateTimeFormatOptions = {
-        timeZone: item.policy.timezone,
-        hour: "2-digit",
-        minute: "2-digit",
-        hour12: false,
-      };
-      const formatter = new Intl.DateTimeFormat("en-US", formatterOptions);
-      return formatter.format(item.checkInAt);
-    },
-  },
-  {
-    accessorKey: "checkOutAt",
-    header: "Check Out",
-    cell: ({ row }) => {
-      const item = row.original as AttendanceItem;
-      if (!item.checkOutAt) return "-";
-      const formatterOptions: Intl.DateTimeFormatOptions = {
-        timeZone: item.policy.timezone,
-        hour: "2-digit",
-        minute: "2-digit",
-        hour12: false,
-      };
-      const formatter = new Intl.DateTimeFormat("en-US", formatterOptions);
-      return formatter.format(item.checkOutAt);
+      return renderComponent(DataTableCheckInCheckOut, {
+        attendanceTimezone: row.original.policy.timezone,
+        checkInAt: row.original.checkInAt,
+        checkOutAt: row.original.checkOutAt,
+      });
     },
   },
   {
@@ -95,7 +74,6 @@ export const columns: ColumnDef<AttendanceItem>[] = [
     },
   },
   {
-    accessorKey: "policy",
     header: "Attendance Timezone",
     cell: ({ row }) => renderComponent(DataTableTimezone, row.original.policy),
   },

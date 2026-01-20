@@ -83,7 +83,7 @@ function getDateInTimezone(date: Date, timezone: string): string {
     month: "2-digit",
     day: "2-digit",
   };
-  const formatter = new Intl.DateTimeFormat("en-CA", options);
+  const formatter = new Intl.DateTimeFormat("en-US", options);
   return formatter.format(date);
 }
 

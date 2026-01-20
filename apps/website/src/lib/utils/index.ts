@@ -216,7 +216,7 @@ export const getYMDToday = () => getYMD(new Date());
  * @return YYYY-MM-DD
  * */
 export const getDateInTimezone = (timezone: TimeZone, date: Date) =>
-  new Intl.DateTimeFormat("en-CA", {
+  new Intl.DateTimeFormat("en-US", {
     timeZone: timezone,
     year: "numeric",
     month: "2-digit",
@@ -226,10 +226,10 @@ export const getDateInTimezone = (timezone: TimeZone, date: Date) =>
 /**
  * Get the hours and minutes of the date in 24 hours format with respect to the timezone
  * */
-export const getTimeInTimezone = (timezone: TimeZone, date: Date) =>
-  new Intl.DateTimeFormat("en-CA", {
+export const getTimeInTimezone = (timezone: TimeZone, date: Date, options?: { hour12: boolean }) =>
+  new Intl.DateTimeFormat("en-US", {
     timeZone: timezone,
     hour: "2-digit",
     minute: "2-digit",
-    hour12: false,
+    hour12: options?.hour12 ?? false,
   }).format(date);
