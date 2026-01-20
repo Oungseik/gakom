@@ -59,21 +59,27 @@ export const organizationMiddleware = (roles: string[] = ["owner", "admin", "mem
         slug: organization.slug,
         role: member.role,
         memberId: member.id,
+        attendancePolicyId: member.attendancePolicyId,
       })
       .from(member)
       .innerJoin(organization, eq(member.organizationId, organization.id))
       .where(eq(member.userId, context.session.user.id));
 
-    const currentOrganization = organizations?.find((o) => o.slug === input.slug);
-    if (!currentOrganization || !roles.includes(currentOrganization.role)) {
+    const result = organizations?.find((o) => o.slug === input.slug);
+    if (!result || !roles.includes(result.role)) {
       throw new ORPCError("FORBIDDEN");
+    }
+
+    if (!result.attendancePolicyId) {
+      throw new ORPCError("INTERNAL_SERVER_ERROR");
     }
 
     return next({
       context: {
         ...context,
-        organization: currentOrganization,
-        member: { role: currentOrganization.role, id: currentOrganization.memberId },
+        organization: result,
+        member: { role: result.role, id: result.memberId },
+        attendancePolicy: { id: result.attendancePolicyId },
       },
     });
   });

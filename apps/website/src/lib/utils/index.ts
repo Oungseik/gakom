@@ -1,3 +1,4 @@
+import type { TimeZone } from "@repo/db/timezone";
 import type { DehydratedState } from "@tanstack/svelte-query";
 import { env } from "$env/dynamic/public";
 
@@ -209,3 +210,26 @@ export function getYMD(date: Date) {
 }
 
 export const getYMDToday = () => getYMD(new Date());
+
+/**
+ * Format the date to YYYY-MM-DD format with respect to the timezone
+ * @return YYYY-MM-DD
+ * */
+export const getDateInTimezone = (timezone: TimeZone, date: Date) =>
+  new Intl.DateTimeFormat("en-CA", {
+    timeZone: timezone,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(date);
+
+/**
+ * Get the hours and minutes of the date in 24 hours format with respect to the timezone
+ * */
+export const getTimeInTimezone = (timezone: TimeZone, date: Date) =>
+  new Intl.DateTimeFormat("en-CA", {
+    timeZone: timezone,
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  }).format(date);

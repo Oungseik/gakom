@@ -1,8 +1,9 @@
 import { ORPCError } from "@orpc/client";
-import { and, attendance, attendancePolicy, eq, member } from "@repo/db";
+import { attendance } from "@repo/db";
 import { z } from "zod";
 import { db } from "$lib/server/db";
 import { organizationMiddleware, os } from "$lib/server/orpc/base";
+import { getDateInTimezone, getTimeInTimezone } from "$lib/utils";
 
 const input = z.object({
   slug: z.string(),
@@ -15,84 +16,40 @@ export const checkInHandler = os
   .input(input)
   .use(organizationMiddleware(["admin", "member", "owner"]))
   .handler(async ({ context, input }) => {
+    const policy = (await db.query.attendancePolicy.findFirst({
+      where: { id: context.attendancePolicy.id },
+    }))!;
+
     const now = new Date();
+    const currentDateInTimezone = getDateInTimezone(policy.timezone, now);
 
-    const [memberRecord] = await db
-      .select({
-        id: member.id,
-        attendancePolicyId: member.attendancePolicyId,
-      })
-      .from(member)
-      .where(
-        and(
-          eq(member.userId, context.session.user.id),
-          eq(member.organizationId, context.organization.id),
-          eq(member.status, "ACTIVE"),
-        ),
-      );
+    // use `findMany` because `findFirst` will fail when do relation at this moment
+    const attendances = await db.query.attendance.findMany({
+      where: {
+        memberId: context.member.id,
+        date: currentDateInTimezone,
+        organizationId: context.organization.id,
+      },
+      with: { attendancePolicy: true },
+      limit: 1,
+    });
 
-    if (!memberRecord) {
-      throw new ORPCError("NOT_FOUND", { message: "Member record not found" });
-    }
-
-    if (!memberRecord.attendancePolicyId) {
-      throw new ORPCError("FORBIDDEN", { message: "No attendance policy assigned" });
-    }
-
-    const [policy] = await db
-      .select({ timezone: attendancePolicy.timezone })
-      .from(attendancePolicy)
-      .where(eq(attendancePolicy.id, memberRecord.attendancePolicyId));
-
-    if (!policy) {
-      throw new ORPCError("NOT_FOUND", { message: "Attendance policy not found" });
-    }
-
-    const options: Intl.DateTimeFormatOptions = {
-      timeZone: policy.timezone,
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
-    };
-    const formatter = new Intl.DateTimeFormat("en-CA", options);
-    const dateInTimezone = formatter.format(now);
-
-    const existingAttendance = await db
-      .select()
-      .from(attendance)
-      .where(and(eq(attendance.memberId, memberRecord.id), eq(attendance.date, dateInTimezone)));
-
-    if (existingAttendance.length > 0) {
+    const attendanceRecord = attendances.at(0);
+    if (attendanceRecord) {
       throw new ORPCError("FORBIDDEN", { message: "Already checked in for today" });
     }
 
-    const timeFormatterOptions: Intl.DateTimeFormatOptions = {
-      timeZone: policy.timezone,
-      hour: "2-digit",
-      minute: "2-digit",
-      hour12: false,
-    };
-    const timeFormatter = new Intl.DateTimeFormat("en-US", timeFormatterOptions);
-    const formattedTime = timeFormatter.format(now);
-    const [hours, minutes] = formattedTime.split(":").map(Number);
-    const currentSeconds = hours * 3600 + minutes * 60;
-
-    const [policyWithTimes] = await db
-      .select({
-        clockInSec: attendancePolicy.clockInSec,
-        clockOutSec: attendancePolicy.clockOutSec,
-      })
-      .from(attendancePolicy)
-      .where(eq(attendancePolicy.id, memberRecord.attendancePolicyId));
-
-    const isLate = currentSeconds > policyWithTimes.clockInSec;
+    const time = getTimeInTimezone(policy.timezone, now);
+    const [hours, minutes] = time.split(":").map(Number);
+    const seconds = hours * 3600 + minutes * 60;
+    const isLate = seconds > policy.clockInSec;
 
     await db.insert(attendance).values({
       userId: context.session.user.id,
-      memberId: memberRecord.id,
+      memberId: context.member.id,
       organizationId: context.organization.id,
-      attendancePolicyId: memberRecord.attendancePolicyId,
-      date: dateInTimezone,
+      attendancePolicyId: policy.id,
+      date: currentDateInTimezone,
       checkInAt: now,
       checkInLocation: {
         latitude: input.latitude,
