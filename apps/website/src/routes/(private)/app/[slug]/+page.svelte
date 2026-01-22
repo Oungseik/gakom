@@ -6,8 +6,9 @@
 
   import AttendanceCheckInCheckOutSkeleton from "$lib/components/cards/AttendanceCheckInCheckOutSkeleton.svelte";
   import AttendanceCheckInCheckoutCard from "$lib/components/cards/AttendanceCheckInCheckoutCard.svelte";
-  import LeaveCard from "$lib/components/cards/LeaveCard.svelte";
+  import LeaveUsageChart from "$lib/components/charts/LeaveUsageChart.svelte";
   import { columns } from "$lib/components/tables/AttendanceTable/app_columns";
+  import { columns as leaveRequestsColumn } from "$lib/components/tables/LeaveRequestsTable/app_columns";
   import DataTable from "$lib/components/tables/common/DataTable.svelte";
   import { orpc } from "$lib/orpc_client";
 
@@ -15,7 +16,6 @@
 
   const { data, params }: PageProps = $props();
   let coords = $state({ latitude: 0, longitude: 0, accuracy: 0 });
-  const histCount = 7;
 
   const attendance = createQuery(() =>
     orpc.organizations.attendances.get.queryOptions({
@@ -46,6 +46,13 @@
     })
   );
 
+  const leaveRequests = createQuery(() =>
+    orpc.organizations.leaveRequests.list.queryOptions({
+      input: { slug: params.slug, pageSize: 5, filter: { from: new Date() } },
+      enabled: !!params.slug,
+    })
+  );
+
   const checkIn = createMutation(() => orpc.organizations.attendances.checkIn.mutationOptions());
   const checkOut = createMutation(() => orpc.organizations.attendances.checkOut.mutationOptions());
 
@@ -69,40 +76,6 @@
       toast.warning("Please use browser which can support location access");
     }
   });
-
-  // const getTaskStatusBadgeClass = (status: "pending" | "in_progress" | "done") => {
-  //   switch (status) {
-  //     case "done":
-  //       return "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400";
-  //     case "in_progress":
-  //       return "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400";
-  //     case "pending":
-  //       return "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300";
-  //     default:
-  //       return "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400";
-  //   }
-  // };
-  //
-  // const mockLeave = $state({ pendingRequests: 2, balance: "12 days used of 28", progress: 0.43 });
-
-  // const mockAnnouncements = $state([
-  //   {
-  //     id: "1",
-  //     title: "Company Holiday Schedule 2025",
-  //     content: "Holiday list released for 2025. Check HR portal for details.",
-  //     date: "2025-01-15",
-  //     author: "HR Dept",
-  //     priority: "high",
-  //   },
-  //   {
-  //     id: "2",
-  //     title: "New Team Building Activity",
-  //     content: "We will have a team building event this month at the central office.",
-  //     date: "2025-01-16",
-  //     author: "Management",
-  //     priority: "normal",
-  //   },
-  // ]);
 </script>
 
 <div class="flex flex-1 flex-col gap-8 p-4">
@@ -161,9 +134,7 @@
     <section>
       <Card.Root>
         <Card.Header class="flex items-center justify-between">
-          <Card.Title class="text-muted-foreground">
-            Attendance history of last {histCount} days
-          </Card.Title>
+          <Card.Title class="text-muted-foreground">Attendance history</Card.Title>
 
           <a href={`/app/${params.slug}/attendances`} class={buttonVariants({ variant: "link" })}
             >View all</a
@@ -181,9 +152,66 @@
     </section>
 
     <section>
-      {#if leaveBalances.data}
-        <LeaveCard slug={params.slug} balances={leaveBalances.data.balances} />
-      {/if}
+      <Card.Root>
+        <Card.Header class="flex items-center justify-between">
+          <Card.Title class="text-muted-foreground">Leave Balance</Card.Title>
+          <a href={`/app/${params.slug}/attendances`} class={buttonVariants({ variant: "link" })}
+            >View all</a
+          >
+        </Card.Header>
+        <Card.Content class="space-y-4">
+          <div class="grid grid-cols-3">
+            <div class="h-25">
+              <LeaveUsageChart
+                maxValue={10}
+                value={2}
+                label="Sick"
+                key="sick_leave"
+                color="var(--color-primary)"
+              />
+            </div>
+
+            <div class="h-25">
+              <LeaveUsageChart
+                maxValue={15}
+                value={3}
+                label="Annual"
+                key="annual_leave"
+                color="var(--color-primary)"
+              />
+            </div>
+
+            <div class="h-22">
+              <LeaveUsageChart
+                maxValue={15}
+                value={8}
+                label="Causal"
+                key="causal_leave"
+                color="var(--color-primary)"
+              />
+            </div>
+          </div>
+          <!-- <div class="grid gap-4 grid-cols-{leaveBalances.data?.balances.length ?? 1}"> -->
+          <!--   {#each leaveBalances.data?.balances as balance (balance.name)} -->
+          <!--     <div> -->
+          <!--       <div class="mb-2 flex items-center justify-between"> -->
+          <!--         <span class="text-sm font-medium">{balance.name}</span> -->
+          <!--         <span class="text-muted-foreground text-sm" -->
+          <!--           >{balance.usedDays}/{balance.totalDays}</span -->
+          <!--         > -->
+          <!--       </div> -->
+          <!--       <Progress value={balance.usedDays} max={balance.totalDays} /> -->
+          <!--     </div> -->
+          <!--   {/each} -->
+          <!-- </div> -->
+          <DataTable
+            columns={leaveRequestsColumn}
+            border={false}
+            data={leaveRequests.data?.items ?? []}
+            loading={leaveRequests.isLoading}
+          />
+        </Card.Content>
+      </Card.Root>
     </section>
   </div>
 </div>

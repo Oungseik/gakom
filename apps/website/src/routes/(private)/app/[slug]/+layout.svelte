@@ -21,7 +21,7 @@
 
   const items = $derived([
     { name: "Home", icon: HouseIcon, url: `/app/${slug}` },
-    { name: "Attendance", icon: ClockIcon, url: `/app/${slug}/attendance` },
+    { name: "Attendances", icon: ClockIcon, url: `/app/${slug}/attendances` },
     { name: "Tasks", icon: ClipboardListIcon, url: `/app/${slug}/tasks` },
     { name: "Leave", icon: CalendarIcon, url: `/app/${slug}/leave` },
     { name: "Profile", icon: UserIcon, url: `/app/${slug}/profile` },
