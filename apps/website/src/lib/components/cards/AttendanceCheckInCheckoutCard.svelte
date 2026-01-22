@@ -1,90 +1,76 @@
 <script lang="ts">
   import type { AttendanceStatus } from "@repo/db";
+  import type { TimeZone } from "@repo/db/timezone";
   import { Button } from "@repo/ui/button";
   import * as Card from "@repo/ui/card";
 
+  import { formatTime, getTimeInTimezone } from "$lib/utils";
+
   type Props = {
+    policy: {
+      timezone: TimeZone;
+      clockInSec: number;
+      clockOutSec: number;
+    };
     attendance: {
-      timezone: string;
       status: AttendanceStatus;
       checkInAt: Date | null;
       checkOutAt: Date | null;
     } | null;
+    disabled?: boolean;
     onCheckIn: () => void;
     onCheckOut: () => void;
   };
 
-  const { attendance, onCheckIn, onCheckOut }: Props = $props();
+  const { attendance, policy, onCheckIn, onCheckOut, disabled = false }: Props = $props();
 </script>
 
-<!-- TODO show the timezone in the UI -->
 <Card.Root>
   <Card.Header>
     <Card.Title class="text-muted-foreground">Today's Attendance</Card.Title>
   </Card.Header>
-  {#if !attendance}
-    <Card.Content>
-      <div class="flex items-center justify-between">
-        <div>
-          <p class="text-muted-foreground text-sm">Status</p>
-          <p class="text-lg font-bold lg:text-2xl">Not Checked In</p>
-        </div>
+  <Card.Content class="space-y-4">
+    <div>
+      <div class="text-muted-foreground">
+        Your attendance is
+        <span>{formatTime(policy.clockInSec)}</span>
+        <span class="text-muted-foreground font-medium">-</span>
+        <span>{formatTime(policy.clockOutSec)}</span>
+        in {policy.timezone.replace("_", "")} timezone.
       </div>
-    </Card.Content>
-    <Card.Footer class="flex items-center">
-      <Button class="w-full" onclick={onCheckIn}>Check in</Button>
-    </Card.Footer>
-  {:else if attendance.checkInAt && !attendance.checkOutAt}
-    {@const checkIn = attendance.checkInAt}
-    <Card.Content>
-      <div class="flex items-center justify-between">
-        <div>
-          <p class="text-muted-foreground text-sm">Status</p>
-          <p class="text-lg font-bold lg:text-2xl">Checked In</p>
-        </div>
-        <div>
-          <p class="text-muted-foreground text-sm">Checked in at</p>
-          <p class="text-lg font-bold lg:text-2xl">
-            {checkIn.toLocaleString("en-US", {
-              hour: "numeric",
-              minute: "numeric",
-              hour12: true,
-            })}
-          </p>
-        </div>
+    </div>
+
+    <div class="flex items-center justify-between">
+      <div>
+        <p class="text-lg font-bold lg:text-xl">Checked In</p>
+        <p class="text-lg font-bold lg:text-xl">Checked Out</p>
       </div>
-    </Card.Content>
-    <Card.Footer class="flex items-center">
-      <Button class="w-full" onclick={onCheckOut}>Check out</Button>
-    </Card.Footer>
-  {:else if attendance.checkInAt && attendance.checkOutAt}
-    {@const checkIn = attendance.checkInAt}
-    {@const checkOut = attendance.checkOutAt}
-    <Card.Content>
-      <div class="flex items-center justify-between">
-        <div>
-          <p class="text-muted-foreground text-sm">Status</p>
-          <p class="text-lg font-bold lg:text-2xl">Checked In</p>
-          <p class="text-lg font-bold lg:text-2xl">Checked Out</p>
-        </div>
-        <div>
-          <p class="text-muted-foreground text-sm">Checked in at</p>
-          <p class="text-lg font-bold lg:text-2xl">
-            {checkIn.toLocaleString("en-US", {
-              hour: "numeric",
-              minute: "numeric",
-              hour12: true,
-            })}
-          </p>
-          <p class="text-lg font-bold lg:text-2xl">
-            {checkOut.toLocaleString("en-US", {
-              hour: "numeric",
-              minute: "numeric",
-              hour12: true,
-            })}
-          </p>
-        </div>
+      <div>
+        <p class="text-lg font-bold lg:text-xl">
+          {#if attendance?.checkInAt}
+            {getTimeInTimezone(policy.timezone, attendance.checkInAt, { hour12: true })}
+          {:else}
+            -
+          {/if}
+        </p>
+
+        <p class="text-lg font-bold lg:text-xl">
+          {#if attendance?.checkOutAt}
+            {getTimeInTimezone(policy.timezone, attendance.checkOutAt, { hour12: true })}
+          {:else}
+            -
+          {/if}
+        </p>
       </div>
-    </Card.Content>
-  {/if}
+    </div>
+  </Card.Content>
+  <Card.Footer>
+    {#if !attendance?.checkInAt}
+      <Button class="w-full" onclick={onCheckIn} {disabled}>Check in</Button>
+    {:else}
+      <Button class="w-full" onclick={onCheckOut} disabled={disabled || !!attendance.checkOutAt}
+        >Check out</Button
+      >
+    {/if}
+  </Card.Footer>
 </Card.Root>

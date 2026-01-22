@@ -13,12 +13,14 @@ export const load: LayoutServerLoad = async ({ parent, params }) => {
   const member = await db.query.member.findFirst({
     where: { organizationId: currentOrganization.id, userId: user.id },
     columns: { role: true },
+    with: { attendancePolicy: true },
   });
 
   return {
     currentOrganization,
     member: {
       role: member?.role ?? "member",
+      attendancePolicy: member?.attendancePolicy,
     },
   };
 };

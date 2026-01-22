@@ -3,10 +3,12 @@ import {
   and,
   desc,
   eq,
+  gte,
   inArray,
   leave,
   leaveRequest,
   like,
+  lte,
   member,
   or,
   organization,
@@ -25,18 +27,8 @@ const input = z.object({
       status: z.array(z.enum(["PENDING", "APPROVED", "REJECTED", "CANCELLED"])).optional(),
       search: z.string().optional(),
       duration: z.number().optional(),
-      dateFrom: z
-        .string()
-        .regex(/^\d{4}-\d{2}-\d{2}$/, {
-          message: "Date must be in YYYY-MM-DD format",
-        })
-        .optional(),
-      dateTo: z
-        .string()
-        .regex(/^\d{4}-\d{2}-\d{2}$/, {
-          message: "Date must be in YYYY-MM-DD format",
-        })
-        .optional(),
+      from: z.date().optional(),
+      to: z.date().optional(),
     })
     .optional(),
 });
@@ -90,6 +82,8 @@ export const listLeaveRequestsHandler = os
           context.member.role === "member"
             ? eq(leaveRequest.memberId, context.member.id)
             : undefined,
+          filter?.from ? gte(leaveRequest.startDate, filter.from) : undefined,
+          filter?.to ? lte(leaveRequest.endDate, filter.to) : undefined,
         ),
       )
       .orderBy(desc(leaveRequest.createdAt))

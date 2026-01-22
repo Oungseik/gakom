@@ -1,4 +1,4 @@
-import { ORPCError } from "@orpc/client";
+import { ORPCError } from "@orpc/server";
 import { attendance } from "@repo/db";
 import { z } from "zod";
 import { db } from "$lib/server/db";

@@ -11,9 +11,10 @@
     loading?: boolean;
     columns: ColumnDef<TData, TValue>[];
     data: TData[];
+    border?: boolean;
   };
 
-  let { data, columns, loading }: DataTableProps<TData, TValue> = $props();
+  let { data, columns, loading, border = true }: DataTableProps<TData, TValue> = $props();
   let rowSelection = $state<RowSelectionState>({});
 
   const table = $derived(
@@ -40,7 +41,7 @@
 </script>
 
 <ScrollArea class="grid w-full grid-cols-1 overflow-auto">
-  <div class="overflow-x-auto rounded-md border">
+  <div class={["overflow-x-auto rounded-md", border && "border"]}>
     <Table.Root>
       <Table.Header>
         {#each table.getHeaderGroups() as headerGroup (headerGroup.id)}

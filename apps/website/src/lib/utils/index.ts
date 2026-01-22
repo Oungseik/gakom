@@ -73,7 +73,7 @@ export function getAttendanceStatusBadgeClass(
 }
 
 export function formatDate(date: Date): string {
-  return date.toLocaleDateString("en-US", {
+  return date.toLocaleDateString("en-CA", {
     year: "numeric",
     month: "short",
     day: "numeric",
@@ -216,7 +216,7 @@ export const getYMDToday = () => getYMD(new Date());
  * @return YYYY-MM-DD
  * */
 export const getDateInTimezone = (timezone: TimeZone, date: Date) =>
-  new Intl.DateTimeFormat("en-US", {
+  new Intl.DateTimeFormat("en-CA", {
     timeZone: timezone,
     year: "numeric",
     month: "2-digit",
@@ -227,9 +227,12 @@ export const getDateInTimezone = (timezone: TimeZone, date: Date) =>
  * Get the hours and minutes of the date in 24 hours format with respect to the timezone
  * */
 export const getTimeInTimezone = (timezone: TimeZone, date: Date, options?: { hour12: boolean }) =>
-  new Intl.DateTimeFormat("en-US", {
+  new Intl.DateTimeFormat("en-CA", {
     timeZone: timezone,
     hour: "2-digit",
     minute: "2-digit",
     hour12: options?.hour12 ?? false,
-  }).format(date);
+  })
+    .format(date)
+    .replaceAll(".", "")
+    .toUpperCase();

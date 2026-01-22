@@ -38,6 +38,7 @@ const input = z.object({
           message: "Date must be in YYYY-MM-DD format",
         })
         .optional(),
+      self: z.boolean().default(false),
     })
     .optional(),
 });
@@ -88,7 +89,7 @@ export const listHandler = os
             : undefined,
           filter?.dateFrom ? gte(attendance.date, filter.dateFrom) : undefined,
           filter?.dateTo ? lte(attendance.date, filter.dateTo) : undefined,
-          context.member.role === "member"
+          context.member.role === "member" || input.filter?.self
             ? eq(attendance.userId, context.session.user.id)
             : undefined,
         ),

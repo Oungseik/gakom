@@ -5,9 +5,9 @@
 
   let { timestamp }: Props = $props();
 
-  const formattedTime = $derived(timestamp.toLocaleTimeString("en-US", { hour12: false }));
+  const formattedTime = $derived(timestamp.toLocaleTimeString("en-CA", { hour12: false }));
   const formattedDate = $derived(
-    timestamp.toLocaleDateString("en-US", { month: "short", day: "2-digit", year: "numeric" })
+    timestamp.toLocaleDateString("en-CA", { month: "short", day: "2-digit", year: "numeric" })
   );
 </script>
 
