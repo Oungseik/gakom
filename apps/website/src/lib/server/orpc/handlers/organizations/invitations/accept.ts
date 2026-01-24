@@ -1,5 +1,5 @@
 import { ORPCError } from "@orpc/server";
-import { and, eq, invitation, member } from "@repo/db";
+import { eq, invitation, member } from "@repo/db";
 import z from "zod";
 import { db } from "$lib/server/db";
 import { authMiddleware, os } from "$lib/server/orpc/base";
@@ -19,7 +19,6 @@ export const acceptInvitationHandler = os
     });
 
     const slug = existingInvitation?.organization?.slug;
-
     if (!existingInvitation || !slug) {
       throw new ORPCError("BAD_REQUEST", { message: "No invitation found" });
     }
@@ -43,8 +42,16 @@ export const acceptInvitationHandler = os
       throw new ORPCError("BAD_REQUEST", { message: "Invalid token" });
     }
 
+    const now = new Date();
+    if (now > expiresAt) {
+      throw new ORPCError("FORBIDDEN", { message: "Invitation already expired" });
+    }
+
     await db.transaction(async (tx) => {
-      // await tx.update(invitation).set({ status: "accepted" }).where(and(eq));
+      await tx
+        .update(invitation)
+        .set({ status: "ACCEPTED" })
+        .where(eq(invitation.id, existingInvitation.id));
 
       await tx.insert(member).values({
         organizationId: existingInvitation.organizationId,

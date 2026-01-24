@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { index, integer, sqliteTable, text, uniqueIndex } from "drizzle-orm/sqlite-core";
+import { index, integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
 import { COUNTRY_CODES } from "../country";
 import { attendancePolicy } from "./attendance";
 import { user } from "./core";
@@ -75,12 +75,11 @@ export const invitation = sqliteTable(
       .references(() => user.id, { onDelete: "cascade" }),
     teamId: text("team_id").references(() => team.id, { onDelete: "cascade" }),
   },
+  // null != null in unique index
   (table) => [
-    uniqueIndex("invitation_organization_email_team_idx").on(
-      table.organizationId,
-      table.email,
-      table.teamId,
-    ),
+    index("invitation_organization_id_idx").on(table.organizationId),
+    index("invitation_email_idx").on(table.email),
+    index("invitation_team_id_idx").on(table.teamId),
   ],
 );
 

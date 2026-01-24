@@ -16,6 +16,8 @@ export type Invitation = {
   expiresAt: Date;
   createdAt: Date;
   organizationId: string;
+  slug: string;
+  attendancePolicyId?: string;
 };
 
 export const columns: ColumnDef<Invitation>[] = [
@@ -57,10 +59,12 @@ export const columns: ColumnDef<Invitation>[] = [
       return renderComponent(DataTableActions, {
         invitationId: row.original.id,
         organizationId: row.original.organizationId,
+        slug: row.original.slug,
         role: row.original.role,
         position: row.original.position,
         email: row.original.email,
         status: row.original.status,
+        attendancePolicyId: row.original.attendancePolicyId,
       });
     },
   },

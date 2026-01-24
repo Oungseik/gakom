@@ -3,18 +3,11 @@ import { error } from "@sveltejs/kit";
 import { acceptInvitationHandler } from "$lib/server/orpc/handlers/organizations/invitations/accept";
 import type { PageServerLoad } from "./$types";
 
-export const load: PageServerLoad = async ({ locals, request }) => {
-  const url = new URL(request.url);
-  const token = url.searchParams.get("token");
-
-  if (!token) {
-    return error(400);
-  }
-
+export const load: PageServerLoad = async ({ params, locals }) => {
   try {
     const { slug } = await call(
       acceptInvitationHandler,
-      { token },
+      { token: params.token },
       { context: { session: locals.session } },
     );
     return { slug };

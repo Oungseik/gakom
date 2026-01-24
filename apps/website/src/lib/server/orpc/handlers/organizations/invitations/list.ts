@@ -39,6 +39,7 @@ export const listInvitationsHandler = os
         createdAt: invitation.createdAt,
         expiresAt: invitation.expiresAt,
         organizationId: organization.id,
+        attendancePolicyId: invitation.attendancePolicyId,
       })
       .from(invitation)
       .innerJoin(organization, eq(invitation.organizationId, organization.id))

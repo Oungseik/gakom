@@ -14,7 +14,6 @@
   import Search from "$lib/components/inputs/Search.svelte";
   import {
     type Invitation,
-    type InvitationStatus,
     columns as invitationColumns,
   } from "$lib/components/tables/InvitationsTable/columns";
   import { columns } from "$lib/components/tables/MembersTable/columns";
@@ -165,7 +164,7 @@
           columns={invitationColumns}
           data={allInvitations.map((invitation) => ({
             ...invitation,
-            status: invitation.status.toUpperCase() as InvitationStatus,
+            slug: params.slug,
             organizationId: data.currentOrganization.id,
           }))}
           loading={invitations.isLoading}

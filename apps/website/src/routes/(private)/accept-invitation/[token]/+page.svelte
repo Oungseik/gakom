@@ -22,7 +22,11 @@
       </Card.Header>
 
       <Card.Footer class="pt-0">
-        <a href={`/app/${data.slug}`} class={[buttonVariants({ variant: "default" }), "w-full"]}>
+        <a
+          href={`/app/${data.slug}`}
+          class={[buttonVariants({ variant: "default" }), "w-full"]}
+          data-sveltekit-reload
+        >
           Go to app</a
         >
       </Card.Footer>

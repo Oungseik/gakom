@@ -17,6 +17,7 @@ import { listHandler } from "./handlers/organizations/attendences/list";
 import { getStatsHandler as getAttendanceStatsHandler } from "./handlers/organizations/attendences/stats";
 import { createOrganizationHandler } from "./handlers/organizations/create";
 import { acceptInvitationHandler } from "./handlers/organizations/invitations/accept";
+import { cancelInvitationHandler } from "./handlers/organizations/invitations/cancel";
 import { listInvitationsHandler } from "./handlers/organizations/invitations/list";
 import { sendInvitationHandler } from "./handlers/organizations/invitations/send";
 import { listLeavePoliciesHandler } from "./handlers/organizations/leave/list";
@@ -66,6 +67,7 @@ export const router = os.router({
       list: listInvitationsHandler,
       send: sendInvitationHandler,
       accept: acceptInvitationHandler,
+      cancel: cancelInvitationHandler,
     },
     leave: {
       list: listLeavePoliciesHandler,

@@ -1,5 +1,5 @@
 import { ORPCError } from "@orpc/server";
-import { invitation } from "@repo/db";
+import { eq, invitation } from "@repo/db";
 import z from "zod";
 import { NO_REPLY_EMAIL } from "$env/static/private";
 import { db } from "$lib/server/db";
@@ -13,6 +13,7 @@ const input = z.object({
   role: z.enum(["ADMIN", "MEMBER"]),
   position: z.string(),
   attendancePolicyId: z.string().optional(),
+  resend: z.boolean().default(false),
 });
 
 export const sendInvitationHandler = os
@@ -29,26 +30,32 @@ export const sendInvitationHandler = os
     }
 
     const expiresAt = new Date();
-    expiresAt.setMinutes(expiresAt.getMinutes() + 5);
+    expiresAt.setMinutes(expiresAt.getMinutes() + 10);
 
     await db.transaction(async (tx) => {
-      await tx
-        .insert(invitation)
-        .values({
+      const oldInvitation = await tx.query.invitation.findFirst({
+        where: { organizationId: context.organization.id, email: input.email, status: "PENDING" },
+        orderBy: { expiresAt: "desc" },
+      });
+
+      if (oldInvitation) {
+        await tx
+          .update(invitation)
+          .set({
+            ...input,
+            expiresAt,
+            createdAt: !input.resend ? new Date() : undefined,
+          })
+          .where(eq(invitation.id, oldInvitation.id));
+      } else {
+        await tx.insert(invitation).values({
           ...input,
           organizationId: context.organization.id,
           expiresAt,
           inviterId: context.session.user.id,
-        })
-        .onConflictDoUpdate({
-          target: [invitation.organizationId, invitation.email, invitation.teamId],
-          set: {
-            expiresAt,
-            role: input.role,
-            position: input.position,
-            attendancePolicyId: input.attendancePolicyId,
-          },
+          teamId: null,
         });
+      }
 
       const token = Bun.SHA256.hash(
         JSON.stringify({
@@ -62,7 +69,7 @@ export const sendInvitationHandler = os
         "base64url",
       );
 
-      const inviteLink = `${getBaseURL()}/accept-invitation?token=${token}`;
+      const inviteLink = `${getBaseURL()}/accept-invitation/${token}`;
       await transporter.sendMail({
         from: NO_REPLY_EMAIL,
         to: input.email,
