@@ -23,7 +23,7 @@ const input = z.object({
 
 export const createLeaveRequestHandler = os
   .input(input)
-  .use(organizationMiddleware(["admin", "owner", "member"]))
+  .use(organizationMiddleware())
   .handler(async ({ context, input }) => {
     const requester = (
       await db

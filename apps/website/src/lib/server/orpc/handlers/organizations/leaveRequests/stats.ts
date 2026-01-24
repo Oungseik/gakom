@@ -10,7 +10,7 @@ const input = z.object({
 export const getStatsHandler = os
   .route({ method: "GET" })
   .input(input)
-  .use(organizationMiddleware(["admin", "owner"]))
+  .use(organizationMiddleware(["ADMIN", "OWNER"]))
   .handler(async ({ context }) => {
     const now = new Date();
     const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());

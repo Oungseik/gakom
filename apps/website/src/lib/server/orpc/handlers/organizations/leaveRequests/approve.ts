@@ -12,7 +12,7 @@ const input = z.object({
 
 export const approveLeaveRequestHandler = os
   .input(input)
-  .use(organizationMiddleware(["admin", "owner"]))
+  .use(organizationMiddleware(["ADMIN", "OWNER"]))
   .handler(async ({ context, input }) => {
     const reviewer = (
       await db
@@ -60,6 +60,13 @@ export const approveLeaveRequestHandler = os
     if (leaveReq.status !== "PENDING" && leaveReq.status !== "REJECTED") {
       throw new ORPCError("BAD_REQUEST", {
         message: `Cannot approve a leave request with status ${leaveReq.status}.`,
+      });
+    }
+
+    const now = new Date();
+    if (now > leaveReq.startDate) {
+      throw new ORPCError("FORBIDDEN", {
+        message: "Cannot approve leave request with back date.",
       });
     }
 

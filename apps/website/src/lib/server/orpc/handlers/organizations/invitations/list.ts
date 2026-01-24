@@ -19,7 +19,7 @@ const input = z.object({
 export const listInvitationsHandler = os
   .route({ method: "GET" })
   .input(input)
-  .use(organizationMiddleware(["admin", "owner"]))
+  .use(organizationMiddleware(["ADMIN", "OWNER"]))
   .handler(async ({ input }) => {
     const search = input.filter?.search;
     const condition = and(
@@ -39,6 +39,7 @@ export const listInvitationsHandler = os
         createdAt: invitation.createdAt,
         expiresAt: invitation.expiresAt,
         organizationId: organization.id,
+        attendancePolicyId: invitation.attendancePolicyId,
       })
       .from(invitation)
       .innerJoin(organization, eq(invitation.organizationId, organization.id))

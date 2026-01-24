@@ -1,33 +1,16 @@
-import { and, eq, leave, leaveBalance, member } from "@repo/db";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
-import { emailOTP, organization, twoFactor } from "better-auth/plugins";
+import { emailOTP, twoFactor } from "better-auth/plugins";
 import { sveltekitCookies } from "better-auth/svelte-kit";
-import { createTransport } from "nodemailer";
 import { getRequestEvent } from "$app/server";
 import {
   AUTH_SECRET,
   GOOGLE_CLIENT_ID,
   GOOGLE_CLIENT_SECRET,
-  GOOGLE_REFRESH_TOKEN,
-  GOOGLE_USER,
   NO_REPLY_EMAIL,
 } from "$env/static/private";
+import { transporter } from "$lib/server/email";
 import { db } from "./server/db";
-import { getBaseURL } from "./utils";
-
-const transporter = createTransport({
-  host: "smtp.gmail.com",
-  port: 465,
-  secure: true,
-  auth: {
-    type: "OAuth2",
-    user: GOOGLE_USER,
-    clientId: GOOGLE_CLIENT_ID,
-    clientSecret: GOOGLE_CLIENT_SECRET,
-    refreshToken: GOOGLE_REFRESH_TOKEN,
-  },
-});
 
 export const auth = betterAuth({
   database: drizzleAdapter(db, {
@@ -75,71 +58,6 @@ export const auth = betterAuth({
   },
 
   plugins: [
-    organization({
-      teams: { enabled: true },
-      schema: {
-        invitation: {
-          additionalFields: {
-            position: { type: "string", required: true, input: true },
-            attendancePolicyId: { type: "string", required: false, input: true },
-          },
-        },
-        member: {
-          additionalFields: {
-            position: { type: "string", required: true, input: true },
-            attendancePolicyId: { type: "string", required: false, input: true },
-          },
-        },
-      },
-      sendInvitationEmail: async ({ id, email }) => {
-        const inviteLink = `${getBaseURL()}/accept-invitation/${id}`;
-        await transporter.sendMail({
-          from: NO_REPLY_EMAIL,
-          to: email,
-          subject: "Invitation",
-          html: `Invite to an organization. Click this link: ${inviteLink}`,
-        });
-      },
-      organizationHooks: {
-        afterAcceptInvitation: async ({ invitation, member: m }) => {
-          await db.transaction(async (tx) => {
-            const updateMemberPromise = tx
-              .update(member)
-              .set({
-                position: invitation.position,
-                attendancePolicyId: invitation.attendancePolicyId,
-              })
-              .where(
-                and(
-                  eq(member.userId, m.userId),
-                  eq(member.organizationId, invitation.organizationId),
-                ),
-              );
-
-            const leaveTypes = await tx
-              .select({
-                id: leave.id,
-                days: leave.days,
-              })
-              .from(leave)
-              .where(eq(leave.organizationId, member.organizationId));
-
-            const leaveInitializePromises = leaveTypes.map((leaveType) =>
-              tx.insert(leaveBalance).values({
-                memberId: m.id,
-                leaveId: leaveType.id,
-                totalDays: leaveType.days,
-                usedDays: 0,
-                pendingDays: 0,
-                year: 0, // First leave year since joining
-              }),
-            );
-
-            await Promise.all([updateMemberPromise, ...leaveInitializePromises]);
-          });
-        },
-      },
-    }),
     emailOTP({
       sendVerificationOTP: async ({ email, otp, type }) => {
         if (type === "forget-password") {

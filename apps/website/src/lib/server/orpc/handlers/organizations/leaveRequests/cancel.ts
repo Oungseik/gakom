@@ -20,7 +20,7 @@ const input = z.object({
 
 export const cancelLeaveRequestHandler = os
   .input(input)
-  .use(organizationMiddleware(["admin", "owner", "member"]))
+  .use(organizationMiddleware())
   .handler(async ({ context, input }) => {
     /** the person who call the API */
     const canceler = (

@@ -2,7 +2,7 @@ import type { TimeZone } from "@repo/db/timezone";
 import type { DehydratedState } from "@tanstack/svelte-query";
 import { env } from "$env/dynamic/public";
 
-export const PROTECTED_PATHS: string[] = ["/app", "/dashboard", "/account"];
+export const PROTECTED_PATHS = ["/app", "/dashboard", "/account"] as const;
 
 const replacements = {
   "<": "\\u003C",
@@ -41,10 +41,10 @@ export function getBaseURL() {
 }
 
 // Function to get role badge color based on role
-export function getRoleBadgeClass(role: "owner" | "admin" | "member"): string {
-  return role === "owner"
+export function getRoleBadgeClass(role: "OWNER" | "ADMIN" | "MEMBER"): string {
+  return role === "OWNER"
     ? "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400"
-    : role === "admin"
+    : role === "ADMIN"
       ? "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400"
       : "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300";
 }

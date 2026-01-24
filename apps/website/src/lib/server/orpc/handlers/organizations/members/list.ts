@@ -29,7 +29,7 @@ const input = z.object({
 export const listMembersHandler = os
   .route({ method: "GET" })
   .input(input)
-  .use(organizationMiddleware(["admin", "owner"]))
+  .use(organizationMiddleware(["ADMIN", "OWNER"]))
   .handler(async ({ input }) => {
     const search = input.filter?.search;
     const condition = and(

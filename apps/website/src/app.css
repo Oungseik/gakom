@@ -156,6 +156,7 @@
 @layer base {
   html {
     overflow-y: scroll; /* Forces the vertical scrollbar to always be visible */
+    scrollbar-gutter: stable;
   }
 
   .overflow-x-auto::-webkit-scrollbar {

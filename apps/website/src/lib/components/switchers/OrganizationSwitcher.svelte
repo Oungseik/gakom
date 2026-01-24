@@ -4,9 +4,6 @@
   import * as DropdownMenu from "@repo/ui/dropdown-menu";
   import * as Sidebar from "@repo/ui/sidebar";
   import { useSidebar } from "@repo/ui/sidebar";
-  import { toast } from "svelte-sonner";
-
-  import { authClient } from "$lib/auth_client";
 
   type Organization = { id: string; name: string; logo: string; slug: string; plan?: string };
   type Props = {
@@ -18,19 +15,6 @@
   let { orgs, activeOrganization, onCreateOrganization }: Props = $props();
 
   const sidebar = useSidebar();
-
-  async function handleSwitchOrganization(param: { id: string; slug: string }) {
-    if (activeOrganization.id === param.id) {
-      return;
-    }
-    await authClient.organization
-      .setActive({
-        organizationId: param.id,
-        organizationSlug: param.slug,
-      })
-      .then(() => (window.location.href = `/dashboard/${param.slug}`))
-      .catch((e) => toast.error(e));
-  }
 </script>
 
 <Sidebar.Menu>
@@ -66,14 +50,13 @@
       >
         <DropdownMenu.Label class="text-muted-foreground text-xs">Organizations</DropdownMenu.Label>
         {#each orgs as org (org.slug)}
-          <DropdownMenu.Item
-            onSelect={() => {
-              handleSwitchOrganization({ id: org.id, slug: org.slug });
-            }}
-            class="gap-2 p-2"
-          >
-            <img src={org.logo} class="size-6 shrink-0 rounded-md border" alt={org.name} />
-            {org.name}
+          <DropdownMenu.Item class="gap-2 p-2">
+            {#snippet children()}
+              <a href="/dashboard/{org.slug}">
+                <img src={org.logo} class="size-6 shrink-0 rounded-md border" alt={org.name} />
+                {org.name}
+              </a>
+            {/snippet}
           </DropdownMenu.Item>
         {/each}
         <DropdownMenu.Separator />

@@ -4,10 +4,9 @@
   import MailIcon from "@lucide/svelte/icons/mail";
   import { Button } from "@repo/ui/button";
   import * as DropdownMenu from "@repo/ui/dropdown-menu";
-  import { useQueryClient } from "@tanstack/svelte-query";
+  import { createMutation, useQueryClient } from "@tanstack/svelte-query";
   import { toast } from "svelte-sonner";
 
-  import { authClient } from "$lib/auth_client";
   import { orpc } from "$lib/orpc_client";
 
   let {
@@ -15,38 +14,67 @@
     ...props
   }: {
     invitationId: string;
-    organizationId: string;
+    slug: string;
     email: string;
     position: string;
-    role: "admin" | "member";
+    role: "ADMIN" | "MEMBER" | "OWNER";
     status: "PENDING" | "ACCEPTED" | "REJECTED" | "CANCELED";
+    attendancePolicyId?: string;
   } = $props();
 
+  const cancelInvitation = createMutation(() =>
+    orpc.organizations.invitations.cancel.mutationOptions()
+  );
+  const sendInvitation = createMutation(() =>
+    orpc.organizations.invitations.send.mutationOptions()
+  );
   const queryClient = useQueryClient();
 
   async function handleResendInvitation() {
-    const { error } = await authClient.organization.inviteMember({ ...props, resend: true });
-    if (error) {
-      return toast.error(error.message ?? "Something went wrong while resend invitation");
+    if (props.role === "OWNER") {
+      return void toast.error("Unable to invite someone as owner");
     }
-    await queryClient.invalidateQueries({ queryKey: orpc.organizations.invitations.list.key() });
-    toast.success(`Resent invitation to ${props.email}`);
+
+    sendInvitation.mutate(
+      {
+        email: props.email,
+        slug: props.slug,
+        position: props.position,
+        role: props.role,
+        attendancePolicyId: props.attendancePolicyId,
+        resend: true,
+      },
+      {
+        onError: (error) => {
+          toast.error(error.message);
+        },
+        onSuccess: async () => {
+          queryClient.invalidateQueries({ queryKey: orpc.organizations.invitations.list.key() });
+          toast.success(`Resent invitation to ${props.email}`);
+        },
+      }
+    );
   }
 
   async function handleCancelInvitation() {
-    const { error } = await authClient.organization.cancelInvitation({
-      invitationId: props.invitationId,
-    });
-
-    if (error) {
-      return toast.error(error.message ?? "Something went wrong while cancel invitation");
-    }
-
-    await queryClient.invalidateQueries({ queryKey: orpc.organizations.invitations.list.key() });
-    toast.success(`Cancelled invitation for ${props.email}`);
+    cancelInvitation.mutate(
+      {
+        invitationId: props.invitationId,
+        slug: props.slug,
+      },
+      {
+        onError: (error) => {
+          toast.error(error.message);
+        },
+        onSuccess: () => {
+          queryClient.invalidateQueries({ queryKey: orpc.organizations.invitations.list.key() });
+          toast.success(`Cancelled invitation for ${props.email}`);
+        },
+      }
+    );
   }
 
-  const canTakeAction = $derived(status !== "ACCEPTED");
+  const canTakeAction = $derived(status === "PENDING");
 </script>
 
 {#if canTakeAction}

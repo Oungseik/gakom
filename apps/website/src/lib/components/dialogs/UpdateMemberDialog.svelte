@@ -18,7 +18,7 @@
     name: string;
     email: string;
     position?: string | null;
-    role: "member" | "admin" | "owner";
+    role: "MEMBER" | "ADMIN" | "OWNER";
     attendancePolicyId?: string | null;
     open: boolean;
     slug: string;
@@ -123,19 +123,19 @@
               type="single"
               name={field.name}
               value={field.state.value}
-              onValueChange={(value) => field.handleChange(value as "member" | "admin")}
-              disabled={isUpdating || member.role === "owner"}
+              onValueChange={(value) => field.handleChange(value as "MEMBER" | "ADMIN")}
+              disabled={isUpdating || member.role === "OWNER"}
             >
               <Select.Trigger class="w-full">
-                {field.state.value === "member"
+                {field.state.value === "MEMBER"
                   ? "Member"
-                  : field.state.value === "admin"
+                  : field.state.value === "ADMIN"
                     ? "Admin"
                     : "Owner"}
               </Select.Trigger>
               <Select.Content>
-                <Select.Item value="member">Member</Select.Item>
-                <Select.Item value="admin">Admin</Select.Item>
+                <Select.Item value="MEMBER">Member</Select.Item>
+                <Select.Item value="ADMIN">Admin</Select.Item>
               </Select.Content>
             </Select.Root>
           </div>

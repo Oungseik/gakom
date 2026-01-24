@@ -1,16 +1,11 @@
 <script lang="ts">
   import CheckCircleIcon from "@lucide/svelte/icons/check-circle";
-  import { Button } from "@repo/ui/button";
+  import { buttonVariants } from "@repo/ui/button";
   import * as Card from "@repo/ui/card";
 
   import type { PageProps } from "./$types";
 
   const { data }: PageProps = $props();
-  const href = $derived(
-    data.invitedOrganizationId && data.organizations
-      ? `/app/${data.organizations.find((o) => o.id === data.invitedOrganizationId)?.slug}`
-      : "/app"
-  );
 </script>
 
 <div class="flex min-h-svh flex-col items-center justify-center gap-6 p-6 md:p-10">
@@ -26,9 +21,15 @@
         </Card.Description>
       </Card.Header>
 
-      <Card.Content class="pt-0">
-        <Button {href} class="w-full">Go to App</Button>
-      </Card.Content>
+      <Card.Footer class="pt-0">
+        <a
+          href={`/app/${data.slug}`}
+          class={[buttonVariants({ variant: "default" }), "w-full"]}
+          data-sveltekit-reload
+        >
+          Go to app</a
+        >
+      </Card.Footer>
     </Card.Root>
   </div>
 </div>

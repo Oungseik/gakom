@@ -8,14 +8,14 @@ const input = z.object({
   userId: z.string(),
   data: z.object({
     position: z.string().nullable(),
-    role: z.enum(["owner", "admin", "member"]),
+    role: z.enum(["OWNER", "ADMIN", "MEMBER"]),
     attendancePolicyId: z.string().nullable(),
   }),
 });
 
 export const updateMemberHandler = os
   .input(input)
-  .use(organizationMiddleware(["owner", "admin"]))
+  .use(organizationMiddleware(["OWNER", "ADMIN"]))
   .handler(async ({ input, context }) => {
     await db
       .update(member)

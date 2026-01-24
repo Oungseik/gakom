@@ -13,7 +13,7 @@ export const listLeaveBalancesHandler = os
   .input(input)
   .use(organizationMiddleware())
   .handler(async ({ input, context }) => {
-    if (input.memberId && context.member.role === "member") {
+    if (input.memberId && context.member.role === "MEMBER") {
       throw new ORPCError("FORBIDDEN", {
         message: "Not enough permission to access the leave balance of other member",
       });

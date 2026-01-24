@@ -12,7 +12,6 @@
   import { toast } from "svelte-sonner";
   import z from "zod";
 
-  import { authClient } from "$lib/auth_client";
   import FullPageSpinner from "$lib/components/overlays/FullPageSpinner.svelte";
   import { orpc } from "$lib/orpc_client";
 
@@ -24,51 +23,35 @@
   let logo: string | undefined = $state(undefined);
 
   const imageUploadMutation = createMutation(() => orpc.images.upload.mutationOptions());
+  const createOrganization = createMutation(() => orpc.organizations.create.mutationOptions());
 
   const form = createForm(() => ({
     defaultValues: { name: "", slug: "" },
     onSubmit: async ({ value }) => {
-      isSubmitting = true;
-      const { error } = await authClient.organization.checkSlug({ slug: value.slug });
-
-      if (error) {
-        isSubmitting = false;
-        toast.error(`The slug "${value.slug} is already taken."`);
-        return;
-      }
-
       if (!logo) {
         isSubmitting = false;
         toast.error(`Please upload a logo of your organization.`);
         return;
       }
 
-      const { data, error: createOrgError } = await authClient.organization.create({
-        name: value.name,
-        slug: value.slug,
-        logo,
-      });
-
-      if (createOrgError) {
-        isSubmitting = false;
-        toast.error(createOrgError.message ?? "Failed to create organization");
-        return;
-      }
-
-      await authClient.organization.setActive(
+      createOrganization.mutate(
         {
-          organizationId: data.id,
-          organizationSlug: data.slug,
+          name: value.name,
+          slug: value.slug,
+          logo,
         },
         {
-          onSuccess: () => {
-            window.location.href = `/dashboard/${data.slug}`;
+          onError: (error) => {
+            toast.error(error.message);
           },
-          onError: (e) => void toast.error(e.error.message),
+          onSuccess: () => {
+            window.location.href = `/dashboard/${value.slug}`;
+          },
+          onSettled: () => {
+            isSubmitting = false;
+          },
         }
       );
-
-      isSubmitting = false;
     },
   }));
 </script>

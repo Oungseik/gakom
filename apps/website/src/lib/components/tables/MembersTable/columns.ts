@@ -18,7 +18,7 @@ export type Member = {
   name: string;
   email: string;
   image?: string | null;
-  role: string;
+  role: "OWNER" | "MEMBER" | "ADMIN";
   address?: string | null;
   city?: string | null;
   countryCode?: string | null;
@@ -115,7 +115,7 @@ export const columns: ColumnDef<Member>[] = [
         email: row.original.email,
         name: row.original.name,
         slug: row.original.slug,
-        role: row.original.role as "admin" | "member",
+        role: row.original.role,
         position: row.original.position,
         attendancePolicyId: row.original.attendancePolicy?.id,
       });

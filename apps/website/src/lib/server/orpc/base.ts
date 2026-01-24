@@ -1,5 +1,5 @@
 import { os as base, ORPCError } from "@orpc/server";
-import { eq, member, organization } from "@repo/db";
+import { and, eq, member, organization } from "@repo/db";
 import { db } from "$lib/server/db";
 
 type Context = {
@@ -51,7 +51,7 @@ export const authMiddleware = os.middleware(async ({ context, next }) => {
 /**
  * Middleware to protect to get the organization information for specific role
  * */
-export const organizationMiddleware = (roles: string[] = ["owner", "admin", "member"]) =>
+export const organizationMiddleware = (roles: string[] = ["OWNER", "ADMIN", "MEMBER"]) =>
   authMiddleware.concat(async ({ context, next }, input: { slug: string }) => {
     const organizations = await db
       .select({
@@ -59,15 +59,20 @@ export const organizationMiddleware = (roles: string[] = ["owner", "admin", "mem
         slug: organization.slug,
         role: member.role,
         memberId: member.id,
+        memberStatus: member.status,
         attendancePolicyId: member.attendancePolicyId,
       })
       .from(member)
       .innerJoin(organization, eq(member.organizationId, organization.id))
-      .where(eq(member.userId, context.session.user.id));
+      .where(and(eq(member.userId, context.session.user.id), eq(member.status, "ACTIVE")));
 
     const result = organizations?.find((o) => o.slug === input.slug);
-    if (!result || !roles.includes(result.role)) {
+    if (!result || !roles.includes(result.role.toUpperCase())) {
       throw new ORPCError("FORBIDDEN");
+    }
+
+    if (result.memberStatus === "DEACTIVATED") {
+      throw new ORPCError("UNAUTHORIZED");
     }
 
     if (!result.attendancePolicyId) {

@@ -1,62 +1,44 @@
 import { redirect } from "@sveltejs/kit";
-import { auth } from "$lib/auth";
+import { db } from "$lib/server/db";
 import type { LayoutServerLoad } from "./$types";
 
-export const load: LayoutServerLoad = async ({ locals, url, request }) => {
+export const load: LayoutServerLoad = async ({ locals, url }) => {
   const session = locals.session?.session;
   const user = locals.session?.user;
   const pathname = url.pathname;
   const isEmailVerified = user?.emailVerified;
 
-  if (["/signin", "/signup"].some((prefix) => pathname.startsWith(prefix))) {
-    if (!session) {
-      return;
-    }
-
-    if (!isEmailVerified) {
-      return redirect(303, "/verify-account");
-    }
-
-    const organizations = await auth.api.listOrganizations({ headers: request.headers });
-    if (organizations.length === 0) {
-      return redirect(303, "/setup");
-    }
-
-    return redirect(303, url.searchParams.get("return_url") ?? "/app");
+  if (["/signin", "/signup"].some((prefix) => pathname.startsWith(prefix)) && !session) {
+    return;
   }
 
-  if (pathname === "/verify-account") {
-    if (!session) {
-      return redirect(303, "/signin");
-    }
-
-    if (!isEmailVerified) {
-      return {
-        session: locals.session?.session,
-        user: locals.session?.user,
-      };
-    }
-
-    const organizations = await auth.api.listOrganizations({ headers: request.headers });
-    if (organizations.length === 0) {
-      return redirect(303, "/setup");
-    }
+  if (!session) {
+    return redirect(303, "/signin");
   }
 
-  if (pathname === "/setup") {
-    if (!session) {
-      return redirect(303, "/signin");
-    }
-
-    const organizations = await auth.api.listOrganizations({ headers: request.headers });
-    if (organizations.length === 0) {
-      return;
-    }
-    return redirect(303, url.searchParams.get("return_url") ?? "/app");
+  if (pathname.startsWith("/forgot-password")) {
+    return { session, user };
   }
 
-  return {
-    session: locals.session?.session,
-    user: locals.session?.user,
-  };
+  if (!isEmailVerified && pathname.startsWith("/verify-account")) {
+    return { session, user };
+  }
+
+  if (!isEmailVerified) {
+    return redirect(303, "/verify-account");
+  }
+
+  const organizations = await db.query.organization.findMany({
+    where: { members: { user: { email: user?.email, members: { status: "ACTIVE" } } } },
+  });
+
+  if (organizations.length === 0 && pathname === "/setup") {
+    return;
+  }
+
+  if (organizations.length === 0) {
+    return redirect(303, "/setup");
+  }
+
+  return redirect(303, url.searchParams.get("return_url") ?? `/app/${organizations.at(0)?.slug}`);
 };

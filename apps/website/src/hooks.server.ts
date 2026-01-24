@@ -1,4 +1,4 @@
-import { count, eq, member, organization } from "@repo/db";
+import { and, eq, member, organization } from "@repo/db";
 import { error, type Handle, redirect } from "@sveltejs/kit";
 import { sequence } from "@sveltejs/kit/hooks";
 import { svelteKitHandler } from "better-auth/svelte-kit";
@@ -49,6 +49,7 @@ const authHandle: Handle = async ({ event, resolve }) => {
   const isEmailVerified = session?.user.emailVerified;
 
   const isProtected = PROTECTED_PATHS.some((path) => pathname.startsWith(path));
+  // `/rpc` route is unprotected and let the authentication in oRPC routes handle by oRPC itself
   if (!isProtected) {
     return resolve(event);
   }
@@ -67,15 +68,6 @@ const authHandle: Handle = async ({ event, resolve }) => {
     return resolve(event);
   }
 
-  const result = await db
-    .select({ count: count() })
-    .from(organization)
-    .where(eq(organization.slug, slug));
-
-  if (!result.at(0)?.count) {
-    return resolve(event);
-  }
-
   const organizations = await db
     .select({
       id: organization.id,
@@ -88,12 +80,12 @@ const authHandle: Handle = async ({ event, resolve }) => {
     })
     .from(member)
     .innerJoin(organization, eq(member.organizationId, organization.id))
-    .where(eq(member.userId, session.user.id));
+    .where(and(eq(member.userId, session.user.id), eq(member.status, "ACTIVE")));
 
   event.locals.organizations = organizations;
 
   const role = organizations.find((org) => org.slug === slug)?.role;
-  if (pathname.startsWith("/dashboard") && role === "member") {
+  if (pathname.startsWith("/dashboard") && role === "MEMBER") {
     return error(403, {
       message: "You don't have enough permission to the organization dashboard.",
     });

@@ -10,12 +10,14 @@ export type InvitationStatus = "PENDING" | "ACCEPTED" | "REJECTED" | "CANCELED";
 export type Invitation = {
   id: string;
   email: string;
-  role: "member" | "admin";
+  role: "MEMBER" | "ADMIN" | "OWNER";
   position: string;
   status: InvitationStatus;
   expiresAt: Date;
   createdAt: Date;
   organizationId: string;
+  slug: string;
+  attendancePolicyId?: string;
 };
 
 export const columns: ColumnDef<Invitation>[] = [
@@ -57,10 +59,12 @@ export const columns: ColumnDef<Invitation>[] = [
       return renderComponent(DataTableActions, {
         invitationId: row.original.id,
         organizationId: row.original.organizationId,
+        slug: row.original.slug,
         role: row.original.role,
         position: row.original.position,
         email: row.original.email,
         status: row.original.status,
+        attendancePolicyId: row.original.attendancePolicyId,
       });
     },
   },

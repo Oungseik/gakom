@@ -1,4 +1,5 @@
 import type { AttendanceLocation } from "@repo/db";
+import type { TimeZone } from "@repo/db/timezone";
 import { renderComponent } from "@repo/ui/data-table";
 import type { ColumnDef } from "@tanstack/table-core";
 import DataTableMemberInfo from "../common/DataTableMemberInfo.svelte";
@@ -25,7 +26,7 @@ export type AttendanceItem = {
   policy: {
     id: string;
     name: string;
-    timezone: string;
+    timezone: TimeZone;
     clockInSec: number;
     clockOutSec: number;
   };
