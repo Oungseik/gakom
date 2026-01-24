@@ -59,6 +59,7 @@ export const organizationMiddleware = (roles: string[] = ["owner", "admin", "mem
         slug: organization.slug,
         role: member.role,
         memberId: member.id,
+        memberStatus: member.status,
         attendancePolicyId: member.attendancePolicyId,
       })
       .from(member)
@@ -68,6 +69,10 @@ export const organizationMiddleware = (roles: string[] = ["owner", "admin", "mem
     const result = organizations?.find((o) => o.slug === input.slug);
     if (!result || !roles.includes(result.role)) {
       throw new ORPCError("FORBIDDEN");
+    }
+
+    if (result.memberStatus === "DEACTIVATED") {
+      throw new ORPCError("UNAUTHORIZED");
     }
 
     if (!result.attendancePolicyId) {

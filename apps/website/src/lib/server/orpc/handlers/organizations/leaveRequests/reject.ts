@@ -64,6 +64,13 @@ export const rejectLeaveRequestHandler = os
       });
     }
 
+    const now = new Date();
+    if (now > leaveReq.startDate) {
+      throw new ORPCError("FORBIDDEN", {
+        message: "Cannot reject leave request with back date.",
+      });
+    }
+
     const daysApart = getDaysDifference(leaveReq.endDate, leaveReq.startDate) + 1;
 
     await db.transaction(async (tx) => {
