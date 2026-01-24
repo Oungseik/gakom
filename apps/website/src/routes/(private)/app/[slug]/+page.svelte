@@ -138,7 +138,7 @@
           <Card.Title class="text-muted-foreground">Attendance history</Card.Title>
 
           <a href={`/app/${params.slug}/attendances`} class={buttonVariants({ variant: "link" })}
-            >View all</a
+            >View details</a
           >
         </Card.Header>
         <Card.Content>
@@ -157,35 +157,21 @@
         <Card.Header class="flex items-center justify-between">
           <Card.Title class="text-muted-foreground">Leave Balance</Card.Title>
           <a href={`/app/${params.slug}/attendances`} class={buttonVariants({ variant: "link" })}
-            >View all</a
+            >View details</a
           >
         </Card.Header>
         <Card.Content class="space-y-4">
           <ScrollArea class="grid w-full grid-cols-1 overflow-auto">
             <div class="flex items-center justify-evenly gap-4">
-              <LeaveUsageChart
-                maxValue={10}
-                value={2}
-                label="Sick Leave"
-                key="sick_leave"
-                color="var(--color-primary)"
-              />
-
-              <LeaveUsageChart
-                maxValue={15}
-                value={3}
-                label="Annual Leave"
-                key="annual_leave"
-                color="var(--color-primary)"
-              />
-
-              <LeaveUsageChart
-                maxValue={15}
-                value={8}
-                label="Causal Leave"
-                key="causal_leave"
-                color="var(--color-primary)"
-              />
+              {#each leaveBalances.data?.balances as balance (balance.name)}
+                <LeaveUsageChart
+                  maxValue={balance.totalDays}
+                  value={balance.usedDays}
+                  label={balance.name}
+                  key={balance.name}
+                  color="var(--color-primary)"
+                />
+              {/each}
             </div>
             <Scrollbar orientation="horizontal" />
           </ScrollArea>
