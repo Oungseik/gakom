@@ -16,6 +16,7 @@ import { getAttendanceHandler } from "./handlers/organizations/attendences/get";
 import { listHandler } from "./handlers/organizations/attendences/list";
 import { getStatsHandler as getAttendanceStatsHandler } from "./handlers/organizations/attendences/stats";
 import { listInvitationsHandler } from "./handlers/organizations/invitations/list";
+import { listLeavePoliciesHandler } from "./handlers/organizations/leave/list";
 import { listLeaveBalancesHandler } from "./handlers/organizations/leaveBalances/list";
 import { approveLeaveRequestHandler } from "./handlers/organizations/leaveRequests/approve";
 import { cancelLeaveRequestHandler } from "./handlers/organizations/leaveRequests/cancel";
@@ -57,7 +58,12 @@ export const router = os.router({
       stats: getStatisticsHandler,
     },
     invitations: { list: listInvitationsHandler },
-    leaveBalances: { list: listLeaveBalancesHandler },
+    leave: {
+      list: listLeavePoliciesHandler,
+    },
+    leaveBalances: {
+      list: listLeaveBalancesHandler,
+    },
     leaveRequests: {
       list: listLeaveRequestsHandler,
       approve: approveLeaveRequestHandler,
