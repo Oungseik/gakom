@@ -1,6 +1,7 @@
 <script lang="ts">
   import { buttonVariants } from "@repo/ui/button";
   import * as Card from "@repo/ui/card";
+  import { ScrollArea, Scrollbar } from "@repo/ui/scroll-area";
   import { createInfiniteQuery, createMutation, createQuery } from "@tanstack/svelte-query";
   import { toast } from "svelte-sonner";
 
@@ -30,7 +31,7 @@
       input: (cursor) => ({
         slug: params.slug,
         cursor,
-        pageSize: 7,
+        pageSize: 5,
         filter: { self: true },
       }),
       getNextPageParam: (lastPage) => lastPage.nextCursor,
@@ -160,50 +161,34 @@
           >
         </Card.Header>
         <Card.Content class="space-y-4">
-          <div class="grid grid-cols-3">
-            <div class="h-25">
+          <ScrollArea class="grid w-full grid-cols-1 overflow-auto">
+            <div class="flex items-center justify-evenly gap-4">
               <LeaveUsageChart
                 maxValue={10}
                 value={2}
-                label="Sick"
+                label="Sick Leave"
                 key="sick_leave"
                 color="var(--color-primary)"
               />
-            </div>
 
-            <div class="h-25">
               <LeaveUsageChart
                 maxValue={15}
                 value={3}
-                label="Annual"
+                label="Annual Leave"
                 key="annual_leave"
                 color="var(--color-primary)"
               />
-            </div>
 
-            <div class="h-22">
               <LeaveUsageChart
                 maxValue={15}
                 value={8}
-                label="Causal"
+                label="Causal Leave"
                 key="causal_leave"
                 color="var(--color-primary)"
               />
             </div>
-          </div>
-          <!-- <div class="grid gap-4 grid-cols-{leaveBalances.data?.balances.length ?? 1}"> -->
-          <!--   {#each leaveBalances.data?.balances as balance (balance.name)} -->
-          <!--     <div> -->
-          <!--       <div class="mb-2 flex items-center justify-between"> -->
-          <!--         <span class="text-sm font-medium">{balance.name}</span> -->
-          <!--         <span class="text-muted-foreground text-sm" -->
-          <!--           >{balance.usedDays}/{balance.totalDays}</span -->
-          <!--         > -->
-          <!--       </div> -->
-          <!--       <Progress value={balance.usedDays} max={balance.totalDays} /> -->
-          <!--     </div> -->
-          <!--   {/each} -->
-          <!-- </div> -->
+            <Scrollbar orientation="horizontal" />
+          </ScrollArea>
           <DataTable
             columns={leaveRequestsColumn}
             border={false}
