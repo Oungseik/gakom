@@ -4,6 +4,8 @@ import { COUNTRY_CODES } from "../country";
 import { attendancePolicy } from "./attendance";
 import { user } from "./core";
 
+export const InvitationStatus = ["ACCEPTED", "CANCELED", "PENDING", "REJECTED"] as const;
+
 export const organization = sqliteTable(
   "organization",
   {
@@ -23,7 +25,9 @@ export const organization = sqliteTable(
 export const member = sqliteTable(
   "member",
   {
-    id: text("id").primaryKey(),
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
     organizationId: text("organization_id")
       .notNull()
       .references(() => organization.id, { onDelete: "cascade" }),
@@ -31,7 +35,9 @@ export const member = sqliteTable(
       .notNull()
       .references(() => user.id, { onDelete: "cascade" }),
     attendancePolicyId: text("attendance_policy_id").references(() => attendancePolicy.id),
-    role: text("role").default("MEMBER").notNull(),
+    role: text("role", { enum: ["OWNER", "ADMIN", "MEMBER"] })
+      .default("MEMBER")
+      .notNull(),
     position: text("position"),
     status: text("status", { enum: ["ACTIVE", "DEACTIVATED"] }).default("ACTIVE"),
     createdAt: integer("created_at", { mode: "timestamp_ms" })
@@ -58,7 +64,7 @@ export const invitation = sqliteTable(
     email: text("email").notNull(),
     role: text("role").notNull(),
     position: text("position").notNull(),
-    status: text("status").default("pending").notNull(),
+    status: text("status", { enum: InvitationStatus }).default("PENDING").notNull(),
     expiresAt: integer("expires_at", { mode: "timestamp_ms" }).notNull(),
     attendancePolicyId: text("attendance_policy_id").references(() => attendancePolicy.id),
     createdAt: integer("created_at", { mode: "timestamp_ms" })

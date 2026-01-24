@@ -15,7 +15,10 @@ import { checkOutHandler } from "./handlers/organizations/attendences/check_out"
 import { getAttendanceHandler } from "./handlers/organizations/attendences/get";
 import { listHandler } from "./handlers/organizations/attendences/list";
 import { getStatsHandler as getAttendanceStatsHandler } from "./handlers/organizations/attendences/stats";
+import { createOrganizationHandler } from "./handlers/organizations/create";
+import { acceptInvitationHandler } from "./handlers/organizations/invitations/accept";
 import { listInvitationsHandler } from "./handlers/organizations/invitations/list";
+import { sendInvitationHandler } from "./handlers/organizations/invitations/send";
 import { listLeavePoliciesHandler } from "./handlers/organizations/leave/list";
 import { listLeaveBalancesHandler } from "./handlers/organizations/leaveBalances/list";
 import { approveLeaveRequestHandler } from "./handlers/organizations/leaveRequests/approve";
@@ -36,6 +39,8 @@ export const router = os.router({
     upload: uploadImageHandler,
   },
   organizations: {
+    create: createOrganizationHandler,
+
     attendances: {
       checkIn: checkInHandler,
       checkOut: checkOutHandler,
@@ -57,7 +62,11 @@ export const router = os.router({
       remove: removeMemberHandler,
       stats: getStatisticsHandler,
     },
-    invitations: { list: listInvitationsHandler },
+    invitations: {
+      list: listInvitationsHandler,
+      send: sendInvitationHandler,
+      accept: acceptInvitationHandler,
+    },
     leave: {
       list: listLeavePoliciesHandler,
     },

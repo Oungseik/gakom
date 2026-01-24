@@ -10,7 +10,7 @@ const input = z.object({
 
 export const removeMemberHandler = os
   .input(input)
-  .use(organizationMiddleware(["owner", "admin"]))
+  .use(organizationMiddleware(["OWNER", "ADMIN"]))
   .handler(async ({ input, context }) => {
     await db
       .update(member)

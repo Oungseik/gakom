@@ -14,7 +14,7 @@ const input = z.object({
 
 export const checkInHandler = os
   .input(input)
-  .use(organizationMiddleware(["admin", "member", "owner"]))
+  .use(organizationMiddleware())
   .handler(async ({ context, input }) => {
     const policy = (await db.query.attendancePolicy.findFirst({
       where: { id: context.attendancePolicy.id },

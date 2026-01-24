@@ -12,7 +12,7 @@ const input = z.object({
 export const listAttendancePoliciesHandler = os
   .route({ method: "GET" })
   .input(input)
-  .use(organizationMiddleware(["admin", "owner"]))
+  .use(organizationMiddleware(["ADMIN", "OWNER"]))
   .handler(async ({ context, input }) => {
     const items = await db
       .select({

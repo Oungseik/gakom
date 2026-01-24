@@ -19,7 +19,7 @@
         getRoleBadgeClass(role),
       ]}
     >
-      {role}
+      {role.toLowerCase()}
     </span>
   </div>
 </div>

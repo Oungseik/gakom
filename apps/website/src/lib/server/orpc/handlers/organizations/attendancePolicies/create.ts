@@ -17,7 +17,7 @@ const input = z.object({
 
 export const createAttendancePolicyHandler = os
   .input(input)
-  .use(organizationMiddleware(["admin", "owner"]))
+  .use(organizationMiddleware(["ADMIN", "OWNER"]))
   .handler(async ({ context, input }) => {
     await db.insert(attendancePolicy).values({
       ...input.data,

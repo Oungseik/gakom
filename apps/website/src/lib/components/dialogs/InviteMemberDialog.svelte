@@ -6,11 +6,10 @@
   import { Label } from "@repo/ui/label";
   import * as Select from "@repo/ui/select";
   import { createForm } from "@tanstack/svelte-form";
-  import { createQuery, useQueryClient } from "@tanstack/svelte-query";
+  import { createMutation, createQuery, useQueryClient } from "@tanstack/svelte-query";
   import { toast } from "svelte-sonner";
   import { z } from "zod";
 
-  import { authClient } from "$lib/auth_client";
   import { orpc } from "$lib/orpc_client";
   import { formatTime } from "$lib/utils";
 
@@ -29,14 +28,17 @@
     })
   );
   const allPolicies = $derived(attendancePolicies.data?.items.flatMap((item) => item) ?? []);
+  const sendInvitation = createMutation(() =>
+    orpc.organizations.invitations.send.mutationOptions()
+  );
 
   const defaultValues: {
-    role: "member" | "admin";
+    role: "MEMBER" | "ADMIN";
     email: string;
     position: string;
     attendancePolicyId?: string;
   } = {
-    role: "member",
+    role: "MEMBER",
     email: "",
     position: "",
   };
@@ -44,25 +46,30 @@
     defaultValues,
     onSubmit: async ({ value }) => {
       isInviting = true;
-      const { error } = await authClient.organization.inviteMember({
-        organizationId: organization.id,
-        email: value.email,
-        role: value.role,
-        position: value.position,
-        attendancePolicyId: value.attendancePolicyId,
-        resend: true,
-      });
 
-      if (error) {
-        toast.error(error.message ?? "something went wrong while inviting member");
-      } else {
-        open = false;
-        form.reset();
-        toast.success(`Successfully invite ${value.email} to ${organization.name}.`);
-      }
-
-      await queryClient.invalidateQueries({ queryKey: orpc.organizations.invitations.list.key() });
-      isInviting = false;
+      sendInvitation.mutate(
+        {
+          slug: organization.slug,
+          email: value.email,
+          role: value.role,
+          position: value.position,
+          attendancePolicyId: value.attendancePolicyId,
+        },
+        {
+          onError: (error) => {
+            toast.error(error.message);
+          },
+          onSuccess: () => {
+            open = false;
+            form.reset();
+            toast.success(`Successfully invite ${value.email} to ${organization.name}.`);
+            queryClient.invalidateQueries({ queryKey: orpc.organizations.invitations.list.key() });
+          },
+          onSettled: () => {
+            isInviting = false;
+          },
+        }
+      );
     },
   }));
 </script>
@@ -147,15 +154,15 @@
             <Select.Root
               type="single"
               name={field.name}
-              onValueChange={(value) => field.handleChange(value as "member" | "admin")}
+              onValueChange={(value) => field.handleChange(value as "MEMBER" | "ADMIN")}
               disabled={isInviting}
             >
               <Select.Trigger class="w-full">
-                {field.state.value === "member" ? "Member" : "Admin"}
+                {field.state.value === "MEMBER" ? "Member" : "Admin"}
               </Select.Trigger>
               <Select.Content>
-                <Select.Item value="member">Member</Select.Item>
-                <Select.Item value="admin">Admin</Select.Item>
+                <Select.Item value="MEMBER">Member</Select.Item>
+                <Select.Item value="ADMIN">Admin</Select.Item>
               </Select.Content>
             </Select.Root>
           </div>

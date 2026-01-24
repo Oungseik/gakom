@@ -27,7 +27,7 @@ const input = z.object({
 export const getStatsHandler = os
   .route({ method: "GET" })
   .input(input)
-  .use(organizationMiddleware(["admin", "owner"]))
+  .use(organizationMiddleware(["ADMIN", "OWNER"]))
   .handler(async ({ input, context }) => {
     const filter = input.filter;
     const today = getYMDToday();

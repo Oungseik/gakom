@@ -18,7 +18,7 @@
     slug: string;
     name: string;
     position?: string | null;
-    role: "member" | "admin";
+    role: "MEMBER" | "ADMIN" | "OWNER";
     attendancePolicyId?: string | null;
   };
 

@@ -122,19 +122,19 @@ async function main() {
   // 2. Create Users and Accounts
   console.log("👥 Creating users and accounts...");
   const userNames = [
-    { name: "John Doe", email: "john.doe@acme.com", city: "New York", role: "admin" },
-    { name: "Jane Smith", email: "jane.smith@acme.com", city: "Los Angeles", role: "member" },
-    { name: "Bob Johnson", email: "bob.johnson@acme.com", city: "Chicago", role: "member" },
-    { name: "Alice Williams", email: "alice.williams@acme.com", city: "Houston", role: "member" },
-    { name: "Charlie Brown", email: "charlie.brown@acme.com", city: "Phoenix", role: "member" },
-    { name: "Diana Prince", email: "diana.prince@acme.com", city: "Philadelphia", role: "member" },
-    { name: "Eve Martinez", email: "eve.martinez@acme.com", city: "San Antonio", role: "member" },
-    { name: "Frank Miller", email: "frank.miller@acme.com", city: "San Diego", role: "member" },
-    { name: "Grace Lee", email: "grace.lee@acme.com", city: "Dallas", role: "member" },
-    { name: "Henry Wilson", email: "henry.wilson@acme.com", city: "San Jose", role: "member" },
-  ];
+    { name: "John Doe", email: "john.doe@acme.com", city: "New York", role: "OWNER" },
+    { name: "Jane Smith", email: "jane.smith@acme.com", city: "Los Angeles", role: "ADMIN" },
+    { name: "Bob Johnson", email: "bob.johnson@acme.com", city: "Chicago", role: "MEMBER" },
+    { name: "Alice Williams", email: "alice.williams@acme.com", city: "Houston", role: "MEMBER" },
+    { name: "Charlie Brown", email: "charlie.brown@acme.com", city: "Phoenix", role: "MEMBER" },
+    { name: "Diana Prince", email: "diana.prince@acme.com", city: "Philadelphia", role: "MEMBER" },
+    { name: "Eve Martinez", email: "eve.martinez@acme.com", city: "San Antonio", role: "MEMBER" },
+    { name: "Frank Miller", email: "frank.miller@acme.com", city: "San Diego", role: "MEMBER" },
+    { name: "Grace Lee", email: "grace.lee@acme.com", city: "Dallas", role: "MEMBER" },
+    { name: "Henry Wilson", email: "henry.wilson@acme.com", city: "San Jose", role: "MEMBER" },
+  ] as const;
 
-  const userIds: { id: string; role: string }[] = [];
+  const userIds: { id: string; role: "OWNER" | "ADMIN" | "MEMBER" }[] = [];
 
   for (const userData of userNames) {
     const userId = crypto.randomUUID();
@@ -240,6 +240,7 @@ async function main() {
     const memberId = crypto.randomUUID();
     await db.insert(member).values({
       id: memberId,
+      status: "ACTIVE",
       organizationId: orgId,
       userId: userIds[i].id,
       attendancePolicyId: policy.id,
@@ -292,7 +293,7 @@ async function main() {
       email: inv.email,
       role: inv.role,
       position: inv.position,
-      status: "pending",
+      status: "PENDING",
       expiresAt: futureDate,
       attendancePolicyId: policies[0].id,
       inviterId: inviterUserId,

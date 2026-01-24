@@ -12,7 +12,7 @@ const input = z.object({
 
 export const rejectLeaveRequestHandler = os
   .input(input)
-  .use(organizationMiddleware(["admin", "owner"]))
+  .use(organizationMiddleware(["ADMIN", "OWNER"]))
   .handler(async ({ context, input }) => {
     const reviewer = (
       await db

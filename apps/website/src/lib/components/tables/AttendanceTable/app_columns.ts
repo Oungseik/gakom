@@ -1,4 +1,5 @@
 import type { AttendanceLocation } from "@repo/db";
+import type { TimeZone } from "@repo/db/timezone";
 import { renderComponent } from "@repo/ui/data-table";
 import type { ColumnDef } from "@tanstack/table-core";
 import DataTableCheckInCheckOut from "./DataTableCheckInCheckOut.svelte";
@@ -14,7 +15,7 @@ export type AttendanceItem = {
   workedSeconds: number | null;
   status: "PRESENT" | "LATE" | "EARLY_LEAVE" | "ABSENT" | "INCOMPLETE";
   policy: {
-    timezone: string;
+    timezone: TimeZone;
   };
 };
 

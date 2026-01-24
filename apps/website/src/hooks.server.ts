@@ -1,4 +1,4 @@
-import { eq, member, organization } from "@repo/db";
+import { and, eq, member, organization } from "@repo/db";
 import { error, type Handle, redirect } from "@sveltejs/kit";
 import { sequence } from "@sveltejs/kit/hooks";
 import { svelteKitHandler } from "better-auth/svelte-kit";
@@ -80,12 +80,12 @@ const authHandle: Handle = async ({ event, resolve }) => {
     })
     .from(member)
     .innerJoin(organization, eq(member.organizationId, organization.id))
-    .where(eq(member.userId, session.user.id));
+    .where(and(eq(member.userId, session.user.id), eq(member.status, "ACTIVE")));
 
   event.locals.organizations = organizations;
 
   const role = organizations.find((org) => org.slug === slug)?.role;
-  if (pathname.startsWith("/dashboard") && role === "member") {
+  if (pathname.startsWith("/dashboard") && role === "MEMBER") {
     return error(403, {
       message: "You don't have enough permission to the organization dashboard.",
     });

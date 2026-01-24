@@ -10,7 +10,7 @@ const input = z.object({
 
 export const deleteAttendancePolicyHandler = os
   .input(input)
-  .use(organizationMiddleware(["admin", "owner"]))
+  .use(organizationMiddleware(["ADMIN", "OWNER"]))
   .handler(async ({ context, input, errors }) => {
     const m = await db
       .select({ count: count() })

@@ -18,32 +18,32 @@
     organizationId: string;
     email: string;
     position: string;
-    role: "admin" | "member";
+    role: "ADMIN" | "MEMBER" | "OWNER";
     status: "PENDING" | "ACCEPTED" | "REJECTED" | "CANCELED";
   } = $props();
 
   const queryClient = useQueryClient();
 
   async function handleResendInvitation() {
-    const { error } = await authClient.organization.inviteMember({ ...props, resend: true });
-    if (error) {
-      return toast.error(error.message ?? "Something went wrong while resend invitation");
-    }
-    await queryClient.invalidateQueries({ queryKey: orpc.organizations.invitations.list.key() });
-    toast.success(`Resent invitation to ${props.email}`);
+    // const { error } = await authClient.organization.inviteMember({ ...props, resend: true });
+    // if (error) {
+    //   return toast.error(error.message ?? "Something went wrong while resend invitation");
+    // }
+    // await queryClient.invalidateQueries({ queryKey: orpc.organizations.invitations.list.key() });
+    // toast.success(`Resent invitation to ${props.email}`);
   }
 
   async function handleCancelInvitation() {
-    const { error } = await authClient.organization.cancelInvitation({
-      invitationId: props.invitationId,
-    });
-
-    if (error) {
-      return toast.error(error.message ?? "Something went wrong while cancel invitation");
-    }
-
-    await queryClient.invalidateQueries({ queryKey: orpc.organizations.invitations.list.key() });
-    toast.success(`Cancelled invitation for ${props.email}`);
+    // const { error } = await authClient.organization.cancelInvitation({
+    //   invitationId: props.invitationId,
+    // });
+    //
+    // if (error) {
+    //   return toast.error(error.message ?? "Something went wrong while cancel invitation");
+    // }
+    //
+    // await queryClient.invalidateQueries({ queryKey: orpc.organizations.invitations.list.key() });
+    // toast.success(`Cancelled invitation for ${props.email}`);
   }
 
   const canTakeAction = $derived(status !== "ACCEPTED");

@@ -9,7 +9,7 @@ const input = z.object({
 export const listLeavePoliciesHandler = os
   .route({ method: "GET" })
   .input(input)
-  .use(organizationMiddleware(["owner", "admin"]))
+  .use(organizationMiddleware(["OWNER", "ADMIN"]))
   .handler(async ({ context }) => {
     const leave = await db.query.leave.findMany({
       where: { organizationId: context.organization.id },

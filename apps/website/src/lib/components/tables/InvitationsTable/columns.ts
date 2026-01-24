@@ -10,7 +10,7 @@ export type InvitationStatus = "PENDING" | "ACCEPTED" | "REJECTED" | "CANCELED";
 export type Invitation = {
   id: string;
   email: string;
-  role: "member" | "admin";
+  role: "MEMBER" | "ADMIN" | "OWNER";
   position: string;
   status: InvitationStatus;
   expiresAt: Date;

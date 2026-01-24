@@ -36,7 +36,7 @@ const input = z.object({
 export const listLeaveRequestsHandler = os
   .route({ method: "GET" })
   .input(input)
-  .use(organizationMiddleware(["admin", "owner", "member"]))
+  .use(organizationMiddleware())
   .handler(async ({ context, input }) => {
     const reviewer = alias(member, "reviewer");
     const reviewerUser = alias(user, "reviewer_user");
@@ -79,7 +79,7 @@ export const listLeaveRequestsHandler = os
             ? or(like(user.name, `%${filter.search}%`), like(member.position, `%${filter.search}%`))
             : undefined,
           filter?.status?.length ? inArray(leaveRequest.status, filter.status) : undefined,
-          context.member.role === "member"
+          context.member.role === "MEMBER"
             ? eq(leaveRequest.memberId, context.member.id)
             : undefined,
           filter?.from ? gte(leaveRequest.startDate, filter.from) : undefined,
