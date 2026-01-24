@@ -16,7 +16,15 @@ export const load: LayoutServerLoad = async ({ locals, url }) => {
     return redirect(303, "/signin");
   }
 
-  if (!isEmailVerified && !pathname.startsWith("/verify-account")) {
+  if (pathname.startsWith("/forgot-password")) {
+    return { session, user };
+  }
+
+  if (!isEmailVerified && pathname.startsWith("/verify-account")) {
+    return { session, user };
+  }
+
+  if (!isEmailVerified) {
     return redirect(303, "/verify-account");
   }
 
@@ -24,7 +32,11 @@ export const load: LayoutServerLoad = async ({ locals, url }) => {
     where: { members: { user: { email: user?.email } } },
   });
 
-  if (organizations.length === 0 && pathname !== "/setup") {
+  if (organizations.length === 0 && pathname === "/setup") {
+    return;
+  }
+
+  if (organizations.length === 0) {
     return redirect(303, "/setup");
   }
 

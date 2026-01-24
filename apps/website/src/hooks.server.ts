@@ -1,4 +1,4 @@
-import { count, eq, member, organization } from "@repo/db";
+import { eq, member, organization } from "@repo/db";
 import { error, type Handle, redirect } from "@sveltejs/kit";
 import { sequence } from "@sveltejs/kit/hooks";
 import { svelteKitHandler } from "better-auth/svelte-kit";
@@ -49,6 +49,7 @@ const authHandle: Handle = async ({ event, resolve }) => {
   const isEmailVerified = session?.user.emailVerified;
 
   const isProtected = PROTECTED_PATHS.some((path) => pathname.startsWith(path));
+  // `/rpc` route is unprotected and let the authentication in oRPC routes handle by oRPC itself
   if (!isProtected) {
     return resolve(event);
   }
@@ -64,15 +65,6 @@ const authHandle: Handle = async ({ event, resolve }) => {
   // pass the access dashboard with no organization, and let the +layout.server.ts handle the error
   const slug = pathname.split("/").at(2);
   if (!slug || pathname.startsWith("/account")) {
-    return resolve(event);
-  }
-
-  const result = await db
-    .select({ count: count() })
-    .from(organization)
-    .where(eq(organization.slug, slug));
-
-  if (!result.at(0)?.count) {
     return resolve(event);
   }
 
