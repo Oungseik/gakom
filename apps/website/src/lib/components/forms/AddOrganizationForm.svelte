@@ -21,6 +21,7 @@
   let isSubmitting = $state(false);
   let isUploading = $state(false);
   let logo: string | undefined = $state(undefined);
+  let src = $state("");
 
   const imageUploadMutation = createMutation(() => orpc.images.upload.mutationOptions());
   const createOrganization = createMutation(() => orpc.organizations.create.mutationOptions());
@@ -71,6 +72,7 @@
   >
     <div class="mx-auto w-fit">
       <ImageCropper.Root
+        bind:src
         onCropped={async (url) => {
           isUploading = true;
           const file = await getFileFromUrl(url);
@@ -80,7 +82,10 @@
               onSuccess: (data) => {
                 logo = data.objectPath;
               },
-              onError: (e) => toast.error(e.message),
+              onError: (e) => {
+                toast.error(e.message);
+                src = "";
+              },
               onSettled: () => {
                 isUploading = false;
               },
