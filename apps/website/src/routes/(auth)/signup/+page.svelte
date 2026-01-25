@@ -5,6 +5,7 @@
   import * as Card from "@repo/ui/card";
   import { Input } from "@repo/ui/input";
   import { Label } from "@repo/ui/label";
+  import * as Password from "@repo/ui/password";
   import { createForm } from "@tanstack/svelte-form";
   import { useSearchParams } from "runed/kit";
   import { toast } from "svelte-sonner";
@@ -142,15 +143,19 @@
               {#snippet children(field)}
                 <div class="space-y-2">
                   <Label for={field.name}>Password</Label>
-                  <Input
-                    type="password"
-                    id={field.name}
-                    name={field.name}
-                    value={field.state.value}
-                    onblur={field.handleBlur}
-                    onchange={(e) => field.handleChange(e.currentTarget.value)}
-                    required
-                  />
+                  <Password.Root>
+                    <Password.Input
+                      required
+                      onchange={(e) => {
+                        if (e.target instanceof HTMLInputElement) {
+                          field.handleChange(e.target.value);
+                        }
+                      }}
+                    >
+                      <Password.ToggleVisibility />
+                    </Password.Input>
+                    <Password.Strength />
+                  </Password.Root>
                   {#if field.state.meta.errors.length}
                     <p class="text-sm text-red-500">{field.state.meta.errors}</p>
                   {/if}
