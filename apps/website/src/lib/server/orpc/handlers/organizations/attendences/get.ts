@@ -15,7 +15,7 @@ export const getAttendanceHandler = os
   .handler(async ({ context }) => {
     if (!context.attendancePolicy.id) {
       throw new ORPCError("UNPROCESSABLE_CONTENT", {
-        message: "Contact admin to assign the attendance policy",
+        message: "Contact admin to request to assign the check-in check-out time.",
       });
     }
 
