@@ -35,17 +35,15 @@
     collapsible = "offcanvas",
     user,
     orgs,
-    currentOrganizationSlug,
+    slug,
     ...restProps
   }: ComponentProps<typeof Sidebar.Root> & {
     user: User;
     orgs: Organization[];
-    currentOrganizationSlug?: string | null;
+    slug?: string | null;
   } = $props();
 
-  const activeOrganization = $derived(
-    orgs.find((o) => o.slug === currentOrganizationSlug) ?? orgs.at(0)!
-  );
+  const activeOrganization = $derived(orgs.find((o) => o.slug === slug) ?? orgs.at(0)!);
   let open = $state(false);
 
   const data = $derived([
