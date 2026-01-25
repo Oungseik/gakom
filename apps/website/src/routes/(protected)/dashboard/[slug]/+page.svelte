@@ -89,8 +89,6 @@
 
   <section>
     <div class="my-4 space-y-2">
-      <h1 class="text-muted-foreground">Attendances</h1>
-
       <div class="flex flex-wrap gap-2">
         <Search bind:value={searchParams.search} />
 

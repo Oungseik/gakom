@@ -1,11 +1,12 @@
 <script lang="ts">
   import AppWindowIcon from "@lucide/svelte/icons/app-window";
-  import BookPlugIcon from "@lucide/svelte/icons/book-plus";
   import CalendarDaysIcon from "@lucide/svelte/icons/calendar-days";
   import ClipboardClockIcon from "@lucide/svelte/icons/clipboard-clock";
+  import ClipboardListIcon from "@lucide/svelte/icons/clipboard-list";
   import FileChartColumnIncreasingIcon from "@lucide/svelte/icons/file-chart-column-increasing";
   import LayoutDashboardIcon from "@lucide/svelte/icons/layout-dashboard";
   import SettingsIcon from "@lucide/svelte/icons/settings";
+  import TicketsPlaneIcon from "@lucide/svelte/icons/tickets-plane";
   import UserPlusIcon from "@lucide/svelte/icons/user-plus";
   import UserSearchIcon from "@lucide/svelte/icons/user-search";
   import UsersIcon from "@lucide/svelte/icons/users";
@@ -57,7 +58,7 @@
     {
       name: "Leave",
       url: `/dashboard/${organization.slug}/leave`,
-      icon: BookPlugIcon,
+      icon: TicketsPlaneIcon,
     },
     {
       name: "Members",
@@ -73,6 +74,11 @@
       name: "Attendance Policies",
       url: `/dashboard/${organization.slug}/attendances/policies`,
       icon: ClipboardClockIcon,
+    },
+    {
+      name: "Leave Policies",
+      url: `/dashboard/${organization.slug}/leave/policies`,
+      icon: ClipboardListIcon,
     },
     {
       name: "Recruits",
