@@ -7,8 +7,7 @@
 
   import type { PageProps } from "./$types";
 
-  const { data }: PageProps = $props();
-  const currentSlug = $derived(data.currentOrganization.slug);
+  const { data, params }: PageProps = $props();
 
   // Mock leave history
   const mockLeaveHistory = $state([
@@ -59,7 +58,7 @@
 </script>
 
 <svelte:head>
-  <title>{data.currentOrganization.name} | Leave Management</title>
+  <title>{data.organization.name} | Leave Management</title>
   <meta name="description" content="Apply for leave and track leave requests" />
 </svelte:head>
 
@@ -73,7 +72,7 @@
   <Card class="p-6">
     <div class="text-center">
       <Button
-        onclick={() => goto(`/app/${currentSlug}/leave/apply`)}
+        onclick={() => goto(`/app/${params.slug}/leave/apply`)}
         size="lg"
         class="px-8 py-6 text-lg"
       >
@@ -159,4 +158,3 @@
     </div>
   </Card>
 </div>
-

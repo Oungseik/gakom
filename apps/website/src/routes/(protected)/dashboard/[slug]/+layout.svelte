@@ -9,11 +9,7 @@
 </script>
 
 <Sidebar.Provider>
-  <DashboardSidebar
-    user={data.user}
-    orgs={data.organizations ?? []}
-    currentOrganizationSlug={params.slug}
-  />
+  <DashboardSidebar user={data.user} orgs={data.organizations} slug={params.slug} />
   <Sidebar.Inset>
     {@render children()}
   </Sidebar.Inset>

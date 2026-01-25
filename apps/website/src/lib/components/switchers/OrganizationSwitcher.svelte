@@ -50,9 +50,9 @@
       >
         <DropdownMenu.Label class="text-muted-foreground text-xs">Organizations</DropdownMenu.Label>
         {#each orgs as org (org.slug)}
-          <DropdownMenu.Item class="gap-2 p-2">
+          <DropdownMenu.Item class="p-0">
             {#snippet children()}
-              <a href="/dashboard/{org.slug}">
+              <a href="/dashboard/{org.slug}" class="flex w-full items-center gap-2 p-2">
                 <img src={org.logo} class="size-6 shrink-0 rounded-md border" alt={org.name} />
                 {org.name}
               </a>

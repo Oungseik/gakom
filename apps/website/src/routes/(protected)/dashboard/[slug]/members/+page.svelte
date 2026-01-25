@@ -142,7 +142,7 @@
           {columns}
           data={allMembers.map((m) => ({
             ...m,
-            organizationId: data.currentOrganization.id,
+            organizationId: data.organization.id,
             slug: params.slug,
           }))}
           loading={members.isLoading}
@@ -165,7 +165,7 @@
           data={allInvitations.map((invitation) => ({
             ...invitation,
             slug: params.slug,
-            organizationId: data.currentOrganization.id,
+            organizationId: data.organization.id,
           }))}
           loading={invitations.isLoading}
         />
@@ -184,4 +184,4 @@
   </Tabs.Root>
 </DashboardContainer>
 
-<InviteMemberDialog bind:open={isInviteDialogOpen} organization={data.currentOrganization} />
+<InviteMemberDialog bind:open={isInviteDialogOpen} organization={data.organization} />

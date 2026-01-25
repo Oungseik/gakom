@@ -15,9 +15,6 @@
   const { data, params, children }: LayoutProps = $props();
 
   const slug = $derived(params.slug);
-  const org = $derived(
-    data.organizations.find((o) => o.slug === slug) ?? data.organizations.at(0)!
-  );
 
   const items = $derived([
     { name: "Home", icon: HouseIcon, url: `/app/${slug}` },
@@ -29,7 +26,12 @@
 </script>
 
 <Sidebar.Provider>
-  <AppSidebar role={data.member.role} user={data.user} {org} {items} />
+  <AppSidebar
+    role={data.member?.role ?? "MEMBER"}
+    user={data.user}
+    organization={data.organization}
+    {items}
+  />
   <Sidebar.Inset>
     {@render children()}
     <AppDock {items} currentPath={page.url.pathname} />

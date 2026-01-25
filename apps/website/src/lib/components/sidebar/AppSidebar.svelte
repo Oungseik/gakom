@@ -28,13 +28,13 @@
     collapsible = "offcanvas",
     user,
     role,
-    org,
+    organization,
     items,
     ...restProps
   }: ComponentProps<typeof Sidebar.Root> & {
     user: User;
     role: string;
-    org: Organization;
+    organization: Organization;
     items: Item[];
   } = $props();
 
@@ -46,12 +46,16 @@
     <div
       class="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground flex gap-2 p-2"
     >
-      <img src={org.logo} class="aspect-square size-8 rounded-lg border" alt={org.name} />
+      <img
+        src={organization.logo}
+        class="aspect-square size-8 rounded-lg border"
+        alt={organization.name}
+      />
       <div class="grid flex-1 text-start text-sm">
         <span class="truncate font-medium">
-          {org.name}
+          {organization.name}
         </span>
-        <span class="truncate text-xs">{org.plan ?? "Free"}</span>
+        <span class="truncate text-xs">{organization.plan ?? "Free"}</span>
       </div>
     </div>
   </Sidebar.Header>
@@ -62,7 +66,7 @@
         class="mt-auto"
         items={[
           {
-            url: `/dashboard/${org.slug}`,
+            url: `/dashboard/${organization.slug}`,
             icon: LayoutDashboardIcon,
             title: "Admin Dashboard",
           },
