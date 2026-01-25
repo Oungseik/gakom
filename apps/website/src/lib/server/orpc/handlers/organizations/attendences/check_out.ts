@@ -16,6 +16,12 @@ export const checkOutHandler = os
   .input(input)
   .use(organizationMiddleware())
   .handler(async ({ context, input }) => {
+    if (!context.attendancePolicy.id) {
+      throw new ORPCError("UNPROCESSABLE_CONTENT", {
+        message: "Contact admin to assign the attendance policy",
+      });
+    }
+
     const policy = (await db.query.attendancePolicy.findFirst({
       where: { id: context.attendancePolicy.id },
     }))!;
