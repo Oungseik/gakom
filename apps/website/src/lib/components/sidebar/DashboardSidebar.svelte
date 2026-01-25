@@ -6,6 +6,7 @@
   import FileChartColumnIncreasingIcon from "@lucide/svelte/icons/file-chart-column-increasing";
   import LayoutDashboardIcon from "@lucide/svelte/icons/layout-dashboard";
   import SettingsIcon from "@lucide/svelte/icons/settings";
+  import UserPlusIcon from "@lucide/svelte/icons/user-plus";
   import UserSearchIcon from "@lucide/svelte/icons/user-search";
   import UsersIcon from "@lucide/svelte/icons/users";
   import * as Sidebar from "@repo/ui/sidebar";
@@ -62,6 +63,11 @@
       name: "Members",
       url: `/dashboard/${organization.slug}/members`,
       icon: UsersIcon,
+    },
+    {
+      name: "Invitations",
+      url: `/dashboard/${organization.slug}/invitations`,
+      icon: UserPlusIcon,
     },
     {
       name: "Attendance Policies",

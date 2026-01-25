@@ -51,7 +51,7 @@
 
 <DashboardContainer>
   <div class="flex items-center justify-between">
-    <div></div>
+    <h1 class="text-muted-foreground">Attendance Policies</h1>
     <Button onclick={handleCreate} variant="outline">
       <PlusIcon /> Create Policy
     </Button>
