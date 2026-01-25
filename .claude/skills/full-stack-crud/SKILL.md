@@ -12,6 +12,7 @@ Create end-to-end CRUD functionality with current project context.
 - Existing entities: !`find apps/website/src -name "*.ts" -exec grep -l "export.*sqliteTable" {} \; | head -5 || echo "No existing schemas"`
 - UI patterns: !`find packages/ui/src/lib/components -name "*.svelte" | wc -l` components exist
 - Auth setup: !`grep -r "BetterAuth\|session" --include="*.ts" hooks/ || echo "Auth setup not found"`
+- Existing tables: !`grep -r "pgTable" --include="*.ts" packages/db/src/ | wc -l` defined
 
 ## CRUD Generation Plan
 
