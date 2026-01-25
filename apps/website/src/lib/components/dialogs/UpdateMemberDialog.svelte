@@ -183,7 +183,9 @@
       </form.Field>
 
       <Dialog.Footer>
-        <Dialog.Close class={buttonVariants({ variant: "outline" })}>Cancel</Dialog.Close>
+        <Dialog.Close type="button" class={buttonVariants({ variant: "outline" })}
+          >Cancel</Dialog.Close
+        >
         <Button type="submit" disabled={isUpdating} class="w-17">
           {#if isUpdating}
             <Loader2Icon class="size-4 animate-spin" />
