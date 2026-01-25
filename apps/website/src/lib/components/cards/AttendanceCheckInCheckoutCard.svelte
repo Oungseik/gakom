@@ -25,7 +25,7 @@
   const { attendance, policy, onCheckIn, onCheckOut, disabled = false }: Props = $props();
 </script>
 
-<Card.Root>
+<Card.Root class="h-62">
   <Card.Header>
     <Card.Title class="text-muted-foreground">Today's Attendance</Card.Title>
   </Card.Header>

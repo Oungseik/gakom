@@ -8,6 +8,7 @@
   import AttendanceCheckInCheckOutSkeleton from "$lib/components/cards/AttendanceCheckInCheckOutSkeleton.svelte";
   import AttendanceCheckInCheckoutCard from "$lib/components/cards/AttendanceCheckInCheckoutCard.svelte";
   import LeaveUsageChart from "$lib/components/charts/LeaveUsageChart.svelte";
+  import AttendanceCheckInCheckoutError from "$lib/components/errors/AttendanceCheckInCheckoutError.svelte";
   import { columns } from "$lib/components/tables/AttendanceTable/app_columns";
   import { columns as leaveRequestsColumn } from "$lib/components/tables/LeaveRequestsTable/app_columns";
   import DataTable from "$lib/components/tables/common/DataTable.svelte";
@@ -57,6 +58,8 @@
   const checkIn = createMutation(() => orpc.organizations.attendances.checkIn.mutationOptions());
   const checkOut = createMutation(() => orpc.organizations.attendances.checkOut.mutationOptions());
 
+  $inspect(attendance.isError);
+
   $effect(() => {
     if ("geolocation" in navigator) {
       navigator.geolocation.getCurrentPosition(
@@ -94,7 +97,9 @@
 
   <div class="gap-8 space-y-8 lg:w-1/2">
     <section>
-      {#if attendance.isLoading}
+      {#if attendance.isError}
+        <AttendanceCheckInCheckoutError message={attendance.error.message} />
+      {:else if attendance.isLoading}
         <AttendanceCheckInCheckOutSkeleton />
       {:else}
         <AttendanceCheckInCheckoutCard

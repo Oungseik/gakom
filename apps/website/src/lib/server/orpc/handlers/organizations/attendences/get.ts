@@ -1,3 +1,4 @@
+import { ORPCError } from "@orpc/client";
 import z from "zod";
 import { db } from "$lib/server/db";
 import { organizationMiddleware, os } from "$lib/server/orpc/base";
@@ -12,7 +13,12 @@ export const getAttendanceHandler = os
   .input(input)
   .use(organizationMiddleware())
   .handler(async ({ context }) => {
-    // policy will always exist since it was already checked by the middleware
+    if (!context.attendancePolicy.id) {
+      throw new ORPCError("UNPROCESSABLE_CONTENT", {
+        message: "Contact admin to request to assign the check-in check-out time.",
+      });
+    }
+
     const policy = (await db.query.attendancePolicy.findFirst({
       where: { id: context.attendancePolicy.id },
     }))!;

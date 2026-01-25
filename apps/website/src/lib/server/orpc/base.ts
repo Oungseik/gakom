@@ -75,10 +75,6 @@ export const organizationMiddleware = (roles: string[] = ["OWNER", "ADMIN", "MEM
       throw new ORPCError("UNAUTHORIZED");
     }
 
-    if (!result.attendancePolicyId) {
-      throw new ORPCError("INTERNAL_SERVER_ERROR");
-    }
-
     return next({
       context: {
         ...context,
