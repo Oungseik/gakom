@@ -2,8 +2,6 @@ import type { TimeZone } from "@repo/db/timezone";
 import type { DehydratedState } from "@tanstack/svelte-query";
 import { env } from "$env/dynamic/public";
 
-export const PROTECTED_PATHS = ["/app", "/dashboard", "/account"] as const;
-
 const replacements = {
   "<": "\\u003C",
   "\u2028": "\\u2028",
