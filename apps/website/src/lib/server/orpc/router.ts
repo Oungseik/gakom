@@ -20,7 +20,10 @@ import { acceptInvitationHandler } from "./handlers/organizations/invitations/ac
 import { cancelInvitationHandler } from "./handlers/organizations/invitations/cancel";
 import { listInvitationsHandler } from "./handlers/organizations/invitations/list";
 import { sendInvitationHandler } from "./handlers/organizations/invitations/send";
+import { createLeavePolicyHandler } from "./handlers/organizations/leave/create";
+import { deleteLeavePolicyHandler } from "./handlers/organizations/leave/delete";
 import { listLeavePoliciesHandler } from "./handlers/organizations/leave/list";
+import { updateLeavePolicyHandler } from "./handlers/organizations/leave/update";
 import { listLeaveBalancesHandler } from "./handlers/organizations/leaveBalances/list";
 import { approveLeaveRequestHandler } from "./handlers/organizations/leaveRequests/approve";
 import { cancelLeaveRequestHandler } from "./handlers/organizations/leaveRequests/cancel";
@@ -70,7 +73,10 @@ export const router = os.router({
       cancel: cancelInvitationHandler,
     },
     leave: {
+      create: createLeavePolicyHandler,
       list: listLeavePoliciesHandler,
+      update: updateLeavePolicyHandler,
+      delete: deleteLeavePolicyHandler,
     },
     leaveBalances: {
       list: listLeaveBalancesHandler,

@@ -10,6 +10,9 @@ export const leave = sqliteTable(
       .$defaultFn(() => crypto.randomUUID()),
     name: text("name").notNull(),
     days: real("days").notNull(),
+    status: text("status", { enum: ["ENABLED", "DISABLED"] })
+      .default("ENABLED")
+      .notNull(),
     organizationId: text("organization_id")
       .notNull()
       .references(() => organization.id, { onDelete: "cascade" }),
