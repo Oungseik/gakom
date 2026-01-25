@@ -76,7 +76,7 @@
 </script>
 
 <svelte:head>
-  <title>{data.currentOrganization.name} | Announcements</title>
+  <title>{data.organization.name} | Announcements</title>
   <meta name="description" content="Company announcements and communications" />
 </svelte:head>
 
@@ -168,4 +168,3 @@
     {/if}
   </Card>
 </div>
-

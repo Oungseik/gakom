@@ -1,26 +1,28 @@
 import { error } from "@sveltejs/kit";
 import { db } from "$lib/server/db";
+import { isNotNull } from "$lib/utils";
 import type { LayoutServerLoad } from "./$types";
 
 export const load: LayoutServerLoad = async ({ parent, params }) => {
-  const { organizations, user } = await parent();
-  const currentOrganization = organizations?.find((o) => o.slug === params.slug);
+  const { user } = await parent();
 
-  if (!currentOrganization) {
+  const u = await db.query.user.findFirst({
+    where: { id: user.id },
+    with: {
+      members: { with: { organization: true, attendancePolicy: true }, columns: { role: true } },
+    },
+  });
+
+  const organizations = u?.members.map((m) => m.organization).filter(isNotNull) ?? [];
+  const organization = organizations.find((o) => o?.slug === params.slug);
+  if (!organization) {
     return error(404);
   }
 
-  const member = await db.query.member.findFirst({
-    where: { organizationId: currentOrganization.id, userId: user.id },
-    columns: { role: true },
-    with: { attendancePolicy: true },
-  });
+  const member = u?.members.find((m) => m.organization?.id === organization.id);
 
   return {
-    currentOrganization,
-    member: {
-      role: member?.role ?? "member",
-      attendancePolicy: member?.attendancePolicy,
-    },
+    organization,
+    member,
   };
 };

@@ -234,3 +234,7 @@ export const getTimeInTimezone = (timezone: TimeZone, date: Date, options?: { ho
     .format(date)
     .replaceAll(".", "")
     .toUpperCase();
+
+export function isNotNull<T>(value: T | null): value is T {
+  return value !== null;
+}

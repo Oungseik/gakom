@@ -58,8 +58,6 @@
   const checkIn = createMutation(() => orpc.organizations.attendances.checkIn.mutationOptions());
   const checkOut = createMutation(() => orpc.organizations.attendances.checkOut.mutationOptions());
 
-  $inspect(attendance.isError);
-
   $effect(() => {
     if ("geolocation" in navigator) {
       navigator.geolocation.getCurrentPosition(
@@ -105,9 +103,9 @@
         <AttendanceCheckInCheckoutCard
           attendance={attendance.data?.attendance ?? null}
           policy={{
-            timezone: data.member.attendancePolicy?.timezone!,
-            clockInSec: data.member.attendancePolicy?.clockInSec!,
-            clockOutSec: data.member.attendancePolicy?.clockOutSec!,
+            timezone: data.member?.attendancePolicy?.timezone!,
+            clockInSec: data.member?.attendancePolicy?.clockInSec!,
+            clockOutSec: data.member?.attendancePolicy?.clockOutSec!,
           }}
           onCheckIn={() => {
             checkIn.mutate(
