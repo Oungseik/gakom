@@ -1,4 +1,3 @@
-import { ORPCError } from "@orpc/client";
 import { and, eq, leave } from "@repo/db";
 import z from "zod";
 import { db } from "$lib/server/db";
@@ -17,17 +16,6 @@ export const updateLeavePolicyHandler = os
   .input(input)
   .use(organizationMiddleware(["ADMIN", "OWNER"]))
   .handler(async ({ context, input }) => {
-    const existingLeave = await db.query.leave.findFirst({
-      where: {
-        name: input.data.name,
-        organizationId: context.organization.id,
-      },
-    });
-
-    if (existingLeave && existingLeave.id !== input.id) {
-      throw new ORPCError("CONFLICT", { message: "A leave policy with this name already exists" });
-    }
-
     await db
       .update(leave)
       .set({

@@ -52,7 +52,7 @@
 </script>
 
 <ConfirmDeleteDialog />
-<UpdateMemberDialog bind:open {...{ email, slug, position, ...member }} />
+<UpdateMemberDialog bind:open {...{ email, slug, position, leaveIds: [], ...member }} />
 
 <DropdownMenu.Root>
   <DropdownMenu.Trigger>

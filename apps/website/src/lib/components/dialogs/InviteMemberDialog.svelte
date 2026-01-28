@@ -27,7 +27,7 @@
       input: { slug: organization.slug, pageSize: 100, cursor: 0 },
     })
   );
-  const allPolicies = $derived(attendancePolicies.data?.items.flatMap((item) => item) ?? []);
+  const allPolicies = $derived(attendancePolicies.data?.items ?? []);
   const sendInvitation = createMutation(() =>
     orpc.organizations.invitations.send.mutationOptions()
   );

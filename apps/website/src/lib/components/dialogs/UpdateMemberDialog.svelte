@@ -20,6 +20,7 @@
     position?: string | null;
     role: "MEMBER" | "ADMIN" | "OWNER";
     attendancePolicyId?: string | null;
+    leaveIds: string[];
     open: boolean;
     slug: string;
   };
@@ -34,7 +35,16 @@
       enabled: !!slug,
     })
   );
-  const allPolicies = $derived(attendancePolicies.data?.items.flatMap((item) => item) ?? []);
+
+  const leave = createQuery(() =>
+    orpc.organizations.leave.list.queryOptions({
+      input: { slug, pageSize: 100, cursor: 0 },
+      enabled: !!slug,
+    })
+  );
+
+  const allPolicies = $derived(attendancePolicies.data?.items ?? []);
+  const allLeave = $derived(leave.data?.items ?? []);
   const memberUpdate = createMutation(() => orpc.organizations.members.update.mutationOptions());
 
   const form = createForm(() => ({
@@ -42,6 +52,7 @@
       position: member.position ?? null,
       role: member.role ?? null,
       attendancePolicyId: member.attendancePolicyId ?? null,
+      leaveIds: member.leaveIds,
     },
     onSubmit: async ({ value }) => {
       isUpdating = true;
@@ -51,6 +62,7 @@
           userId: member.userId,
           slug,
           data: {
+            leaveIds: value.leaveIds,
             attendancePolicyId: value.attendancePolicyId,
             position: value.position,
             role: value.role,
@@ -174,6 +186,43 @@
                     <span class="text-muted-foreground"
                       >({formatTime(p.clockIn)} - {formatTime(p.clockOut)})</span
                     >
+                  </Select.Item>
+                {/each}
+              </Select.Content>
+            </Select.Root>
+          </div>
+        {/snippet}
+      </form.Field>
+
+      <form.Field name="leaveIds">
+        {#snippet children(field)}
+          <div class="space-y-2">
+            <Label for={field.name}>Leave Policies</Label>
+            <Select.Root
+              type="multiple"
+              name={field.name}
+              onValueChange={(value) => field.handleChange(value)}
+              disabled={isUpdating || allPolicies.length === 0}
+            >
+              <Select.Trigger class="w-full">
+                {#if allLeave.length === 0}
+                  Not configured leave policies yet.
+                {:else if field.state.value?.length === 0}
+                  Select leave policies
+                {:else}
+                  <div class="flex gap-1 truncate">
+                    {#each field.state.value as id (id)}
+                      <div class="bg-secondary w-24 truncate rounded-md p-1 text-xs">
+                        {allLeave.find((l) => l.id === id)?.name}
+                      </div>
+                    {/each}
+                  </div>
+                {/if}
+              </Select.Trigger>
+              <Select.Content>
+                {#each allLeave as l (l.id)}
+                  <Select.Item value={l.id}>
+                    {l.name} <span class="text-muted-foreground text-sm"> - {l.days} day(s)</span>
                   </Select.Item>
                 {/each}
               </Select.Content>

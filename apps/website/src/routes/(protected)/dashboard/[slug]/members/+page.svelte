@@ -1,7 +1,4 @@
 <script lang="ts">
-  import UserPlusIcon from "@lucide/svelte/icons/user-plus";
-  import { Button } from "@repo/ui/button";
-  import { Label } from "@repo/ui/label";
   import { createInfiniteQuery, createQuery } from "@tanstack/svelte-query";
   import { useSearchParams } from "runed/kit";
 
