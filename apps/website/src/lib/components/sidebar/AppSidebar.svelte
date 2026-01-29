@@ -69,6 +69,7 @@
             url: `/dashboard/${organization.slug}`,
             icon: LayoutDashboardIcon,
             title: "Admin Dashboard",
+            fullReload: true,
           },
         ]}
       />

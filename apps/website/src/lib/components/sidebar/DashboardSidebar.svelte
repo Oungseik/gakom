@@ -120,6 +120,7 @@
           url: `/app/${organization.slug}`,
           icon: AppWindowIcon,
           title: "Application",
+          fullReload: true,
         },
       ]}
     />
