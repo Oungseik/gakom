@@ -56,7 +56,7 @@
       icon: LayoutDashboardIcon,
     },
     {
-      name: "Leave",
+      name: "Leave Requests",
       url: `/dashboard/${organization.slug}/leave`,
       icon: TicketsPlaneIcon,
     },
