@@ -62,6 +62,7 @@ export const listHandler = os
         workedSeconds: attendance.workedSeconds,
         status: attendance.status,
         updatedAt: attendance.updatedAt,
+        memberId: attendance.memberId,
         user: {
           id: user.id,
           name: user.name,

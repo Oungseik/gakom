@@ -12,7 +12,7 @@ export const listLeavePoliciesHandler = os
   .use(organizationMiddleware(["OWNER", "ADMIN"]))
   .handler(async ({ context }) => {
     const items = await db.query.leave.findMany({
-      where: { organizationId: context.organization.id, status: "ENABLED" },
+      where: { organizationId: context.organization.id },
     });
 
     return { items };

@@ -2,7 +2,7 @@ import { defineRelations } from "drizzle-orm";
 import { attendance, attendancePolicy } from "./attendance";
 import { account, session, twoFactor, user } from "./core";
 import { image } from "./image";
-import { leave, leaveBalance, leaveBalanceAdjustment, leaveRequest } from "./leave";
+import { leave, leaveBalance, leaveBalanceAdjustment, leaveRequest, leaveToMember } from "./leave";
 import { invitation, member, organization, team, teamMember } from "./organization";
 
 export const relations = defineRelations(
@@ -20,6 +20,7 @@ export const relations = defineRelations(
     attendancePolicy,
     attendance,
     leave,
+    leaveToMember,
     leaveRequest,
     leaveBalance,
     leaveBalanceAdjustment,
@@ -62,6 +63,7 @@ export const relations = defineRelations(
       }),
       leaveBalance: r.one.leaveBalance({ from: r.member.id, to: r.leaveBalance.memberId }),
       leaveBalanceAdjustments: r.many.leaveBalanceAdjustment(),
+      leaveToMembers: r.many.leaveToMember(),
     },
     invitation: {
       organization: r.one.organization({
@@ -105,6 +107,7 @@ export const relations = defineRelations(
       leaveRequests: r.many.leaveRequest(),
       leaveBalances: r.many.leaveBalance(),
       leaveBalanceAdjustments: r.many.leaveBalanceAdjustment(),
+      leaveToMembers: r.many.leaveToMember(),
     },
     leaveRequest: {
       leave: r.one.leave({ from: r.leaveRequest.leaveId, to: r.leave.id }),
@@ -134,6 +137,10 @@ export const relations = defineRelations(
         from: r.leaveBalanceAdjustment.requestId,
         to: r.leaveRequest.id,
       }),
+    },
+    leaveToMember: {
+      member: r.one.member({ from: r.leaveToMember.memberId, to: r.member.id }),
+      leave: r.one.leave({ from: r.leaveToMember.leaveId, to: r.leave.id }),
     },
   }),
 );

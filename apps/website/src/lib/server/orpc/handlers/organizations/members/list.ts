@@ -47,6 +47,7 @@ export const listMembersHandler = os
 
     const items = await db
       .select({
+        id: member.id,
         userId: user.id,
         name: user.name,
         email: user.email,

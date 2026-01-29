@@ -46,7 +46,6 @@ export const deleteLeavePolicyHandler = os
     }
 
     await db
-      .update(leave)
-      .set({ status: "DISABLED" })
+      .delete(leave)
       .where(and(eq(leave.id, input.id), eq(leave.organizationId, context.organization.id)));
   });
