@@ -28,6 +28,7 @@ export const member = pgTable(
     userId: text("user_id")
       .notNull()
       .references(() => user.id, { onDelete: "cascade" }),
+    position: text("position").notNull(),
     role: text("role", { enum: ["OWNER", "ADMIN", "MEMBER"] })
       .default("MEMBER")
       .notNull(),

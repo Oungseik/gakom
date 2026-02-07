@@ -1,4 +1,5 @@
 import { os as base, ORPCError } from "@orpc/server";
+import { db } from "$lib/server/db";
 
 type Context = {
   session?: {
@@ -45,3 +46,33 @@ export const authMiddleware = os.middleware(async ({ context, next }) => {
 
   return next({ context: { ...context, session } });
 });
+
+/**
+ * Middleware to get the organization information for specific role
+ * */
+export const organizationMiddleware = (
+  roles: ("OWNER" | "ADMIN" | "MEMBER")[] = ["OWNER", "ADMIN", "MEMBER"],
+) =>
+  authMiddleware.concat(async ({ context, next }, input: { slug: string }) => {
+    const member = await db.query.member.findFirst({
+      where: {
+        userId: context.session.user.id,
+        organization: { slug: input.slug },
+        leftAt: { isNull: true },
+        role: { in: roles },
+      },
+      with: { organization: true },
+    });
+
+    if (!member?.organization) {
+      throw new ORPCError("FORBIDDEN");
+    }
+
+    return next({
+      context: {
+        ...context,
+        organization: member.organization,
+        member: { role: member.role, id: member.id },
+      },
+    });
+  });
