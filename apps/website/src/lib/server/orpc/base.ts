@@ -39,6 +39,9 @@ export const authMiddleware = os.middleware(async ({ context, next }) => {
     throw new ORPCError("UNAUTHORIZED");
   }
 
-  return next({ context: { session } });
-});
+  if (!session.user.emailVerified) {
+    throw new ORPCError("FORBIDDEN");
+  }
 
+  return next({ context: { ...context, session } });
+});

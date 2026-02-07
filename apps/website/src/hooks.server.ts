@@ -1,5 +1,8 @@
 import type { Handle } from "@sveltejs/kit";
 import { sequence } from "@sveltejs/kit/hooks";
+import { svelteKitHandler } from "better-auth/svelte-kit";
+import { building } from "$app/environment";
+import { auth } from "$lib/auth";
 import { paraglideMiddleware } from "$lib/paraglide/server";
 import { client } from "$lib/server/orpc/router";
 import { rateLimiter } from "$lib/server/rate-limit";
@@ -32,7 +35,13 @@ const rateLimitHandle: Handle = async ({ event, resolve }) => {
 };
 
 const authHandle: Handle = async ({ event, resolve }) => {
-  // TODO handle authentication here
+  if (event.url.pathname.startsWith("/api/auth")) {
+    return svelteKitHandler({ event, resolve, auth, building });
+  }
+
+  const session = await auth.api.getSession({ headers: event.request.headers });
+  event.locals.session = session;
+
   return resolve(event);
 };
 
