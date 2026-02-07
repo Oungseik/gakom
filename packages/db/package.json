@@ -41,6 +41,7 @@
     }
   },
   "dependencies": {
+    "@repo/config": "workspace:*",
     "dotenv": "^17.2.3",
     "drizzle-orm": "1.0.0-beta.15-859cf75",
     "pg": "^8.18.0"

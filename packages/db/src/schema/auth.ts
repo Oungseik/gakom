@@ -1,3 +1,4 @@
+import { COUNTRY_CODES } from "@repo/config";
 import { boolean, index, pgTable, text, timestamp, uniqueIndex } from "drizzle-orm/pg-core";
 
 export const user = pgTable(
@@ -8,6 +9,9 @@ export const user = pgTable(
     email: text("email").notNull().unique(),
     emailVerified: boolean("email_verified").default(false).notNull(),
     image: text("image"),
+    address: text("address"),
+    city: text("city"),
+    countryCode: text("country_code", { enum: COUNTRY_CODES }),
     createdAt: timestamp("created_at")
       .$defaultFn(() => new Date())
       .notNull(),
