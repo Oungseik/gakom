@@ -3,7 +3,7 @@ import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { sveltekitCookies } from "better-auth/svelte-kit";
 
 import { getRequestEvent } from "$app/server";
-import { BETTER_AUTH_SECRET } from "$env/static/private";
+import { AUTH_SECRET } from "$env/static/private";
 import { db } from "./server/db";
 
 export const auth = betterAuth({
@@ -18,7 +18,7 @@ export const auth = betterAuth({
     },
   },
 
-  secret: BETTER_AUTH_SECRET,
+  secret: AUTH_SECRET,
 
   emailAndPassword: {
     enabled: true,
