@@ -51,11 +51,12 @@ export const relations = defineRelations(
       user: r.one.user({ from: r.attendance.userId, to: r.user.id }),
     },
     attendancePolicy: {
+      attendances: r.many.attendance(),
+      members: r.many.member(),
       organization: r.one.organization({
         from: r.attendancePolicy.organizationId,
         to: r.organization.id,
       }),
-      attendances: r.many.attendance(),
     },
 
     image: {
@@ -64,6 +65,10 @@ export const relations = defineRelations(
 
     member: {
       attendances: r.many.attendance(),
+      attendancePolicy: r.one.attendancePolicy({
+        from: r.member.attendancePolicyId,
+        to: r.attendancePolicy.id,
+      }),
       organization: r.one.organization({ from: r.member.organizationId, to: r.organization.id }),
       user: r.one.user({ from: r.member.userId, to: r.user.id }),
     },

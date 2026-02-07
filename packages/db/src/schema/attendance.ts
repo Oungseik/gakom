@@ -1,12 +1,7 @@
-import { TIMEZONES } from "@repo/config";
-import { index, integer, pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
+import { ATTENDANCE_STATUS, type Days, TIMEZONES } from "@repo/config";
+import { index, integer, json, pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
 import { user } from "./auth";
 import { member, organization } from "./organization";
-
-const status = ["PRESENT", "LATE", "EARLY_LEAVE", "ABSENT", "INCOMPLETE"] as const;
-
-export type Day = "SUN" | "MON" | "TUE" | "WED" | "THU" | "FRI" | "SAT";
-export type AttendanceStatus = (typeof status)[number];
 
 export const attendancePolicy = pgTable(
   "attendance_policy",
@@ -16,7 +11,7 @@ export const attendancePolicy = pgTable(
     timezone: text("timezone", { enum: TIMEZONES }).notNull(),
     clockInSec: integer("clock_in_sec").notNull(),
     clockOutSec: integer("clock_out_sec").notNull(),
-    workdays: text("work_days").array().default(["MON", "TUE", "WED", "THU", "FRI"]).notNull(),
+    workdays: json("work_days").$type<Days[]>().notNull(),
     organizationId: uuid("organization_id")
       .notNull()
       .references(() => organization.id, { onDelete: "cascade" }),
@@ -58,7 +53,7 @@ export const attendance = pgTable(
     checkInLocation: text("check_in_location"),
     checkOutLocation: text("check_out_location"),
     workedSeconds: integer("worked_seconds").default(0),
-    status: text("status", { enum: status }).default("ABSENT").notNull(),
+    status: text("status", { enum: ATTENDANCE_STATUS }).default("ABSENT").notNull(),
     updatedAt: timestamp("updated_at")
       .$defaultFn(() => new Date())
       .$onUpdate(() => new Date())
