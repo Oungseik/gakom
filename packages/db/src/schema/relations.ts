@@ -1,4 +1,5 @@
 import { defineRelations } from "drizzle-orm";
+import { attendance, attendancePolicy } from "./attendance";
 import { account, session, twoFactor, user } from "./auth";
 import { image } from "./image";
 import { member, organization } from "./organization";
@@ -9,6 +10,9 @@ export const relations = defineRelations(
     user,
     session,
     twoFactor,
+
+    attendance,
+    attendancePolicy,
 
     image,
 
@@ -26,11 +30,32 @@ export const relations = defineRelations(
       user: r.one.user({ from: r.twoFactor.userId, to: r.user.id }),
     },
     user: {
-      sessions: r.many.session(),
       accounts: r.many.account(),
-      twoFactors: r.many.twoFactor(),
+      attendances: r.many.attendance(),
       images: r.many.image(),
       members: r.many.member(),
+      sessions: r.many.session(),
+      twoFactors: r.many.twoFactor(),
+    },
+
+    attendance: {
+      attendancePolicy: r.one.attendancePolicy({
+        from: r.attendance.attendancePolicyId,
+        to: r.attendancePolicy.id,
+      }),
+      member: r.one.member({ from: r.attendance.memberId, to: r.member.id }),
+      organization: r.one.organization({
+        from: r.attendance.organizationId,
+        to: r.organization.id,
+      }),
+      user: r.one.user({ from: r.attendance.userId, to: r.user.id }),
+    },
+    attendancePolicy: {
+      organization: r.one.organization({
+        from: r.attendancePolicy.organizationId,
+        to: r.organization.id,
+      }),
+      attendances: r.many.attendance(),
     },
 
     image: {
@@ -38,10 +63,13 @@ export const relations = defineRelations(
     },
 
     member: {
+      attendances: r.many.attendance(),
       organization: r.one.organization({ from: r.member.organizationId, to: r.organization.id }),
       user: r.one.user({ from: r.member.userId, to: r.user.id }),
     },
     organization: {
+      attendancePolicies: r.many.attendancePolicy(),
+      attendances: r.many.attendance(),
       members: r.many.member(),
     },
   }),
