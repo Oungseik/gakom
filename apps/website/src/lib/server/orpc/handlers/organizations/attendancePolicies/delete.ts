@@ -12,22 +12,6 @@ export const deleteAttendancePolicyHandler = os
   .input(input)
   .use(organizationMiddleware(["ADMIN", "OWNER"]))
   .handler(async ({ context, input, errors }) => {
-    const m = await db
-      .select({ count: count() })
-      .from(member)
-      .where(
-        and(
-          eq(member.attendancePolicyId, input.id),
-          eq(member.organizationId, context.organization.id),
-        ),
-      );
-
-    if (m.at(0)?.count) {
-      throw errors.FORBIDDEN({
-        message: "Members are assigned to this attendance policy",
-      });
-    }
-
     const ap = await db
       .select({ count: count() })
       .from(attendancePolicy)
