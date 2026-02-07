@@ -166,7 +166,7 @@
         <Card.Content class="space-y-4">
           <ScrollArea class="grid w-full grid-cols-1 overflow-auto">
             <div class="flex items-center justify-evenly gap-4">
-              {#each leaveBalances.data?.balances as balance (balance.name)}
+              {#each leaveBalances.data?.items as balance (balance.name)}
                 <LeaveUsageChart
                   maxValue={balance.totalDays}
                   value={balance.usedDays}
