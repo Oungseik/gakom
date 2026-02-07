@@ -1,6 +1,6 @@
 import { call, ORPCError } from "@orpc/server";
 import { error } from "@sveltejs/kit";
-import { acceptInvitationHandler } from "$lib/server/orpc/handlers/organizations/invitations/accept";
+import { acceptInvitationHandler } from "$lib/server/orpc/handlers/invitations/accept";
 import type { PageServerLoad } from "./$types";
 
 export const load: PageServerLoad = async ({ params, locals }) => {

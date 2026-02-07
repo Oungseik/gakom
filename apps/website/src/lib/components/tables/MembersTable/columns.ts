@@ -112,7 +112,7 @@ export const columns: ColumnDef<Member>[] = [
     cell: ({ row }) => {
       return renderComponent(DataTableActions, {
         userId: row.original.userId,
-        memberid: row.original.memberId,
+        memberId: row.original.memberId,
         organizationId: row.original.organizationId,
         email: row.original.email,
         name: row.original.name,

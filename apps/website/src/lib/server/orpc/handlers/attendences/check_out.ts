@@ -16,14 +16,14 @@ export const checkOutHandler = os
   .input(input)
   .use(organizationMiddleware())
   .handler(async ({ context, input }) => {
-    if (!context.attendancePolicy.id) {
+    if (!context.member.attendancePolicyId) {
       throw new ORPCError("UNPROCESSABLE_CONTENT", {
         message: "Contact admin to request to assign the check-in check-out time.",
       });
     }
 
     const policy = (await db.query.attendancePolicy.findFirst({
-      where: { id: context.attendancePolicy.id },
+      where: { id: context.member.attendancePolicyId },
     }))!;
 
     const now = new Date();
