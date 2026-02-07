@@ -71,7 +71,12 @@ export const organizationMiddleware = (roles: Roles = ["OWNER", "ADMIN", "MEMBER
       context: {
         ...context,
         organization: member.organization,
-        member: { role: member.role, id: member.id, attendancePolicyId: member.attendancePolicyId },
+        member: {
+          role: member.role,
+          id: member.id,
+          attendancePolicyId: member.attendancePolicyId,
+          calendarId: member.calendarId,
+        },
       },
     });
   });

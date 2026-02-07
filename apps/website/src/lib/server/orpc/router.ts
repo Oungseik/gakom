@@ -12,6 +12,12 @@ import { checkOutHandler } from "./handlers/attendences/check_out";
 import { getAttendanceHandler } from "./handlers/attendences/get";
 import { listHandler } from "./handlers/attendences/list";
 import { getStatsHandler as getAttendanceStatsHandler } from "./handlers/attendences/stats";
+import { createCalendarHandler } from "./handlers/calendars/create";
+import { deleteCalendarHandler } from "./handlers/calendars/delete";
+import { getCalendarHandler } from "./handlers/calendars/get";
+import { listCalendarsHandler } from "./handlers/calendars/list";
+import { setDefaultCalendarHandler } from "./handlers/calendars/setDefault";
+import { updateCalendarHandler } from "./handlers/calendars/update";
 import { healthCheckHandler } from "./handlers/health/health_check";
 import { removeImageHandler } from "./handlers/images/remove_image";
 import { uploadImageHandler } from "./handlers/images/upload_image";
@@ -38,6 +44,14 @@ import { createOrganizationHandler } from "./handlers/organizations/create";
 
 export const router = os.router({
   health: { check: healthCheckHandler },
+  calendars: {
+    list: listCalendarsHandler,
+    get: getCalendarHandler,
+    create: createCalendarHandler,
+    update: updateCalendarHandler,
+    delete: deleteCalendarHandler,
+    setDefault: setDefaultCalendarHandler,
+  },
   images: {
     remove: removeImageHandler,
     upload: uploadImageHandler,
