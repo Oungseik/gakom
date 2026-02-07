@@ -1,4 +1,5 @@
 import { index, pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
+import { attendancePolicy } from "./attendance";
 import { user } from "./auth";
 
 export const organization = pgTable(
@@ -29,6 +30,7 @@ export const member = pgTable(
       .notNull()
       .references(() => user.id, { onDelete: "cascade" }),
     position: text("position").notNull(),
+    attendancePolicyId: text("attendance_policy_id").references(() => attendancePolicy.id),
     role: text("role", { enum: ["OWNER", "ADMIN", "MEMBER"] })
       .default("MEMBER")
       .notNull(),

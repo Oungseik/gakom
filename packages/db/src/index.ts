@@ -1,5 +1,6 @@
 import { SQL } from "bun";
 import { drizzle } from "drizzle-orm/bun-sql";
+import { attendance, attendancePolicy } from "./schema/attendance";
 import { account, session, twoFactor, user, verification } from "./schema/auth";
 import { image } from "./schema/image";
 import { member, organization } from "./schema/organization";
@@ -18,6 +19,9 @@ export const connectDb = (dbURL: string) => {
 
       image,
 
+      attendance,
+      attendancePolicy,
+
       member,
       organization,
     },
@@ -27,6 +31,7 @@ export const connectDb = (dbURL: string) => {
 
 export * from "drizzle-orm";
 export { alias, type PgSelect } from "drizzle-orm/pg-core";
+export * from "./schema/attendance";
 export * from "./schema/auth";
 export * from "./schema/image";
 export * from "./schema/organization";
