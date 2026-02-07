@@ -6,6 +6,7 @@ const input = z.object({
   slug: z.string(),
 });
 
+// TODO support infinite query
 export const listLeavePoliciesHandler = os
   .route({ method: "GET" })
   .input(input)

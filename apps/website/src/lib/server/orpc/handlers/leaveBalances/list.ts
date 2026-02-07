@@ -3,6 +3,7 @@ import z from "zod";
 import { db } from "$lib/server/db";
 import { organizationMiddleware, os } from "$lib/server/orpc/base";
 
+// TODO support infinite query
 const input = z.object({
   slug: z.string(),
   memberId: z.string().optional(),
