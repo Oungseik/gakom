@@ -25,5 +25,11 @@ export const auth = betterAuth({
     autoSignIn: false,
   },
 
+  emailVerification: {
+    sendOnSignUp: true,
+    autoSignInAfterVerification: true,
+    // TODO send verification email
+  },
+
   plugins: [sveltekitCookies(getRequestEvent)],
 });
