@@ -17,7 +17,7 @@
   let editingPolicy = $state<{ id: string; name: string; days: number } | null>(null);
 
   const leavePolicies = createQuery(() =>
-    orpc.organizations.leave.list.queryOptions({
+    orpc.leave.list.queryOptions({
       input: { slug: params.slug },
       enabled: !!params.slug,
     })

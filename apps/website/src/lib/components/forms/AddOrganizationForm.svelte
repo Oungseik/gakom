@@ -24,7 +24,7 @@
   let src = $state("");
 
   const imageUploadMutation = createMutation(() => orpc.images.upload.mutationOptions());
-  const createOrganization = createMutation(() => orpc.organizations.create.mutationOptions());
+  const createOrganization = createMutation(() => orpc.create.mutationOptions());
 
   const form = createForm(() => ({
     defaultValues: { name: "", slug: "" },

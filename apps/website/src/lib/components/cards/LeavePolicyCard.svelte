@@ -21,7 +21,7 @@
   let { id, name, days, slug, onEdit, onDeleted }: Props = $props();
   const queryClient = useQueryClient();
 
-  const deletePolicy = createMutation(() => orpc.organizations.leave.delete.mutationOptions());
+  const deletePolicy = createMutation(() => orpc.leave.delete.mutationOptions());
 
   function handleDelete() {
     confirmDelete({
@@ -35,7 +35,7 @@
               toast.success("Leave policy deleted successfully");
               onDeleted();
               queryClient.invalidateQueries({
-                queryKey: orpc.organizations.leave.list.key(),
+                queryKey: orpc.leave.list.key(),
               });
             },
             onError: (error) => {

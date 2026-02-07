@@ -19,7 +19,7 @@
   const membersFilterParams = useSearchParams(membersFilterSchema);
 
   const members = createInfiniteQuery(() =>
-    orpc.organizations.members.list.infiniteOptions({
+    orpc.members.list.infiniteOptions({
       enabled: !!params.slug,
       initialPageParam: 0,
       input: (cursor) => ({ pageSize: 20, cursor, slug: params.slug }),
@@ -30,7 +30,7 @@
   const allMembers = $derived(members.data?.pages.flatMap((page) => page.items) ?? []);
 
   const stats = createQuery(() =>
-    orpc.organizations.members.stats.queryOptions({ input: { slug: params.slug } })
+    orpc.members.stats.queryOptions({ input: { slug: params.slug } })
   );
 
   const thisMonthTrend = $derived(
@@ -86,6 +86,7 @@
       {columns}
       data={allMembers.map((m) => ({
         ...m,
+        memberId: m.id,
         organizationId: data.organization.id,
         slug: params.slug,
       }))}

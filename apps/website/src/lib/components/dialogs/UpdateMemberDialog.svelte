@@ -15,6 +15,7 @@
 
   type Props = {
     userId: string;
+    memberId: string;
     name: string;
     email: string;
     position?: string | null;
@@ -25,19 +26,19 @@
     slug: string;
   };
 
-  let { open = $bindable(false), slug, ...member }: Props = $props();
+  let { open = $bindable(false), slug, ...props }: Props = $props();
   let isUpdating = $state(false);
   const queryClient = useQueryClient();
 
   const attendancePolicies = createQuery(() =>
-    orpc.organizations.attendancesPolicies.list.queryOptions({
+    orpc.attendancesPolicies.list.queryOptions({
       input: { slug, pageSize: 100, cursor: 0 },
       enabled: !!slug,
     })
   );
 
   const leave = createQuery(() =>
-    orpc.organizations.leave.list.queryOptions({
+    orpc.leave.list.queryOptions({
       input: { slug, pageSize: 100, cursor: 0 },
       enabled: !!slug,
     })
@@ -45,21 +46,21 @@
 
   const allPolicies = $derived(attendancePolicies.data?.items ?? []);
   const allLeave = $derived(leave.data?.items ?? []);
-  const memberUpdate = createMutation(() => orpc.organizations.members.update.mutationOptions());
+  const memberUpdate = createMutation(() => orpc.members.update.mutationOptions());
 
   const form = createForm(() => ({
     defaultValues: {
-      position: member.position ?? null,
-      role: member.role ?? null,
-      attendancePolicyId: member.attendancePolicyId ?? null,
-      leaveIds: member.leaveIds,
+      position: props.position ?? null,
+      role: props.role ?? null,
+      attendancePolicyId: props.attendancePolicyId ?? null,
+      leaveIds: props.leaveIds,
     },
     onSubmit: async ({ value }) => {
       isUpdating = true;
 
       memberUpdate.mutate(
         {
-          userId: member.userId,
+          memberId: props.memberId,
           slug,
           data: {
             leaveIds: value.leaveIds,
@@ -71,7 +72,7 @@
         {
           onSuccess: () => {
             toast.success("Successfully update user information");
-            queryClient.invalidateQueries({ queryKey: orpc.organizations.members.list.key() });
+            queryClient.invalidateQueries({ queryKey: orpc.members.list.key() });
             open = false;
             isUpdating = false;
           },
@@ -87,7 +88,7 @@
 <Dialog.Root bind:open>
   <Dialog.Content>
     <Dialog.Header>
-      <Dialog.Title>Update {member.name}</Dialog.Title>
+      <Dialog.Title>Update {props.name}</Dialog.Title>
     </Dialog.Header>
 
     <form
@@ -136,7 +137,7 @@
               name={field.name}
               value={field.state.value}
               onValueChange={(value) => field.handleChange(value as "MEMBER" | "ADMIN")}
-              disabled={isUpdating || member.role === "OWNER"}
+              disabled={isUpdating || props.role === "OWNER"}
             >
               <Select.Trigger class="w-full">
                 {field.state.value === "MEMBER"

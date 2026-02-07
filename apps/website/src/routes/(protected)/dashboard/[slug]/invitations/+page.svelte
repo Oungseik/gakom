@@ -17,7 +17,7 @@
   let isInviteDialogOpen = $state(false);
 
   const invitations = createInfiniteQuery(() =>
-    orpc.organizations.invitations.list.infiniteOptions({
+    orpc.invitations.list.infiniteOptions({
       enabled: !!params.slug,
       initialPageParam: 0,
       input: (cursor) => ({ pageSize: 20, cursor, slug: params.slug }),

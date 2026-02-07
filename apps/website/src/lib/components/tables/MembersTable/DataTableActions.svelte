@@ -13,6 +13,7 @@
 
   type Props = {
     userId: string;
+    memberId: string;
     email: string;
     organizationId: string;
     slug: string;
@@ -22,11 +23,11 @@
     attendancePolicyId?: string | null;
   };
 
-  let { email, slug, organizationId, position, ...member }: Props = $props();
+  let { email, slug, organizationId, position, ...props }: Props = $props();
   let open = $state(false);
 
   const queryClient = useQueryClient();
-  const removeMember = createMutation(() => orpc.organizations.members.remove.mutationOptions());
+  const removeMember = createMutation(() => orpc.members.remove.mutationOptions());
 
   function handleRemoveMember() {
     confirmDelete({
@@ -34,15 +35,15 @@
       description: "Are you sure want to remove the member from the organization",
       onConfirm: async () => {
         removeMember.mutate(
-          { slug, userId: member.userId },
+          { slug, userId: props.userId },
           {
             onError: (error) =>
               toast.error(
                 error.message ?? "Something went wrong while remove member from the organization"
               ),
             onSuccess: () => {
-              queryClient.invalidateQueries({ queryKey: orpc.organizations.members.key() });
-              queryClient.invalidateQueries({ queryKey: orpc.organizations.leaveRequests.key() });
+              queryClient.invalidateQueries({ queryKey: orpc.members.key() });
+              queryClient.invalidateQueries({ queryKey: orpc.leaveRequests.key() });
             },
           }
         );
@@ -52,7 +53,7 @@
 </script>
 
 <ConfirmDeleteDialog />
-<UpdateMemberDialog bind:open {...{ email, slug, position, leaveIds: [], ...member }} />
+<UpdateMemberDialog bind:open {...{ email, slug, position, leaveIds: [], ...props }} />
 
 <DropdownMenu.Root>
   <DropdownMenu.Trigger>

@@ -23,10 +23,10 @@
   } = $props();
 
   const cancelInvitation = createMutation(() =>
-    orpc.organizations.invitations.cancel.mutationOptions()
+    orpc.invitations.cancel.mutationOptions()
   );
   const sendInvitation = createMutation(() =>
-    orpc.organizations.invitations.send.mutationOptions()
+    orpc.invitations.send.mutationOptions()
   );
   const queryClient = useQueryClient();
 
@@ -49,7 +49,7 @@
           toast.error(error.message);
         },
         onSuccess: async () => {
-          queryClient.invalidateQueries({ queryKey: orpc.organizations.invitations.list.key() });
+          queryClient.invalidateQueries({ queryKey: orpc.invitations.list.key() });
           toast.success(`Resent invitation to ${props.email}`);
         },
       }
@@ -67,7 +67,7 @@
           toast.error(error.message);
         },
         onSuccess: () => {
-          queryClient.invalidateQueries({ queryKey: orpc.organizations.invitations.list.key() });
+          queryClient.invalidateQueries({ queryKey: orpc.invitations.list.key() });
           toast.success(`Cancelled invitation for ${props.email}`);
         },
       }

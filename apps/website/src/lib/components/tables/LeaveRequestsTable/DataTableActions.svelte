@@ -15,10 +15,10 @@
 
   const queryClient = useQueryClient();
   const approveRequest = createMutation(() =>
-    orpc.organizations.leaveRequests.approve.mutationOptions()
+    orpc.leaveRequests.approve.mutationOptions()
   );
   const rejectLeaveRequest = createMutation(() =>
-    orpc.organizations.leaveRequests.reject.mutationOptions()
+    orpc.leaveRequests.reject.mutationOptions()
   );
 
   function handleApproveLeaveRequest() {
@@ -27,7 +27,7 @@
       {
         onError: (error) => toast.error(error.message),
         onSuccess: () => {
-          queryClient.invalidateQueries({ queryKey: orpc.organizations.leaveRequests.key() });
+          queryClient.invalidateQueries({ queryKey: orpc.leaveRequests.key() });
         },
       }
     );
@@ -38,7 +38,7 @@
       {
         onError: (error) => toast.error(error.message),
         onSuccess: () => {
-          queryClient.invalidateQueries({ queryKey: orpc.organizations.leaveRequests.key() });
+          queryClient.invalidateQueries({ queryKey: orpc.leaveRequests.key() });
         },
       }
     );

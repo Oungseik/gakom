@@ -20,14 +20,14 @@
   let coords = $state({ latitude: 0, longitude: 0, accuracy: 0 });
 
   const attendance = createQuery(() =>
-    orpc.organizations.attendances.get.queryOptions({
+    orpc.attendances.get.queryOptions({
       input: { slug: params.slug },
       enabled: !!params.slug,
     })
   );
 
   const attendances = createInfiniteQuery(() =>
-    orpc.organizations.attendances.list.infiniteOptions({
+    orpc.attendances.list.infiniteOptions({
       initialPageParam: 0,
       input: (cursor) => ({
         slug: params.slug,
@@ -42,21 +42,21 @@
   const allAttendances = $derived(attendances.data?.pages.flatMap((page) => page.items) ?? []);
 
   const leaveBalances = createQuery(() =>
-    orpc.organizations.leaveBalances.list.queryOptions({
+    orpc.leaveBalances.list.queryOptions({
       input: { slug: params.slug },
       enabled: !!params.slug,
     })
   );
 
   const leaveRequests = createQuery(() =>
-    orpc.organizations.leaveRequests.list.queryOptions({
+    orpc.leaveRequests.list.queryOptions({
       input: { slug: params.slug, pageSize: 5, filter: { from: new Date() } },
       enabled: !!params.slug,
     })
   );
 
-  const checkIn = createMutation(() => orpc.organizations.attendances.checkIn.mutationOptions());
-  const checkOut = createMutation(() => orpc.organizations.attendances.checkOut.mutationOptions());
+  const checkIn = createMutation(() => orpc.attendances.checkIn.mutationOptions());
+  const checkOut = createMutation(() => orpc.attendances.checkOut.mutationOptions());
 
   $effect(() => {
     if ("geolocation" in navigator) {

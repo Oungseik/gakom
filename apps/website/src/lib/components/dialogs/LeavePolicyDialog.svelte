@@ -27,8 +27,8 @@
 
   const isEditMode = $derived(!!policy);
 
-  const leavePolicyUpdate = createMutation(() => orpc.organizations.leave.update.mutationOptions());
-  const leavePolicyCreate = createMutation(() => orpc.organizations.leave.create.mutationOptions());
+  const leavePolicyUpdate = createMutation(() => orpc.leave.update.mutationOptions());
+  const leavePolicyCreate = createMutation(() => orpc.leave.create.mutationOptions());
 
   const defaultValues = $derived({
     name: policy?.name ?? "",
@@ -56,9 +56,7 @@
       {
         onSuccess: () => {
           toast.success("Successfully created leave policy");
-          queryClient.invalidateQueries({
-            queryKey: orpc.organizations.leave.list.key(),
-          });
+          queryClient.invalidateQueries({ queryKey: orpc.leave.list.key() });
           open = false;
         },
         onError: (error) => toast.error(error.message),
@@ -72,9 +70,7 @@
       {
         onSuccess: () => {
           toast.success("Successfully updated leave policy");
-          queryClient.invalidateQueries({
-            queryKey: orpc.organizations.leave.list.key(),
-          });
+          queryClient.invalidateQueries({ queryKey: orpc.leave.list.key() });
           open = false;
         },
         onError: (error) => toast.error(error.message),

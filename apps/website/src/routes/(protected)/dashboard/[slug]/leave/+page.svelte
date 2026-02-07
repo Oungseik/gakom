@@ -37,7 +37,7 @@
   const debounceStatus = new Debounced(() => searchParams.status, 1000);
 
   const leaveRequests = createInfiniteQuery(() =>
-    orpc.organizations.leaveRequests.list.infiniteOptions({
+    orpc.leaveRequests.list.infiniteOptions({
       initialPageParam: 0,
       input: (cursor) => ({
         pageSize: 20,
@@ -55,7 +55,7 @@
 
   const allLeaveRequests = $derived(leaveRequests.data?.pages.flatMap((page) => page.items) ?? []);
   const stats = createQuery(() =>
-    orpc.organizations.leaveRequests.stats.queryOptions({
+    orpc.leaveRequests.stats.queryOptions({
       input: { slug: params.slug },
       enabled: !!params.slug,
     })

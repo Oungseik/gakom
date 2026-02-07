@@ -20,7 +20,7 @@
   let { policy, onEdit }: Props = $props();
   const queryClient = useQueryClient();
   const deletePolicy = createMutation(() =>
-    orpc.organizations.attendancesPolicies.delete.mutationOptions()
+    orpc.attendancesPolicies.delete.mutationOptions()
   );
 
   async function handleDelete() {
@@ -37,7 +37,7 @@
             onSuccess: () => {
               toast.success("Attendance policy deleted successfully");
               queryClient.invalidateQueries({
-                queryKey: orpc.organizations.attendancesPolicies.list.key(),
+                queryKey: orpc.attendancesPolicies.list.key(),
               });
             },
             onError: (error) => {
