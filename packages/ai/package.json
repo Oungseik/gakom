@@ -13,9 +13,14 @@
     ".": {
       "types": "./src/index.ts",
       "default": "./src/index.ts"
+    },
+    "./models": {
+      "types": "./src/models.ts",
+      "default": "./src/models.ts"
     }
   },
   "dependencies": {
+    "@langchain/core": "^1.1.19",
     "@langchain/openai": "^1.2.5",
     "dotenv": "^17.2.3",
     "langchain": "^1.2.18",
