@@ -44,6 +44,7 @@ export const createOrganizationHandler = os
       organizationId: orgId,
       userId: context.session.user.id,
       role: "OWNER",
+      position: "Owner",
     });
 
     return {
