@@ -181,8 +181,8 @@ importers:
         specifier: ^17.2.3
         version: 17.2.3
       drizzle-orm:
-        specifier: 1.0.0-beta.12-a5629fb
-        version: 1.0.0-beta.12-a5629fb(@types/mssql@9.1.9)(@types/pg@8.16.0)(bun-types@1.3.8)(mssql@11.0.1)(pg@8.18.0)
+        specifier: 1.0.0-beta.15-859cf75
+        version: 1.0.0-beta.15-859cf75(@types/mssql@9.1.9)(@types/pg@8.16.0)(bun-types@1.3.8)(mssql@11.0.1)(pg@8.18.0)(zod@4.3.6)
       pg:
         specifier: ^8.18.0
         version: 8.18.0
@@ -200,11 +200,11 @@ importers:
         specifier: ^11.0.0
         version: 11.0.0
       drizzle-kit:
-        specifier: 1.0.0-beta.12-a5629fb
-        version: 1.0.0-beta.12-a5629fb
+        specifier: 1.0.0-beta.15-859cf75
+        version: 1.0.0-beta.15-859cf75
       drizzle-seed:
         specifier: ^0.3.1
-        version: 0.3.1(drizzle-orm@1.0.0-beta.12-a5629fb(@types/mssql@9.1.9)(@types/pg@8.16.0)(bun-types@1.3.8)(mssql@11.0.1)(pg@8.18.0))
+        version: 0.3.1(drizzle-orm@1.0.0-beta.15-859cf75(@types/mssql@9.1.9)(@types/pg@8.16.0)(bun-types@1.3.8)(mssql@11.0.1)(pg@8.18.0)(zod@4.3.6))
       tsdown:
         specifier: 0.20.3
         version: 0.20.3(typescript@5.9.3)
@@ -2331,8 +2331,8 @@ packages:
     resolution: {integrity: sha512-O9EC/miwdnRDY10qRxM8P3Pg8hXe3LyU4ZipReKOgTwn4OqANmftj8XJz1UPUAS6NMHf0E2htjsbQujUTkncCg==}
     hasBin: true
 
-  drizzle-kit@1.0.0-beta.12-a5629fb:
-    resolution: {integrity: sha512-l+p4QOMvPGYBYEE9NBlU7diu+NSlxuOUwi0I7i01Uj1PpfU0NxhPzaks/9q1MDw4FAPP8vdD0dOhoqosKtRWWQ==}
+  drizzle-kit@1.0.0-beta.15-859cf75:
+    resolution: {integrity: sha512-Y36s1XQGVb1PgU3aRNgufp1K3D2VkIifu8kv4Ubsmxi+Dq+N7KMklnpp7Knu/XC4FZi2MHPPG3v3o097r0/TcQ==}
     hasBin: true
 
   drizzle-orm@0.45.1:
@@ -2427,8 +2427,8 @@ packages:
       sqlite3:
         optional: true
 
-  drizzle-orm@1.0.0-beta.12-a5629fb:
-    resolution: {integrity: sha512-wyOAgr9Cy9oEN6z5S0JGhfipLKbRRJtQKgbDO9SXGR9swMBbGNIlXkeMqPRrqYQ8k70mh+7ZJ/eVmJ2F7zR3Vg==}
+  drizzle-orm@1.0.0-beta.15-859cf75:
+    resolution: {integrity: sha512-dGVb2Q70H2AV6513hkOXR3Ud0FeGXLdugVq3YehoqkGIVTJrkuo0gRnCcW/dfI00O07t3T4HSh4clF/D/o/IsQ==}
     peerDependencies:
       '@aws-sdk/client-rds-data': '>=3'
       '@cloudflare/workers-types': '>=4'
@@ -2442,6 +2442,7 @@ packages:
       '@opentelemetry/api': ^1.4.1
       '@planetscale/database': '>=1.13'
       '@prisma/client': '*'
+      '@sinclair/typebox': '>=0.34.8'
       '@sqlitecloud/drivers': '>=1.0.653'
       '@tidbcloud/serverless': '*'
       '@tursodatabase/database': '>=0.2.1'
@@ -2454,6 +2455,7 @@ packages:
       '@upstash/redis': '>=1.34.7'
       '@vercel/postgres': '>=0.8.0'
       '@xata.io/client': '*'
+      arktype: '>=2.0.0'
       better-sqlite3: '>=9.3.0'
       bun-types: '*'
       expo-sqlite: '>=14.0.0'
@@ -2465,6 +2467,9 @@ packages:
       prisma: '*'
       sql.js: '>=1'
       sqlite3: '>=5'
+      typebox: '>=1.0.0'
+      valibot: '>=1.0.0-beta.7'
+      zod: ^3.25.0 || ^4.0.0
     peerDependenciesMeta:
       '@aws-sdk/client-rds-data':
         optional: true
@@ -2490,6 +2495,8 @@ packages:
         optional: true
       '@prisma/client':
         optional: true
+      '@sinclair/typebox':
+        optional: true
       '@sqlitecloud/drivers':
         optional: true
       '@tidbcloud/serverless':
@@ -2512,6 +2519,8 @@ packages:
         optional: true
       '@xata.io/client':
         optional: true
+      arktype:
+        optional: true
       better-sqlite3:
         optional: true
       bun-types:
@@ -2531,6 +2540,12 @@ packages:
       sql.js:
         optional: true
       sqlite3:
+        optional: true
+      typebox:
+        optional: true
+      valibot:
+        optional: true
+      zod:
         optional: true
 
   drizzle-seed@0.3.1:
@@ -5918,12 +5933,12 @@ snapshots:
       - supports-color
     optional: true
 
-  drizzle-kit@1.0.0-beta.12-a5629fb:
+  drizzle-kit@1.0.0-beta.15-859cf75:
     dependencies:
       '@drizzle-team/brocli': 0.11.0
       '@js-temporal/polyfill': 0.5.1
       esbuild: 0.25.12
-      tsx: 4.21.0
+      jiti: 2.6.1
 
   drizzle-orm@0.45.1(@types/pg@8.16.0)(bun-types@1.3.8)(kysely@0.28.11)(pg@8.18.0):
     optionalDependencies:
@@ -5933,7 +5948,7 @@ snapshots:
       pg: 8.18.0
     optional: true
 
-  drizzle-orm@1.0.0-beta.12-a5629fb(@types/mssql@9.1.9)(@types/pg@8.16.0)(bun-types@1.3.8)(mssql@11.0.1)(pg@8.18.0):
+  drizzle-orm@1.0.0-beta.15-859cf75(@types/mssql@9.1.9)(@types/pg@8.16.0)(bun-types@1.3.8)(mssql@11.0.1)(pg@8.18.0)(zod@4.3.6):
     dependencies:
       '@types/mssql': 9.1.9
       mssql: 11.0.1
@@ -5941,12 +5956,13 @@ snapshots:
       '@types/pg': 8.16.0
       bun-types: 1.3.8
       pg: 8.18.0
+      zod: 4.3.6
 
-  drizzle-seed@0.3.1(drizzle-orm@1.0.0-beta.12-a5629fb(@types/mssql@9.1.9)(@types/pg@8.16.0)(bun-types@1.3.8)(mssql@11.0.1)(pg@8.18.0)):
+  drizzle-seed@0.3.1(drizzle-orm@1.0.0-beta.15-859cf75(@types/mssql@9.1.9)(@types/pg@8.16.0)(bun-types@1.3.8)(mssql@11.0.1)(pg@8.18.0)(zod@4.3.6)):
     dependencies:
       pure-rand: 6.1.0
     optionalDependencies:
-      drizzle-orm: 1.0.0-beta.12-a5629fb(@types/mssql@9.1.9)(@types/pg@8.16.0)(bun-types@1.3.8)(mssql@11.0.1)(pg@8.18.0)
+      drizzle-orm: 1.0.0-beta.15-859cf75(@types/mssql@9.1.9)(@types/pg@8.16.0)(bun-types@1.3.8)(mssql@11.0.1)(pg@8.18.0)(zod@4.3.6)
 
   dts-resolver@2.1.3: {}
 
@@ -7253,6 +7269,7 @@ snapshots:
       get-tsconfig: 4.13.3
     optionalDependencies:
       fsevents: 2.3.3
+    optional: true
 
   turbo-darwin-64@2.8.3:
     optional: true
