@@ -21,3 +21,13 @@ export function getSeparator(locale: Intl.LocalesArgument, separatorType: "decim
   const separatorPart = parts.find((part) => part.type === separatorType);
   return separatorPart ? separatorPart.value : "N/A";
 }
+
+export function getImageContentType(file: string) {
+  return file.endsWith(".svg")
+    ? "image/svg+xml"
+    : file.endsWith("webp")
+      ? "image/webp"
+      : file.endsWith("png")
+        ? "image/png"
+        : "image/jpeg";
+}
