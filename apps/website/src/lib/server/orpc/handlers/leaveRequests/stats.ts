@@ -1,4 +1,4 @@
-import { and, count, eq, gte, leave, leaveRequest, lte, member } from "@repo/db";
+import { and, count, eq, gte, isNull, leave, leaveRequest, lte, member } from "@repo/db";
 import { z } from "zod";
 import { db } from "$lib/server/db";
 import { organizationMiddleware, os } from "$lib/server/orpc/base";
@@ -25,7 +25,7 @@ export const getStatsHandler = os
         and(
           eq(leave.organizationId, context.organization.id),
           eq(leaveRequest.status, "PENDING"),
-          eq(member.status, "ACTIVE"),
+          isNull(member.leftAt),
         ),
       );
 
@@ -38,7 +38,7 @@ export const getStatsHandler = os
         and(
           eq(leave.organizationId, context.organization.id),
           eq(leaveRequest.status, "APPROVED"),
-          eq(member.status, "ACTIVE"),
+          isNull(member.leftAt),
           lte(leaveRequest.updatedAt, endOfDay),
           gte(leaveRequest.updatedAt, startOfDay),
         ),
@@ -53,7 +53,7 @@ export const getStatsHandler = os
         and(
           eq(leave.organizationId, context.organization.id),
           eq(leaveRequest.status, "APPROVED"),
-          eq(member.status, "ACTIVE"),
+          isNull(member.leftAt),
           lte(leaveRequest.startDate, endOfDay),
           gte(leaveRequest.endDate, startOfDay),
         ),

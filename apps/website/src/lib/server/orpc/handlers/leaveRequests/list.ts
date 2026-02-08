@@ -5,6 +5,7 @@ import {
   eq,
   gte,
   inArray,
+  isNull,
   leave,
   leaveRequest,
   like,
@@ -74,7 +75,7 @@ export const listLeaveRequestsHandler = os
       .where(
         and(
           eq(leave.organizationId, context.organization.id),
-          eq(member.status, "ACTIVE"),
+          isNull(member.leftAt),
           filter?.search
             ? or(like(user.name, `%${filter.search}%`), like(member.position, `%${filter.search}%`))
             : undefined,
