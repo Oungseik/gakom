@@ -41,7 +41,6 @@ export const member = sqliteTable(
       .default("MEMBER")
       .notNull(),
     position: text("position"),
-    status: text("status", { enum: ["ACTIVE", "DEACTIVATED"] }).default("ACTIVE"),
     createdAt: integer("created_at", { mode: "timestamp_ms" })
       .default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)
       .notNull(),

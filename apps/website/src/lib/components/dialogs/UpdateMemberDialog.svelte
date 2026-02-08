@@ -212,6 +212,7 @@
             <Label for={field.name}>Leave Policies</Label>
             <Select.Root
               type="multiple"
+              value={field.state.value}
               name={field.name}
               onValueChange={(value) => field.handleChange(value)}
               disabled={isUpdating || allPolicies.length === 0}

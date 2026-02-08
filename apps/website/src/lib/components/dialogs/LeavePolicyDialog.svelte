@@ -57,6 +57,7 @@
         onSuccess: () => {
           toast.success("Successfully created leave policy");
           queryClient.invalidateQueries({ queryKey: orpc.leave.list.key() });
+          form.reset();
           open = false;
         },
         onError: (error) => toast.error(error.message),
@@ -71,6 +72,7 @@
         onSuccess: () => {
           toast.success("Successfully updated leave policy");
           queryClient.invalidateQueries({ queryKey: orpc.leave.list.key() });
+          form.reset();
           open = false;
         },
         onError: (error) => toast.error(error.message),

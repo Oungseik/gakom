@@ -26,6 +26,7 @@ export type Member = {
   position?: string | null;
   joinedAt: Date;
   leftAt?: Date | null;
+  leaveIds: string[];
   calendarId: string | null;
   attendancePolicy?: {
     id: string;
@@ -121,6 +122,7 @@ export const columns: ColumnDef<Member>[] = [
         role: row.original.role,
         position: row.original.position,
         attendancePolicyId: row.original.attendancePolicy?.id,
+        leaveIds: row.original.leaveIds,
         calendarId: row.original.calendarId,
       });
     },

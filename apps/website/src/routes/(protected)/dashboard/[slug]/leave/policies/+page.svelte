@@ -32,10 +32,6 @@
     editingPolicy = null;
     dialogOpen = true;
   }
-
-  function handleDeleted() {
-    // Query will be invalidated by the dialog, no additional action needed
-  }
 </script>
 
 <DashboardHeader
@@ -72,7 +68,6 @@
           days={policy.days}
           slug={params.slug}
           onEdit={() => handleEdit(policy)}
-          onDeleted={handleDeleted}
         />
       {/each}
     </div>

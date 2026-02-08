@@ -1,4 +1,4 @@
-import { and, count, eq, gte, lte, member, organization } from "@repo/db";
+import { and, count, eq, gte, isNotNull, isNull, lte, member, organization } from "@repo/db";
 import { z } from "zod";
 import { db } from "$lib/server/db";
 import { organizationMiddleware, os } from "$lib/server/orpc/base";
@@ -63,14 +63,14 @@ export const getStatisticsHandler = os
       .select({ count: count() })
       .from(member)
       .innerJoin(organization, eq(member.organizationId, organization.id))
-      .where(and(eq(organization.slug, input.slug), eq(member.status, "ACTIVE")));
+      .where(and(eq(organization.slug, input.slug), isNull(member.leftAt)));
 
     // Deactivated members query
     const deactivatedMembersQuery = db
       .select({ count: count() })
       .from(member)
       .innerJoin(organization, eq(member.organizationId, organization.id))
-      .where(and(eq(organization.slug, input.slug), eq(member.status, "DEACTIVATED")));
+      .where(and(eq(organization.slug, input.slug), isNotNull(member.leftAt)));
 
     // Execute all queries in parallel
     const [totalMembers, thisMonthJoins, lastMonthJoins, activeMembers, deactivatedMembers] =

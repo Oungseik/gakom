@@ -14,8 +14,8 @@
     name: string;
     days: number;
     slug: string;
-    onEdit: () => void;
-    onDeleted: () => void;
+    onEdit?: () => void;
+    onDeleted?: () => void;
   };
 
   let { id, name, days, slug, onEdit, onDeleted }: Props = $props();
@@ -33,7 +33,7 @@
           {
             onSuccess: () => {
               toast.success("Leave policy deleted successfully");
-              onDeleted();
+              onDeleted?.();
               queryClient.invalidateQueries({
                 queryKey: orpc.leave.list.key(),
               });

@@ -21,6 +21,7 @@
     position?: string | null;
     role: "MEMBER" | "ADMIN" | "OWNER";
     attendancePolicyId?: string | null;
+    leaveIds: string[];
     calendarId: string | null;
   };
 
@@ -54,7 +55,7 @@
 </script>
 
 <ConfirmDeleteDialog />
-<UpdateMemberDialog bind:open {...{ email, slug, position, leaveIds: [], ...props }} />
+<UpdateMemberDialog bind:open {...{ email, slug, position, ...props }} />
 
 <DropdownMenu.Root>
   <DropdownMenu.Trigger>
@@ -73,6 +74,8 @@
     >
       <SquarePenIcon size="4" /> Edit
     </DropdownMenu.Item>
+
+    <DropdownMenu.Separator />
     <DropdownMenu.Item onclick={handleRemoveMember} variant="destructive">
       <TrashIcon size="4" /> Remove member
     </DropdownMenu.Item>
