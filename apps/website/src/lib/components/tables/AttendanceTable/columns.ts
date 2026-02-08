@@ -2,6 +2,7 @@ import type { AttendanceLocation } from "@repo/db";
 import type { TimeZone } from "@repo/db/timezone";
 import { renderComponent } from "@repo/ui/data-table";
 import type { ColumnDef } from "@tanstack/table-core";
+import { formatDate } from "$lib/utils";
 import DataTableMemberInfo from "../common/DataTableMemberInfo.svelte";
 import DataTableCheckInCheckOut from "./DataTableCheckInCheckOut.svelte";
 import DataTableStatus from "./DataTableStatus.svelte";
@@ -50,7 +51,7 @@ export const columns: ColumnDef<AttendanceItem>[] = [
     header: "Date",
     cell: ({ row }) => {
       const item = row.original as AttendanceItem;
-      return item.date;
+      return formatDate(new Date(item.date));
     },
   },
   {
