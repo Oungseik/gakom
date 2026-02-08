@@ -326,6 +326,9 @@ importers:
       typescript:
         specifier: ^5.9.3
         version: 5.9.3
+      vaul-svelte:
+        specifier: 1.0.0-next.7
+        version: 1.0.0-next.7(svelte@5.50.0)
       vite:
         specifier: ^7.3.1
         version: 7.3.1(@types/node@25.2.1)(jiti@2.6.1)(lightningcss@1.31.1)(tsx@4.21.0)
@@ -4092,6 +4095,12 @@ packages:
     resolution: {integrity: sha512-+NYs2QeMWy+GWFOEm9xnn6HCDp0l7QBD7ml8zLUmJ+93Q5NF0NocErnwkTkXVFNiX3/fpC6afS8Dhb/gz7R7eg==}
     hasBin: true
 
+  vaul-svelte@1.0.0-next.7:
+    resolution: {integrity: sha512-7zN7Bi3dFQixvvbUJY9uGDe7Ws/dGZeBQR2pXdXmzQiakjrxBvWo0QrmsX3HK+VH+SZOltz378cmgmCS9f9rSg==}
+    engines: {node: '>=18', pnpm: '>=8.7.0'}
+    peerDependencies:
+      svelte: ^5.0.0
+
   vfile-message@2.0.4:
     resolution: {integrity: sha512-DjssxRGkMvifUOJre00juHoP9DPWuzjxKuMDrhNbk2TdaYYBNMStsNhEOt3idrtI12VQYM/1+iM0KOzXi4pxwQ==}
 
@@ -7681,6 +7690,12 @@ snapshots:
   uuid@13.0.0: {}
 
   uuid@8.3.2: {}
+
+  vaul-svelte@1.0.0-next.7(svelte@5.50.0):
+    dependencies:
+      runed: 0.23.4(svelte@5.50.0)
+      svelte: 5.50.0
+      svelte-toolbelt: 0.7.1(svelte@5.50.0)
 
   vfile-message@2.0.4:
     dependencies:

@@ -9,7 +9,10 @@ export const load: LayoutServerLoad = async ({ parent, params }) => {
   const u = await db.query.user.findFirst({
     where: { id: user.id },
     with: {
-      members: { with: { organization: true, attendancePolicy: true }, columns: { role: true } },
+      members: {
+        with: { organization: true, attendancePolicy: true, calendar: true },
+        columns: { role: true, calendarId: true },
+      },
     },
   });
 
