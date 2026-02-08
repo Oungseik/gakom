@@ -7,11 +7,11 @@ import { deleteAttendancePolicyHandler } from "./handlers/attendancePolicies/del
 import { getAttendancePolicyHandler } from "./handlers/attendancePolicies/get";
 import { listAttendancePoliciesHandler } from "./handlers/attendancePolicies/list";
 import { updateAttendancePolicyHandler } from "./handlers/attendancePolicies/update";
-import { checkInHandler } from "./handlers/attendences/check_in";
-import { checkOutHandler } from "./handlers/attendences/check_out";
-import { getAttendanceHandler } from "./handlers/attendences/get";
-import { listHandler } from "./handlers/attendences/list";
-import { getStatsHandler as getAttendanceStatsHandler } from "./handlers/attendences/stats";
+import { checkInHandler } from "./handlers/attendances/check_in";
+import { checkOutHandler } from "./handlers/attendances/check_out";
+import { getAttendanceHandler } from "./handlers/attendances/get";
+import { listHandler } from "./handlers/attendances/list";
+import { getStatsHandler as getAttendanceStatsHandler } from "./handlers/attendances/stats";
 import { createCalendarEventsHandler } from "./handlers/calendarEvents/create";
 import { deleteCalendarEventHandler } from "./handlers/calendarEvents/delete";
 import { getCalendarEventHandler } from "./handlers/calendarEvents/get";

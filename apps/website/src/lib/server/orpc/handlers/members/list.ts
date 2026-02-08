@@ -60,6 +60,7 @@ export const listMembersHandler = os
         joinedAt: member.createdAt,
         leftAt: member.leftAt,
         attendancePolicy: attendancePolicy,
+        calendarId: member.calendarId,
       })
       .from(member)
       .innerJoin(user, eq(member.userId, user.id))

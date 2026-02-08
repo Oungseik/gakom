@@ -21,6 +21,7 @@
     position?: string | null;
     role: "MEMBER" | "ADMIN" | "OWNER";
     attendancePolicyId?: string | null;
+    calendarId: string | null;
   };
 
   let { email, slug, organizationId, position, ...props }: Props = $props();
