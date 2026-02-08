@@ -45,8 +45,16 @@
     })
   );
 
+  const calendars = createQuery(() =>
+    orpc.calendars.list.queryOptions({
+      input: { slug, pageSize: 100, cursor: 0 },
+      enabled: !!slug,
+    })
+  );
+
   const allPolicies = $derived(attendancePolicies.data?.items ?? []);
   const allLeave = $derived(leave.data?.items ?? []);
+  const allCalendars = $derived(calendars.data?.items ?? []);
   const memberUpdate = createMutation(() => orpc.members.update.mutationOptions());
 
   const form = createForm(() => ({
@@ -227,6 +235,48 @@
                 {#each allLeave as l (l.id)}
                   <Select.Item value={l.id}>
                     {l.name} <span class="text-muted-foreground text-sm"> - {l.days} day(s)</span>
+                  </Select.Item>
+                {/each}
+              </Select.Content>
+            </Select.Root>
+          </div>
+        {/snippet}
+      </form.Field>
+
+      <form.Field name="calendarId">
+        {#snippet children(field)}
+          <div class="space-y-2">
+            <Label for={field.name}>Calendar</Label>
+            <Select.Root
+              type="single"
+              name={field.name}
+              value={field.state.value ?? ""}
+              onValueChange={(value) => field.handleChange(value || null)}
+              disabled={isUpdating || allCalendars.length === 0}
+            >
+              <Select.Trigger class="w-full">
+                <span>
+                  {#if field.state.value}
+                    {@const cal = allCalendars.find(
+                      (c: (typeof allCalendars)[number]) => c.id === field.state.value
+                    )}
+                    {cal?.name}
+                    {#if cal?.isDefault}
+                      <span class="text-muted-foreground text-sm">(Default)</span>
+                    {/if}
+                  {:else}
+                    No calendar assigned
+                  {/if}
+                </span>
+              </Select.Trigger>
+              <Select.Content>
+                <Select.Item value="">No calendar</Select.Item>
+                {#each allCalendars as cal (cal.id)}
+                  <Select.Item value={cal.id}>
+                    {cal.name}
+                    {#if cal.isDefault}
+                      <span class="text-muted-foreground text-sm">(Default)</span>
+                    {/if}
                   </Select.Item>
                 {/each}
               </Select.Content>
