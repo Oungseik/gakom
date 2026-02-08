@@ -24,6 +24,7 @@
     leaveIds: string[];
     open: boolean;
     slug: string;
+    calendarId: string | null;
   };
 
   let { open = $bindable(false), slug, ...props }: Props = $props();
@@ -50,6 +51,7 @@
 
   const form = createForm(() => ({
     defaultValues: {
+      calendarId: props.calendarId,
       position: props.position ?? null,
       role: props.role ?? null,
       attendancePolicyId: props.attendancePolicyId ?? null,
@@ -64,6 +66,7 @@
           slug,
           data: {
             leaveIds: value.leaveIds,
+            calendarId: value.calendarId,
             attendancePolicyId: value.attendancePolicyId,
             position: value.position,
             role: value.role,

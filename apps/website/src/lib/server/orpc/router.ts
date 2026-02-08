@@ -12,6 +12,11 @@ import { checkOutHandler } from "./handlers/attendences/check_out";
 import { getAttendanceHandler } from "./handlers/attendences/get";
 import { listHandler } from "./handlers/attendences/list";
 import { getStatsHandler as getAttendanceStatsHandler } from "./handlers/attendences/stats";
+import { createCalendarEventsHandler } from "./handlers/calendarEvents/create";
+import { deleteCalendarEventHandler } from "./handlers/calendarEvents/delete";
+import { getCalendarEventHandler } from "./handlers/calendarEvents/get";
+import { listCalendarEventsHandler } from "./handlers/calendarEvents/list";
+import { updateCalendarEventHandler } from "./handlers/calendarEvents/update";
 import { createCalendarHandler } from "./handlers/calendars/create";
 import { deleteCalendarHandler } from "./handlers/calendars/delete";
 import { getCalendarHandler } from "./handlers/calendars/get";
@@ -51,6 +56,13 @@ export const router = os.router({
     update: updateCalendarHandler,
     delete: deleteCalendarHandler,
     setDefault: setDefaultCalendarHandler,
+  },
+  calendarEvents: {
+    list: listCalendarEventsHandler,
+    get: getCalendarEventHandler,
+    create: createCalendarEventsHandler,
+    update: updateCalendarEventHandler,
+    delete: deleteCalendarEventHandler,
   },
   images: {
     remove: removeImageHandler,

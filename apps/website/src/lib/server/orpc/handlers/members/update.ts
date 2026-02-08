@@ -1,7 +1,8 @@
-import { and, calendar, eq, inArray, leaveToMember, member } from "@repo/db";
+import { ORPCError } from "@orpc/server";
+import { and, eq, inArray, leaveToMember, member } from "@repo/db";
 import z from "zod";
 import { db } from "$lib/server/db";
-import { ORPCError, organizationMiddleware, os } from "$lib/server/orpc/base";
+import { organizationMiddleware, os } from "$lib/server/orpc/base";
 
 const input = z.object({
   slug: z.string(),
@@ -21,10 +22,10 @@ export const updateMemberHandler = os
   .handler(async ({ context, input }) => {
     if (input.data.calendarId) {
       const cal = await db.query.calendar.findFirst({
-        where: and(
-          eq(calendar.id, input.data.calendarId),
-          eq(calendar.organizationId, context.organization.id),
-        ),
+        where: {
+          id: input.data.calendarId,
+          organizationId: context.organization.id,
+        },
       });
       if (!cal) {
         throw new ORPCError("NOT_FOUND", {
