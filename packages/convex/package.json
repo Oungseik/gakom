@@ -1,0 +1,37 @@
+{
+  "$schema": "https://json.schemastore.org/package.json",
+  "name": "@repo/convex",
+  "private": true,
+  "version": "0.0.0",
+  "scripts": {
+    "check": "biome check --write .",
+    "dev": "convex dev",
+    "predev": "convex dev --until-success && convex dashboard",
+    "logs": "convex logs",
+    "lint": "tsc -p convex && eslint . --report-unused-disable-directives --max-warnings 0"
+  },
+  "exports": {
+    ".": {
+      "types": "./src/convex/_generated/api.d.ts",
+      "default": "./src/convex/_generated/api.js"
+    }
+  },
+  "dependencies": {
+    "convex": "^1.31.7"
+  },
+  "devDependencies": {
+    "@convex-dev/eslint-plugin": "^1.1.1",
+    "@eslint/eslintrc": "^3.3.3",
+    "@eslint/js": "^9.39.2",
+    "@types/node": "^24.10.11",
+    "@typescript-eslint/eslint-plugin": "^8.54.0",
+    "@typescript-eslint/parser": "^8.54.0",
+    "eslint": "^9.39.2",
+    "globals": "^17.3.0",
+    "typescript": "^5.9.3"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": ["esbuild", "@tailwindcss/oxide"]
+  }
+}
+
