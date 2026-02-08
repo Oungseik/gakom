@@ -12,10 +12,16 @@
     columns: ColumnDef<TData, TValue>[];
     data: TData[];
     border?: boolean;
+    rowSelection?: RowSelectionState;
   };
 
-  let { data, columns, loading, border = true }: DataTableProps<TData, TValue> = $props();
-  let rowSelection = $state<RowSelectionState>({});
+  let {
+    data,
+    columns,
+    loading,
+    border = true,
+    rowSelection = $bindable({}),
+  }: DataTableProps<TData, TValue> = $props();
 
   const table = $derived(
     createSvelteTable({

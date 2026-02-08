@@ -1,5 +1,4 @@
 import { os as base, ORPCError } from "@orpc/server";
-import { and, eq, member, organization } from "@repo/db";
 import { db } from "$lib/server/db";
 
 type Context = {
@@ -51,36 +50,33 @@ export const authMiddleware = os.middleware(async ({ context, next }) => {
 /**
  * Middleware to protect to get the organization information for specific role
  * */
-export const organizationMiddleware = (roles: string[] = ["OWNER", "ADMIN", "MEMBER"]) =>
+type Roles = ("OWNER" | "ADMIN" | "MEMBER")[];
+export const organizationMiddleware = (roles: Roles = ["OWNER", "ADMIN", "MEMBER"]) =>
   authMiddleware.concat(async ({ context, next }, input: { slug: string }) => {
-    const organizations = await db
-      .select({
-        id: organization.id,
-        slug: organization.slug,
-        role: member.role,
-        memberId: member.id,
-        memberStatus: member.status,
-        attendancePolicyId: member.attendancePolicyId,
-      })
-      .from(member)
-      .innerJoin(organization, eq(member.organizationId, organization.id))
-      .where(and(eq(member.userId, context.session.user.id), eq(member.status, "ACTIVE")));
+    const member = await db.query.member.findFirst({
+      where: {
+        userId: context.session.user.id,
+        organization: { slug: input.slug },
+        leftAt: { isNull: true },
+        role: { in: roles },
+      },
+      with: { organization: true },
+    });
 
-    const result = organizations?.find((o) => o.slug === input.slug);
-    if (!result || !roles.includes(result.role.toUpperCase())) {
+    if (!member?.organization) {
       throw new ORPCError("FORBIDDEN");
-    }
-
-    if (result.memberStatus === "DEACTIVATED") {
-      throw new ORPCError("UNAUTHORIZED");
     }
 
     return next({
       context: {
         ...context,
-        organization: result,
-        member: { role: result.role, id: result.memberId },
-        attendancePolicy: { id: result.attendancePolicyId },
+        organization: member.organization,
+        member: {
+          role: member.role,
+          id: member.id,
+          attendancePolicyId: member.attendancePolicyId,
+          calendarId: member.calendarId,
+        },
       },
     });
   });

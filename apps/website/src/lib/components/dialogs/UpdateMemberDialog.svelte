@@ -15,42 +15,58 @@
 
   type Props = {
     userId: string;
+    memberId: string;
     name: string;
     email: string;
     position?: string | null;
     role: "MEMBER" | "ADMIN" | "OWNER";
     attendancePolicyId?: string | null;
+    leaveIds: string[];
     open: boolean;
     slug: string;
+    calendarId: string | null;
   };
 
-  let { open = $bindable(false), slug, ...member }: Props = $props();
+  let { open = $bindable(false), slug, ...props }: Props = $props();
   let isUpdating = $state(false);
   const queryClient = useQueryClient();
 
   const attendancePolicies = createQuery(() =>
-    orpc.organizations.attendancesPolicies.list.queryOptions({
+    orpc.attendancesPolicies.list.queryOptions({
       input: { slug, pageSize: 100, cursor: 0 },
       enabled: !!slug,
     })
   );
-  const allPolicies = $derived(attendancePolicies.data?.items.flatMap((item) => item) ?? []);
-  const memberUpdate = createMutation(() => orpc.organizations.members.update.mutationOptions());
+
+  const leave = createQuery(() =>
+    orpc.leave.list.queryOptions({
+      input: { slug, pageSize: 100, cursor: 0 },
+      enabled: !!slug,
+    })
+  );
+
+  const allPolicies = $derived(attendancePolicies.data?.items ?? []);
+  const allLeave = $derived(leave.data?.items ?? []);
+  const memberUpdate = createMutation(() => orpc.members.update.mutationOptions());
 
   const form = createForm(() => ({
     defaultValues: {
-      position: member.position ?? null,
-      role: member.role ?? null,
-      attendancePolicyId: member.attendancePolicyId ?? null,
+      calendarId: props.calendarId,
+      position: props.position ?? null,
+      role: props.role ?? null,
+      attendancePolicyId: props.attendancePolicyId ?? null,
+      leaveIds: props.leaveIds,
     },
     onSubmit: async ({ value }) => {
       isUpdating = true;
 
       memberUpdate.mutate(
         {
-          userId: member.userId,
+          memberId: props.memberId,
           slug,
           data: {
+            leaveIds: value.leaveIds,
+            calendarId: value.calendarId,
             attendancePolicyId: value.attendancePolicyId,
             position: value.position,
             role: value.role,
@@ -59,7 +75,7 @@
         {
           onSuccess: () => {
             toast.success("Successfully update user information");
-            queryClient.invalidateQueries({ queryKey: orpc.organizations.members.list.key() });
+            queryClient.invalidateQueries({ queryKey: orpc.members.list.key() });
             open = false;
             isUpdating = false;
           },
@@ -75,7 +91,7 @@
 <Dialog.Root bind:open>
   <Dialog.Content>
     <Dialog.Header>
-      <Dialog.Title>Update {member.name}</Dialog.Title>
+      <Dialog.Title>Update {props.name}</Dialog.Title>
     </Dialog.Header>
 
     <form
@@ -124,7 +140,7 @@
               name={field.name}
               value={field.state.value}
               onValueChange={(value) => field.handleChange(value as "MEMBER" | "ADMIN")}
-              disabled={isUpdating || member.role === "OWNER"}
+              disabled={isUpdating || props.role === "OWNER"}
             >
               <Select.Trigger class="w-full">
                 {field.state.value === "MEMBER"
@@ -182,8 +198,47 @@
         {/snippet}
       </form.Field>
 
+      <form.Field name="leaveIds">
+        {#snippet children(field)}
+          <div class="space-y-2">
+            <Label for={field.name}>Leave Policies</Label>
+            <Select.Root
+              type="multiple"
+              name={field.name}
+              onValueChange={(value) => field.handleChange(value)}
+              disabled={isUpdating || allPolicies.length === 0}
+            >
+              <Select.Trigger class="w-full">
+                {#if allLeave.length === 0}
+                  Not configured leave policies yet.
+                {:else if field.state.value?.length === 0}
+                  Select leave policies
+                {:else}
+                  <div class="flex gap-1 truncate">
+                    {#each field.state.value as id (id)}
+                      <div class="bg-secondary w-24 truncate rounded-md p-1 text-xs">
+                        {allLeave.find((l) => l.id === id)?.name}
+                      </div>
+                    {/each}
+                  </div>
+                {/if}
+              </Select.Trigger>
+              <Select.Content>
+                {#each allLeave as l (l.id)}
+                  <Select.Item value={l.id}>
+                    {l.name} <span class="text-muted-foreground text-sm"> - {l.days} day(s)</span>
+                  </Select.Item>
+                {/each}
+              </Select.Content>
+            </Select.Root>
+          </div>
+        {/snippet}
+      </form.Field>
+
       <Dialog.Footer>
-        <Dialog.Close class={buttonVariants({ variant: "outline" })}>Cancel</Dialog.Close>
+        <Dialog.Close type="button" class={buttonVariants({ variant: "outline" })}
+          >Cancel</Dialog.Close
+        >
         <Button type="submit" disabled={isUpdating} class="w-17">
           {#if isUpdating}
             <Loader2Icon class="size-4 animate-spin" />

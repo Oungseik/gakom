@@ -38,7 +38,7 @@
   const debounceDateTo = new Debounced(() => searchParams.dateTo, 1000);
 
   const attendances = createInfiniteQuery(() =>
-    orpc.organizations.attendances.list.infiniteOptions({
+    orpc.attendances.list.infiniteOptions({
       initialPageParam: 0,
       input: (cursor) => ({
         slug: params.slug,
@@ -59,7 +59,7 @@
   const allAttendances = $derived(attendances.data?.pages.flatMap((page) => page.items) ?? []);
 
   const stats = createQuery(() =>
-    orpc.organizations.attendances.stats.queryOptions({
+    orpc.attendances.stats.queryOptions({
       input: {
         slug: params.slug,
         filter: {
@@ -89,8 +89,6 @@
 
   <section>
     <div class="my-4 space-y-2">
-      <h1 class="text-muted-foreground">Attendances</h1>
-
       <div class="flex flex-wrap gap-2">
         <Search bind:value={searchParams.search} />
 

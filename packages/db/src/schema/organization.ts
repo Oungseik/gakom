@@ -2,6 +2,7 @@ import { sql } from "drizzle-orm";
 import { index, integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
 import { COUNTRY_CODES } from "../country";
 import { attendancePolicy } from "./attendance";
+import { calendar } from "./calendar";
 import { user } from "./core";
 
 export const InvitationStatus = ["ACCEPTED", "CANCELED", "PENDING", "REJECTED"] as const;
@@ -35,6 +36,7 @@ export const member = sqliteTable(
       .notNull()
       .references(() => user.id, { onDelete: "cascade" }),
     attendancePolicyId: text("attendance_policy_id").references(() => attendancePolicy.id),
+    calendarId: text("calendar_id").references(() => calendar.id, { onDelete: "set null" }),
     role: text("role", { enum: ["OWNER", "ADMIN", "MEMBER"] })
       .default("MEMBER")
       .notNull(),
@@ -49,6 +51,7 @@ export const member = sqliteTable(
     index("member_organization_id_idx").on(table.organizationId),
     index("member_user_id_idx").on(table.userId),
     index("member_attendance_policy_id_idx").on(table.attendancePolicyId),
+    index("member_calendar_id_idx").on(table.calendarId),
   ],
 );
 

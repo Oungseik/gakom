@@ -23,13 +23,13 @@
   const queryClient = useQueryClient();
 
   const attendancePolicies = createQuery(() =>
-    orpc.organizations.attendancesPolicies.list.queryOptions({
+    orpc.attendancesPolicies.list.queryOptions({
       input: { slug: organization.slug, pageSize: 100, cursor: 0 },
     })
   );
-  const allPolicies = $derived(attendancePolicies.data?.items.flatMap((item) => item) ?? []);
+  const allPolicies = $derived(attendancePolicies.data?.items ?? []);
   const sendInvitation = createMutation(() =>
-    orpc.organizations.invitations.send.mutationOptions()
+    orpc.invitations.send.mutationOptions()
   );
 
   const defaultValues: {
@@ -63,7 +63,7 @@
             open = false;
             form.reset();
             toast.success(`Successfully invite ${value.email} to ${organization.name}.`);
-            queryClient.invalidateQueries({ queryKey: orpc.organizations.invitations.list.key() });
+            queryClient.invalidateQueries({ queryKey: orpc.invitations.list.key() });
           },
           onSettled: () => {
             isInviting = false;

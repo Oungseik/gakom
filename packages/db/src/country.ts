@@ -249,6 +249,8 @@ export const COUNTRY_CODES = [
   "ZW", // Zimbabwe
 ] as const;
 
+export type CountryCode = (typeof COUNTRY_CODES)[number];
+
 export const COUNTRIES: Map<
   (typeof COUNTRY_CODES)[number],
   {

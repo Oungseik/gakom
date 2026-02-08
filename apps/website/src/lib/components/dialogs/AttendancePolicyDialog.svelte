@@ -31,10 +31,10 @@
 
   const isEditMode = $derived(!!policy);
   const attendancesPoliciesUpdate = createMutation(() =>
-    orpc.organizations.attendancesPolicies.update.mutationOptions()
+    orpc.attendancesPolicies.update.mutationOptions()
   );
   const attendancesPoliciesCreate = createMutation(() =>
-    orpc.organizations.attendancesPolicies.create.mutationOptions()
+    orpc.attendancesPolicies.create.mutationOptions()
   );
 
   const tz = Intl.DateTimeFormat().resolvedOptions().timeZone as TimeZone;
@@ -89,7 +89,7 @@
         onSuccess: () => {
           toast.success("Successfully added an attendance policy");
           queryClient.invalidateQueries({
-            queryKey: orpc.organizations.attendancesPolicies.list.key(),
+            queryKey: orpc.attendancesPolicies.list.key(),
           });
           open = false;
         },
@@ -108,7 +108,7 @@
         onSuccess: () => {
           toast.success("Successfully updated the attendance policy");
           queryClient.invalidateQueries({
-            queryKey: orpc.organizations.attendancesPolicies.list.key(),
+            queryKey: orpc.attendancesPolicies.list.key(),
           });
           open = false;
         },

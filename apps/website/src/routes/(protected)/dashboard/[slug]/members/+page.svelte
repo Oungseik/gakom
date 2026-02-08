@@ -1,49 +1,26 @@
 <script lang="ts">
-  import UserPlusIcon from "@lucide/svelte/icons/user-plus";
-  import { Button } from "@repo/ui/button";
-  import { Label } from "@repo/ui/label";
-  import * as Tabs from "@repo/ui/tabs";
   import { createInfiniteQuery, createQuery } from "@tanstack/svelte-query";
   import { useSearchParams } from "runed/kit";
 
   import LoadMoreBtn from "$lib/components/buttons/LoadMoreBtn.svelte";
   import MemberStatisticsCard from "$lib/components/cards/MemberStatisticsCard.svelte";
   import DashboardContainer from "$lib/components/containers/DashboardContainer.svelte";
-  import InviteMemberDialog from "$lib/components/dialogs/InviteMemberDialog.svelte";
   import DashboardHeader from "$lib/components/headers/DashboardHeader.svelte";
   import Search from "$lib/components/inputs/Search.svelte";
-  import {
-    type Invitation,
-    columns as invitationColumns,
-  } from "$lib/components/tables/InvitationsTable/columns";
   import { columns } from "$lib/components/tables/MembersTable/columns";
   import DataTable from "$lib/components/tables/common/DataTable.svelte";
   import { orpc } from "$lib/orpc_client";
-  import { membersTabSchema } from "$lib/searchParams";
   import { membersFilterSchema } from "$lib/searchParams";
 
   import type { PageProps } from "./$types";
 
   const { params, data }: PageProps = $props();
-  let isInviteDialogOpen = $state(false);
 
-  type View = { id: string; label: string };
-
-  const tabParams = useSearchParams(membersTabSchema);
   const membersFilterParams = useSearchParams(membersFilterSchema);
 
   const members = createInfiniteQuery(() =>
-    orpc.organizations.members.list.infiniteOptions({
-      enabled: tabParams.tab === "members",
-      initialPageParam: 0,
-      input: (cursor) => ({ pageSize: 20, cursor, slug: params.slug }),
-      getNextPageParam: (lastPage) => lastPage.nextCursor,
-    })
-  );
-
-  const invitations = createInfiniteQuery(() =>
-    orpc.organizations.invitations.list.infiniteOptions({
-      enabled: tabParams.tab === "invitations",
+    orpc.members.list.infiniteOptions({
+      enabled: !!params.slug,
       initialPageParam: 0,
       input: (cursor) => ({ pageSize: 20, cursor, slug: params.slug }),
       getNextPageParam: (lastPage) => lastPage.nextCursor,
@@ -51,17 +28,9 @@
   );
 
   const allMembers = $derived(members.data?.pages.flatMap((page) => page.items) ?? []);
-  const allInvitations = $derived(
-    invitations.data?.pages.flatMap((page) => page.items) ?? []
-  ) as Invitation[];
-
-  let views: View[] = $derived([
-    { id: "members", label: "Members" },
-    { id: "invitations", label: "Invitations" },
-  ]);
 
   const stats = createQuery(() =>
-    orpc.organizations.members.stats.queryOptions({ input: { slug: params.slug } })
+    orpc.members.stats.queryOptions({ input: { slug: params.slug } })
   );
 
   const thisMonthTrend = $derived(
@@ -108,80 +77,30 @@
     </div>
   {/if}
 
-  <Tabs.Root bind:value={tabParams.tab} class="w-full flex-col justify-start gap-6">
-    <section class="mt-4 flex items-center justify-between">
-      <Label for="view-selector" class="sr-only">View</Label>
+  <section class="mt-4 space-y-2">
+    <div class="flex flex-wrap gap-2">
+      <Search bind:value={membersFilterParams.search} />
+    </div>
 
-      <Tabs.List
-        class="**:data-[slot=badge]:bg-muted-foreground/30 flex **:data-[slot=badge]:size-5 **:data-[slot=badge]:rounded-full **:data-[slot=badge]:px-1 @4xl/main:flex"
-      >
-        {#each views as view (view.id)}
-          <Tabs.Trigger value={view.id}>
-            {view.label}
-          </Tabs.Trigger>
-        {/each}
-      </Tabs.List>
-      <div></div>
-      <div>
-        <Button variant="outline" onclick={() => (isInviteDialogOpen = true)}>
-          <UserPlusIcon size={4} />
-          Invite</Button
-        >
+    <DataTable
+      {columns}
+      data={allMembers.map((m) => ({
+        ...m,
+        memberId: m.id,
+        organizationId: data.organization.id,
+        slug: params.slug,
+      }))}
+      loading={members.isLoading}
+    />
+
+    {#if members.hasNextPage}
+      <div class="flex items-center justify-center py-4">
+        <LoadMoreBtn
+          onclick={() => members.fetchNextPage()}
+          loading={members.isFetchingNextPage}
+          disabled={members.isFetchingNextPage}
+        />
       </div>
-    </section>
-
-    <section class="space-y-2">
-      {#if tabParams.tab === "members"}
-        <div class="flex flex-wrap gap-2">
-          <Search bind:value={membersFilterParams.search} />
-        </div>
-      {:else}{/if}
-
-      <Tabs.Content value="members">
-        <DataTable
-          {columns}
-          data={allMembers.map((m) => ({
-            ...m,
-            organizationId: data.organization.id,
-            slug: params.slug,
-          }))}
-          loading={members.isLoading}
-        />
-
-        {#if members.hasNextPage}
-          <div class="flex items-center justify-center py-4">
-            <LoadMoreBtn
-              onclick={() => members.fetchNextPage()}
-              loading={members.isFetchingNextPage}
-              disabled={members.isFetchingNextPage}
-            />
-          </div>
-        {/if}
-      </Tabs.Content>
-
-      <Tabs.Content value="invitations">
-        <DataTable
-          columns={invitationColumns}
-          data={allInvitations.map((invitation) => ({
-            ...invitation,
-            slug: params.slug,
-            organizationId: data.organization.id,
-          }))}
-          loading={invitations.isLoading}
-        />
-
-        {#if invitations.hasNextPage}
-          <div class="flex items-center justify-center py-4">
-            <LoadMoreBtn
-              onclick={() => invitations.fetchNextPage()}
-              loading={invitations.isFetchingNextPage}
-              disabled={invitations.isFetchingNextPage}
-            />
-          </div>
-        {/if}
-      </Tabs.Content>
-    </section>
-  </Tabs.Root>
+    {/if}
+  </section>
 </DashboardContainer>
-
-<InviteMemberDialog bind:open={isInviteDialogOpen} organization={data.organization} />

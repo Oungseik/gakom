@@ -4,10 +4,6 @@ export const returnUrlSchema = createSearchParamsSchema({
   return_url: { type: "string" },
 });
 
-export const membersTabSchema = createSearchParamsSchema({
-  tab: { type: "string", default: "members" },
-});
-
 export const attendancesFilterSchema = createSearchParamsSchema({
   search: { type: "string" },
   status: {

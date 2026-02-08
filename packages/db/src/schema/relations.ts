@@ -1,8 +1,9 @@
 import { defineRelations } from "drizzle-orm";
 import { attendance, attendancePolicy } from "./attendance";
+import { calendar, calendarEvent } from "./calendar";
 import { account, session, twoFactor, user } from "./core";
 import { image } from "./image";
-import { leave, leaveBalance, leaveBalanceAdjustment, leaveRequest } from "./leave";
+import { leave, leaveBalance, leaveBalanceAdjustment, leaveRequest, leaveToMember } from "./leave";
 import { invitation, member, organization, team, teamMember } from "./organization";
 
 export const relations = defineRelations(
@@ -20,9 +21,12 @@ export const relations = defineRelations(
     attendancePolicy,
     attendance,
     leave,
+    leaveToMember,
     leaveRequest,
     leaveBalance,
     leaveBalanceAdjustment,
+    calendar,
+    calendarEvent,
   },
   (r) => ({
     user: {
@@ -47,6 +51,7 @@ export const relations = defineRelations(
       teams: r.many.team(),
       attendancePolicies: r.many.attendancePolicy(),
       leave: r.many.leave(),
+      calendars: r.many.calendar(),
     },
     member: {
       organization: r.one.organization({ from: r.member.organizationId, to: r.organization.id }),
@@ -55,6 +60,7 @@ export const relations = defineRelations(
         from: r.member.attendancePolicyId,
         to: r.attendancePolicy.id,
       }),
+      calendar: r.one.calendar({ from: r.member.calendarId, to: r.calendar.id }),
       leaveRequests: r.many.leaveRequest({ from: r.member.id, to: r.leaveRequest.memberId }),
       reviewedLeaveRequests: r.many.leaveRequest({
         from: r.member.id,
@@ -62,6 +68,7 @@ export const relations = defineRelations(
       }),
       leaveBalance: r.one.leaveBalance({ from: r.member.id, to: r.leaveBalance.memberId }),
       leaveBalanceAdjustments: r.many.leaveBalanceAdjustment(),
+      leaveToMembers: r.many.leaveToMember(),
     },
     invitation: {
       organization: r.one.organization({
@@ -105,6 +112,7 @@ export const relations = defineRelations(
       leaveRequests: r.many.leaveRequest(),
       leaveBalances: r.many.leaveBalance(),
       leaveBalanceAdjustments: r.many.leaveBalanceAdjustment(),
+      leaveToMembers: r.many.leaveToMember(),
     },
     leaveRequest: {
       leave: r.one.leave({ from: r.leaveRequest.leaveId, to: r.leave.id }),
@@ -134,6 +142,18 @@ export const relations = defineRelations(
         from: r.leaveBalanceAdjustment.requestId,
         to: r.leaveRequest.id,
       }),
+    },
+    leaveToMember: {
+      member: r.one.member({ from: r.leaveToMember.memberId, to: r.member.id }),
+      leave: r.one.leave({ from: r.leaveToMember.leaveId, to: r.leave.id }),
+    },
+    calendar: {
+      organization: r.one.organization({ from: r.calendar.organizationId, to: r.organization.id }),
+      events: r.many.calendarEvent(),
+      members: r.many.member(),
+    },
+    calendarEvent: {
+      calendar: r.one.calendar({ from: r.calendarEvent.calendarId, to: r.calendar.id }),
     },
   }),
 );

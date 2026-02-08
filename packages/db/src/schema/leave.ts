@@ -1,5 +1,13 @@
 import { sql } from "drizzle-orm";
-import { index, integer, real, sqliteTable, text, unique } from "drizzle-orm/sqlite-core";
+import {
+  index,
+  integer,
+  real,
+  sqliteTable,
+  text,
+  unique,
+  uniqueIndex,
+} from "drizzle-orm/sqlite-core";
 import { member, organization } from "./organization";
 
 export const leave = sqliteTable(
@@ -122,4 +130,20 @@ export const leaveBalanceAdjustment = sqliteTable(
     index("leave_balance_adjustment_member_id_idx").on(table.memberId),
     index("leave_balance_adjustment_leave_request_id_idx").on(table.requestId),
   ],
+);
+
+export const leaveToMember = sqliteTable(
+  "leave_member",
+  {
+    leaveId: text("leave_id")
+      .notNull()
+      .references(() => leave.id, { onDelete: "cascade" }),
+    memberId: text("member_id")
+      .notNull()
+      .references(() => member.id, { onDelete: "cascade" }),
+    createdAt: integer("created_at", { mode: "timestamp_ms" })
+      .default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)
+      .notNull(),
+  },
+  (table) => [uniqueIndex("member_id_leave_id_idx").on(table.memberId, table.leaveId)],
 );

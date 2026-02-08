@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { COUNTRIES } from "@repo/db/country";
+  import { COUNTRIES, type CountryCode } from "@repo/db/country";
 
   let {
     address,
@@ -8,10 +8,10 @@
   }: {
     address?: string | null;
     city?: string | null;
-    countryCode?: string | null;
+    countryCode?: CountryCode | null;
   } = $props();
 
-  const countryName = $derived(countryCode ? COUNTRIES.get(countryCode as any)?.name : undefined);
+  const countryName = $derived(countryCode ? COUNTRIES.get(countryCode)?.name : undefined);
 
   const hasAddressData = $derived(address || city || countryName);
 </script>

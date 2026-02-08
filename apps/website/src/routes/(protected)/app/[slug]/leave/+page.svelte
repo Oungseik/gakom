@@ -84,7 +84,6 @@
     </div>
   </Card>
 
-  <!-- Leave Balance Summary -->
   <Card class="p-6">
     <h2 class="mb-4 text-xl font-semibold">Leave Balance</h2>
     <div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">

@@ -15,6 +15,7 @@ export type Member = {
   organizationId: string;
   slug: string;
   userId: string;
+  memberId: string;
   name: string;
   email: string;
   image?: string | null;
@@ -25,6 +26,7 @@ export type Member = {
   position?: string | null;
   joinedAt: Date;
   leftAt?: Date | null;
+  calendarId: string | null;
   attendancePolicy?: {
     id: string;
     name: string;
@@ -111,6 +113,7 @@ export const columns: ColumnDef<Member>[] = [
     cell: ({ row }) => {
       return renderComponent(DataTableActions, {
         userId: row.original.userId,
+        memberId: row.original.memberId,
         organizationId: row.original.organizationId,
         email: row.original.email,
         name: row.original.name,
@@ -118,6 +121,7 @@ export const columns: ColumnDef<Member>[] = [
         role: row.original.role,
         position: row.original.position,
         attendancePolicyId: row.original.attendancePolicy?.id,
+        calendarId: row.original.calendarId,
       });
     },
   },

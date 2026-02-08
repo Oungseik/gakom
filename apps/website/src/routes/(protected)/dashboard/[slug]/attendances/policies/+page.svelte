@@ -21,7 +21,7 @@
   let editingPolicy = $state<AttendancePolicy | null>(null);
 
   const policies = createInfiniteQuery(() =>
-    orpc.organizations.attendancesPolicies.list.infiniteOptions({
+    orpc.attendancesPolicies.list.infiniteOptions({
       initialPageParam: 0,
       input: (cursor) => ({ pageSize: 20, cursor, slug: params.slug }),
       getNextPageParam: (lastPage) => lastPage.nextCursor,
@@ -51,7 +51,7 @@
 
 <DashboardContainer>
   <div class="flex items-center justify-between">
-    <div></div>
+    <h1 class="text-muted-foreground">Attendance Policies</h1>
     <Button onclick={handleCreate} variant="outline">
       <PlusIcon /> Create Policy
     </Button>
