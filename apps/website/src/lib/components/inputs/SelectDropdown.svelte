@@ -1,5 +1,5 @@
 <script lang="ts" generics="Value">
-  import { Button } from "@repo/ui/button";
+  import { buttonVariants } from "@repo/ui/button";
   import { Checkbox } from "@repo/ui/checkbox";
   import { Label } from "@repo/ui/label";
   import * as Popover from "@repo/ui/popover";
@@ -22,11 +22,9 @@
 </script>
 
 <Popover.Root>
-  <Popover.Trigger>
-    <Button variant="outline">
-      <props.icon class="size-4" />
-      {props.desc}
-    </Button>
+  <Popover.Trigger class={buttonVariants({ variant: "outline" })}>
+    <props.icon class="size-4" />
+    {props.desc}
   </Popover.Trigger>
   <Popover.Content align="start" class="w-52 p-4">
     <div class="space-y-3">

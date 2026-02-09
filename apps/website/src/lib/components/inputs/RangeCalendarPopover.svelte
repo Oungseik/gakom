@@ -1,7 +1,7 @@
 <script lang="ts">
   import { CalendarDate, type DateValue } from "@internationalized/date";
   import CalendarIcon from "@lucide/svelte/icons/calendar";
-  import { Button } from "@repo/ui/button";
+  import { buttonVariants } from "@repo/ui/button";
   import * as Popover from "@repo/ui/popover";
   import { RangeCalendar } from "@repo/ui/range-calendar";
 
@@ -17,11 +17,9 @@
 </script>
 
 <Popover.Root>
-  <Popover.Trigger>
-    <Button variant="outline">
-      <CalendarIcon class="size-4" />
-      Date Range
-    </Button>
+  <Popover.Trigger class={buttonVariants({ variant: "outline" })}>
+    <CalendarIcon class="size-4" />
+    Date Range
   </Popover.Trigger>
   <Popover.Content class="w-124 p-0">
     <RangeCalendar
