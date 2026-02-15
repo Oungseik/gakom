@@ -2,22 +2,22 @@
   import { CalendarDate } from "@internationalized/date";
   import CalendarIcon from "@lucide/svelte/icons/calendar";
   import ClockIcon from "@lucide/svelte/icons/clock";
-  import FilterIcon from "@lucide/svelte/icons/filter";
   import XIcon from "@lucide/svelte/icons/x";
   import { Button, buttonVariants } from "@repo/ui/button";
+  import { ConfirmDeleteDialog, confirmDelete } from "@repo/ui/confirm-delete-dialog";
   import * as Dialog from "@repo/ui/dialog";
   import { Input } from "@repo/ui/input";
   import { Label } from "@repo/ui/label";
   import * as Popover from "@repo/ui/popover";
   import { RangeCalendar } from "@repo/ui/range-calendar";
   import { ScrollArea, Scrollbar } from "@repo/ui/scroll-area";
+  import * as Select from "@repo/ui/select";
   import { createInfiniteQuery, createMutation, createQuery } from "@tanstack/svelte-query";
   import { useSearchParams } from "runed/kit";
   import { toast } from "svelte-sonner";
 
   import LoadMoreBtn from "$lib/components/buttons/LoadMoreBtn.svelte";
   import LeaveUsageChart from "$lib/components/charts/LeaveUsageChart.svelte";
-  import SelectDropdown from "$lib/components/inputs/SelectDropdown.svelte";
   import { orpc } from "$lib/orpc_client";
   import { leaveRequestsFilterSchema } from "$lib/searchParams";
   import { formatDate } from "$lib/utils";
@@ -46,6 +46,7 @@
           status: searchParams.status.length > 0 ? searchParams.status : undefined,
           dateFrom: searchParams.dateFrom ? new Date(searchParams.dateFrom) : undefined,
           dateTo: searchParams.dateTo ? new Date(searchParams.dateTo) : undefined,
+          self: true,
         },
       }),
       getNextPageParam: (lastPage) => lastPage.nextCursor,
@@ -135,6 +136,16 @@
     return new Date(request.endDate).getTime() > Date.now();
   }
 
+  function handleCancelWithConfirm(id: string) {
+    confirmDelete({
+      title: "Cancel leave request",
+      description: "Are you sure you want to cancel this leave request?",
+      onConfirm: async () => {
+        handleCancelRequest(id);
+      },
+    });
+  }
+
   function formatDateStr(date: Date | string) {
     return new Date(date).toLocaleDateString("en-US", {
       month: "short",
@@ -145,6 +156,7 @@
 </script>
 
 <Dialog.Root bind:open={showRequestDialog}>
+  <ConfirmDeleteDialog />
   <div class="space-y-6 p-4 md:p-6 lg:w-2/3 lg:p-8 xl:w-1/2">
     <div class="flex items-center justify-between">
       <div>
@@ -156,13 +168,6 @@
     <section class="space-y-3">
       <div class="flex items-center justify-between">
         <h2 class="text-lg font-semibold">Leave Balances</h2>
-        <Dialog.Trigger
-          class={buttonVariants({ variant: "outline" })}
-          onclick={() => (showRequestDialog = true)}
-        >
-          <CalendarIcon class="mr-2 size-4" />
-          Request Leave
-        </Dialog.Trigger>
       </div>
       {#if balances.isLoading}
         <div class="bg-card animate-pulse rounded-lg border p-4">
@@ -199,24 +204,45 @@
           </ScrollArea>
         </div>
       {/if}
+
+      <Dialog.Trigger
+        class={buttonVariants({ variant: "default", class: "w-full" })}
+        onclick={() => (showRequestDialog = true)}
+      >
+        <CalendarIcon class="mr-2 size-4" />
+        Request Leave
+      </Dialog.Trigger>
     </section>
 
     <section class="space-y-3">
-      <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+      <div class="flex items-center justify-between gap-3">
         <h2 class="text-lg font-semibold">Leave History</h2>
-        <SelectDropdown
-          icon={FilterIcon}
-          desc="Status"
-          data={[
-            { value: "all", label: "All" },
-            { value: "PENDING", label: "Pending" },
-            { value: "APPROVED", label: "Approved" },
-            { value: "REJECTED", label: "Rejected" },
-            { value: "CANCELLED", label: "Cancelled" },
-          ]}
+        <Select.Root
+          type="single"
           value={currentStatus}
-          onCheckedChange={(value) => setStatusFilter(value)}
-        />
+          onValueChange={(value) => setStatusFilter(value)}
+        >
+          <Select.Trigger class="w-32">
+            {currentStatus === "all"
+              ? "All"
+              : currentStatus === "PENDING"
+                ? "Pending"
+                : currentStatus === "APPROVED"
+                  ? "Approved"
+                  : currentStatus === "REJECTED"
+                    ? "Rejected"
+                    : currentStatus === "CANCELLED"
+                      ? "Cancelled"
+                      : "Status"}
+          </Select.Trigger>
+          <Select.Content>
+            <Select.Item value="all">All</Select.Item>
+            <Select.Item value="PENDING">Pending</Select.Item>
+            <Select.Item value="APPROVED">Approved</Select.Item>
+            <Select.Item value="REJECTED">Rejected</Select.Item>
+            <Select.Item value="CANCELLED">Cancelled</Select.Item>
+          </Select.Content>
+        </Select.Root>
       </div>
 
       <div class="space-y-2">
@@ -238,21 +264,10 @@
           </div>
         {:else}
           {#each allRequests as request (request.id)}
-            <div class="bg-card flex items-center justify-between rounded-lg border p-4">
+            <div class="bg-card flex items-start justify-between rounded-lg border p-4">
               <div class="min-w-0 flex-1">
-                <div class="mb-1 flex items-center gap-2">
+                <div class="mb-1">
                   <p class="truncate font-medium">{request.name}</p>
-                  <span
-                    class="rounded-full px-2 py-0.5 text-xs {request.status === 'PENDING'
-                      ? 'bg-yellow-100 text-yellow-800'
-                      : request.status === 'APPROVED'
-                        ? 'bg-green-100 text-green-800'
-                        : request.status === 'REJECTED'
-                          ? 'bg-red-100 text-red-800'
-                          : 'bg-gray-100 text-gray-800'}"
-                  >
-                    {request.status}
-                  </span>
                 </div>
                 <div class="text-muted-foreground flex items-center gap-2 text-sm">
                   <ClockIcon class="size-3.5" />
@@ -264,16 +279,29 @@
                   <p class="text-muted-foreground mt-1 truncate text-sm">{request.reason}</p>
                 {/if}
               </div>
-              {#if canCancel({ status: request.status, endDate: request.endDate })}
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onclick={() => handleCancelRequest(request.id)}
-                  disabled={cancelRequest.isPending}
+              <div class="flex flex-col items-end gap-2">
+                <span
+                  class="rounded-full px-2 py-0.5 text-xs {request.status === 'PENDING'
+                    ? 'bg-yellow-100 text-yellow-800'
+                    : request.status === 'APPROVED'
+                      ? 'bg-green-100 text-green-800'
+                      : request.status === 'REJECTED'
+                        ? 'bg-red-100 text-red-800'
+                        : 'bg-gray-100 text-gray-800'}"
                 >
-                  <XIcon class="size-4" />
-                </Button>
-              {/if}
+                  {request.status}
+                </span>
+                {#if canCancel({ status: request.status, endDate: request.endDate })}
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onclick={() => handleCancelWithConfirm(request.id)}
+                    disabled={cancelRequest.isPending}
+                  >
+                    <XIcon class="size-4" />
+                  </Button>
+                {/if}
+              </div>
             </div>
           {/each}
         {/if}
@@ -299,18 +327,27 @@
     <div class="grid gap-4 py-4">
       <div class="grid gap-2">
         <Label>Leave Type</Label>
-        <SelectDropdown
-          icon={CalendarIcon}
-          desc="Leave type"
-          data={[
-            { value: "", label: "Select leave type" },
-            ...(balances.data?.items.map((b) => ({ value: b.leaveId, label: b.name })) ?? []),
-          ]}
+        <Select.Root
+          type="single"
           value={selectedLeaveId}
-          onCheckedChange={(value) => {
+          onValueChange={(value) => {
             selectedLeaveId = value;
           }}
-        />
+        >
+          <Select.Trigger class="w-full">
+            {#if selectedLeaveId}
+              {@const leave = balances.data?.items.find((b) => b.leaveId === selectedLeaveId)}
+              {leave?.name ?? "Select leave type"}
+            {:else}
+              Select leave type
+            {/if}
+          </Select.Trigger>
+          <Select.Content>
+            {#each balances.data?.items ?? [] as b (b.leaveId)}
+              <Select.Item value={b.leaveId}>{b.name}</Select.Item>
+            {/each}
+          </Select.Content>
+        </Select.Root>
       </div>
       <div class="grid gap-2">
         <Label>Date Range</Label>

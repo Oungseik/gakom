@@ -22,7 +22,6 @@ export const cancelLeaveRequestHandler = os
   .input(input)
   .use(organizationMiddleware())
   .handler(async ({ context, input }) => {
-    /** the person who call the API */
     const canceler = (
       await db
         .select({
@@ -30,7 +29,7 @@ export const cancelLeaveRequestHandler = os
           createdAt: member.createdAt,
         })
         .from(member)
-        .where(eq(member.id, context.session.user.id))
+        .where(eq(member.userId, context.session.user.id))
         .limit(1)
     ).at(0);
 
