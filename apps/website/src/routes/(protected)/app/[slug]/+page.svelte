@@ -47,7 +47,7 @@
 
   const leaveRequests = createQuery(() =>
     orpc.leaveRequests.list.queryOptions({
-      input: { slug: params.slug, pageSize: 5, filter: { from: new Date() } },
+      input: { slug: params.slug, pageSize: 5, filter: { from: new Date(), self: true } },
       enabled: !!params.slug,
     })
   );

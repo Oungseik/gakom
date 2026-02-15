@@ -30,6 +30,7 @@ const input = z.object({
       duration: z.number().optional(),
       from: z.date().optional(),
       to: z.date().optional(),
+      self: z.boolean().optional(),
     })
     .optional(),
 });
@@ -80,7 +81,7 @@ export const listLeaveRequestsHandler = os
             ? or(like(user.name, `%${filter.search}%`), like(member.position, `%${filter.search}%`))
             : undefined,
           filter?.status?.length ? inArray(leaveRequest.status, filter.status) : undefined,
-          context.member.role === "MEMBER"
+          context.member.role === "MEMBER" || filter?.self
             ? eq(leaveRequest.memberId, context.member.id)
             : undefined,
           filter?.from ? gte(leaveRequest.startDate, filter.from) : undefined,
