@@ -1,10 +1,8 @@
 <script lang="ts">
-  import { Button } from "@repo/ui/button";
   import { createInfiniteQuery } from "@tanstack/svelte-query";
   import { Debounced } from "runed";
   import { useSearchParams } from "runed/kit";
 
-  import { page } from "$app/state";
   import LoadMoreBtn from "$lib/components/buttons/LoadMoreBtn.svelte";
   import AttendanceHistoryCard from "$lib/components/cards/AttendanceHistoryCard.svelte";
   import RangeCalendarPopover from "$lib/components/inputs/RangeCalendarPopover.svelte";
@@ -61,9 +59,6 @@
         });
       }}
     />
-    {#if page.url.search}
-      <Button variant="outline" size="sm" onclick={() => searchParams.reset()}>Reset</Button>
-    {/if}
   </div>
 
   <div class="space-y-2">

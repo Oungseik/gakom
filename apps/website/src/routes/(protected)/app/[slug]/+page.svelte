@@ -77,7 +77,7 @@
   });
 </script>
 
-<div class="flex flex-1 flex-col gap-6 p-4">
+<div class="flex flex-1 flex-col gap-6 p-4 lg:w-1/2">
   <div>
     <p class="text-xl font-bold lg:text-3xl">Welcome back, {data.user.name}!</p>
     <p class="text-muted-foreground">
