@@ -19,9 +19,7 @@
 
   let { policy, onEdit }: Props = $props();
   const queryClient = useQueryClient();
-  const deletePolicy = createMutation(() =>
-    orpc.attendancesPolicies.delete.mutationOptions()
-  );
+  const deletePolicy = createMutation(() => orpc.attendancesPolicies.delete.mutationOptions());
 
   async function handleDelete() {
     confirmDelete({
@@ -65,6 +63,7 @@
     <DropdownMenu.Item onclick={() => onEdit(policy)}>
       <SquarePenIcon size={16} class="mr-2" /> Edit
     </DropdownMenu.Item>
+    <DropdownMenu.Separator />
     <DropdownMenu.Item onclick={handleDelete} variant="destructive">
       <TrashIcon size={16} class="mr-2" /> Delete
     </DropdownMenu.Item>

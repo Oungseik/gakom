@@ -14,12 +14,8 @@
   let { id, slug }: Props = $props();
 
   const queryClient = useQueryClient();
-  const approveRequest = createMutation(() =>
-    orpc.leaveRequests.approve.mutationOptions()
-  );
-  const rejectLeaveRequest = createMutation(() =>
-    orpc.leaveRequests.reject.mutationOptions()
-  );
+  const approveRequest = createMutation(() => orpc.leaveRequests.approve.mutationOptions());
+  const rejectLeaveRequest = createMutation(() => orpc.leaveRequests.reject.mutationOptions());
 
   function handleApproveLeaveRequest() {
     approveRequest.mutate(
@@ -58,6 +54,7 @@
     <DropdownMenu.Item onclick={handleApproveLeaveRequest}>
       <CircleCheckBigIcon size="4" /> Approve
     </DropdownMenu.Item>
+    <DropdownMenu.Separator />
     <DropdownMenu.Item onclick={handleRejectLeaveRequest} variant="destructive">
       <CircleXIcon size="4" /> Reject
     </DropdownMenu.Item>
