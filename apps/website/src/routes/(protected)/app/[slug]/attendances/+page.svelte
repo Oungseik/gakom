@@ -1,171 +1,112 @@
 <script lang="ts">
-  import { Badge } from "@repo/ui/badge";
   import { Button } from "@repo/ui/button";
-  import { Card } from "@repo/ui/card";
+  import { createInfiniteQuery } from "@tanstack/svelte-query";
+  import { Debounced } from "runed";
+  import { useSearchParams } from "runed/kit";
 
-  import { formatTime } from "$lib/utils";
+  import { page } from "$app/state";
+  import LoadMoreBtn from "$lib/components/buttons/LoadMoreBtn.svelte";
+  import AttendanceHistoryCard from "$lib/components/cards/AttendanceHistoryCard.svelte";
+  import RangeCalendarPopover from "$lib/components/inputs/RangeCalendarPopover.svelte";
+  import { orpc } from "$lib/orpc_client";
+  import { attendancesHistoryFilterSchema } from "$lib/searchParams";
 
   import type { PageProps } from "./$types";
 
-  const { data }: PageProps = $props();
+  const { params }: PageProps = $props();
 
-  const attendanceState = $state<{
-    status: "not_checked_in" | "checked_in" | "checked_out";
-    checkInTime: string | null;
-    checkOutTime: string | null;
-  }>({
-    status: "not_checked_in",
-    checkInTime: null,
-    checkOutTime: null,
-  });
+  const searchParams = useSearchParams(attendancesHistoryFilterSchema);
+  const debounceDateFrom = new Debounced(() => searchParams.dateFrom, 1000);
+  const debounceDateTo = new Debounced(() => searchParams.dateTo, 1000);
 
-  const handleToggleAttendance = () => {
-    if (attendanceState.status === "not_checked_in") {
-      attendanceState.status = "checked_in";
-      attendanceState.checkInTime = formatTime(new Date().getTime() / 1000);
-    } else if (attendanceState.status === "checked_in") {
-      attendanceState.status = "checked_out";
-      attendanceState.checkOutTime = formatTime(new Date().getTime() / 1000);
-    } else {
-      attendanceState.status = "not_checked_in";
-      attendanceState.checkInTime = null;
-      attendanceState.checkOutTime = null;
-    }
-  };
+  const attendances = createInfiniteQuery(() =>
+    orpc.attendances.list.infiniteOptions({
+      initialPageParam: 0,
+      input: (cursor) => ({
+        slug: params.slug,
+        cursor,
+        pageSize: 20,
+        filter: {
+          self: true,
+          dateFrom: debounceDateFrom.current || undefined,
+          dateTo: debounceDateTo.current || undefined,
+        },
+      }),
+      getNextPageParam: (lastPage) => lastPage.nextCursor,
+      enabled: !!params.slug,
+    })
+  );
 
-  // Mock data for today's timeline
-  const attendanceRecord = $state({
-    checkIn: attendanceState.checkInTime,
-    checkOut: attendanceState.checkOutTime,
-    workingHours:
-      attendanceState.checkInTime && attendanceState.checkOutTime
-        ? `${Math.round((new Date().getTime() / 1000 - new Date(attendanceState.checkOutTime).getTime() / 1000) / 3600)} hours`
-        : "0 hours",
-  });
-
-  const mockWeeklySummary = $state([
-    { day: "Mon", status: "PRESENT" as const, hours: "8h" },
-    { day: "Tue", status: "PRESENT" as const, hours: "8h" },
-    { day: "Wed", status: "PRESENT" as const, hours: "8h" },
-    { day: "Thu", status: "PRESENT" as const, hours: "8h" },
-    { day: "Fri", status: "LATE" as const, hours: "7h" },
-    { day: "Sat", status: "MISSED" as const, hours: "0h" },
-    { day: "Sun", status: "MISSED" as const, hours: "0h" },
-  ]);
-
-  const getStatusBadgeClass = (status: "PRESENT" | "LATE" | "EARLY_LEAVE" | "MISSED") => {
-    switch (status) {
-      case "PRESENT":
-        return "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400";
-      case "LATE":
-      case "EARLY_LEAVE":
-        return "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400";
-      case "MISSED":
-        return "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400";
-      default:
-        return "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300";
-    }
-  };
+  const allAttendances = $derived(attendances.data?.pages.flatMap((page) => page.items) ?? []);
 </script>
 
-<svelte:head>
-  <title>{data.organization.name} | Attendance</title>
-  <meta name="description" content="Daily attendance check-in and check-out system" />
-</svelte:head>
-
-<div class="container mx-auto space-y-6 p-4 md:p-6 lg:p-8">
+<div class="space-y-6 p-4 md:p-6 lg:w-1/2 lg:p-8">
   <div>
-    <h1 class="text-2xl font-bold">Attendance</h1>
-    <p class="text-gray-600 dark:text-gray-400">Track your daily attendance</p>
+    <h1 class="text-2xl font-bold">Attendance History</h1>
+    <p class="text-muted-foreground">View your attendance records</p>
   </div>
 
-  <!-- Large Check In/Out Button -->
-  <Card class="p-8">
-    <div class="text-center">
-      <div class="mb-6">
-        <p class="mb-2 text-lg text-gray-600 dark:text-gray-400">Current Status</p>
-        <Badge
-          class={attendanceState.status === "checked_in"
-            ? "bg-green-100 text-green-800"
-            : attendanceState.status === "checked_out"
-              ? "bg-blue-100 text-blue-800"
-              : "bg-gray-100 text-gray-800"}
-        >
-          {attendanceState.status === "not_checked_in"
-            ? "Not Checked In"
-            : attendanceState.status === "checked_in"
-              ? "Checked In"
-              : "Checked Out"}
-        </Badge>
-      </div>
+  <div class="flex flex-wrap items-center gap-2">
+    <RangeCalendarPopover
+      from={searchParams.dateFrom}
+      to={searchParams.dateTo}
+      onValueChange={({ start, end }) => {
+        searchParams.update({
+          dateFrom: start
+            ? `${start.year}-${start.month.toString().padStart(2, "0")}-${start.day.toString().padStart(2, "0")}`
+            : undefined,
+          dateTo: end
+            ? `${end.year}-${end.month.toString().padStart(2, "0")}-${end.day.toString().padStart(2, "0")}`
+            : undefined,
+        });
+      }}
+    />
+    {#if page.url.search}
+      <Button variant="outline" size="sm" onclick={() => searchParams.reset()}>Reset</Button>
+    {/if}
+  </div>
 
-      <Button onclick={handleToggleAttendance} size="lg" class="px-12 py-8 text-xl">
-        {attendanceState.status === "not_checked_in"
-          ? "Check In"
-          : attendanceState.status === "checked_in"
-            ? "Check Out"
-            : "Check In Again"}
-      </Button>
-    </div>
-  </Card>
-
-  <!-- Today's Timeline -->
-  <Card class="p-6">
-    <h2 class="mb-4 text-xl font-semibold">Today's Timeline</h2>
-    <div class="space-y-4">
-      {#if attendanceRecord.checkIn}
-        <div class="flex items-center space-x-4 rounded-lg bg-gray-50 p-4 dark:bg-gray-800">
-          <div class="h-3 w-3 rounded-full bg-green-500"></div>
-          <div class="flex-1">
-            <p class="font-medium text-gray-900 dark:text-white">Check In</p>
-            <p class="text-sm text-gray-600 dark:text-gray-400">{attendanceRecord.checkIn}</p>
+  <div class="space-y-2">
+    {#if attendances.isLoading}
+      {#each Array(5) as _}
+        <div class="border-border bg-card animate-pulse rounded-lg border px-4 py-2.5">
+          <div class="flex items-center justify-between gap-4">
+            <div class="flex-1">
+              <div class="bg-muted mb-1 h-4 w-24 rounded"></div>
+              <div class="bg-muted h-3 w-32 rounded"></div>
+            </div>
+            <div class="flex items-center gap-3">
+              <div class="bg-muted h-3 w-12 rounded"></div>
+              <div class="bg-muted h-5 w-16 rounded-full"></div>
+            </div>
           </div>
-        </div>
-      {/if}
-
-      {#if attendanceRecord.checkOut}
-        <div class="flex items-center space-x-4 rounded-lg bg-gray-50 p-4 dark:bg-gray-800">
-          <div class="h-3 w-3 rounded-full bg-red-500"></div>
-          <div class="flex-1">
-            <p class="font-medium text-gray-900 dark:text-white">Check Out</p>
-            <p class="text-sm text-gray-600 dark:text-gray-400">{attendanceRecord.checkOut}</p>
-          </div>
-        </div>
-      {/if}
-
-      {#if attendanceState.status === "checked_in" || attendanceState.status === "checked_out"}
-        <div class="rounded-lg bg-blue-50 p-4 dark:bg-blue-900/30">
-          <p class="text-sm text-gray-600 dark:text-gray-400">
-            <span class="font-medium">Working Hours Today:</span>
-            {attendanceRecord.workingHours}
-          </p>
-        </div>
-      {/if}
-    </div>
-  </Card>
-
-  <!-- Weekly Summary -->
-  <Card class="p-6">
-    <h2 class="mb-4 text-xl font-semibold">This Week Summary</h2>
-    <div class="grid grid-cols-7 gap-2">
-      {#each mockWeeklySummary as day}
-        <div class="text-center">
-          <div class="mb-1 text-sm font-medium">{day.day}</div>
-          <Badge class={getStatusBadgeClass(day.status)}>
-            {day.status === "PRESENT" ? "✓" : day.status === "LATE" ? "T" : "✗"}
-          </Badge>
-          <div class="mt-1 text-xs text-gray-500">{day.hours}</div>
         </div>
       {/each}
-    </div>
-  </Card>
+    {:else if allAttendances.length === 0}
+      <div class="py-8 text-center">
+        <p class="text-muted-foreground">No attendance records found</p>
+      </div>
+    {:else}
+      {#each allAttendances as attendance (attendance.id)}
+        <AttendanceHistoryCard
+          date={attendance.date}
+          checkInAt={attendance.checkInAt}
+          checkOutAt={attendance.checkOutAt}
+          workedSeconds={attendance.workedSeconds}
+          status={attendance.status}
+          timezone={attendance.policy.timezone}
+        />
+      {/each}
+    {/if}
 
-  <!-- Request Correction Link -->
-  <Card class="p-6">
-    <div class="text-center">
-      <p class="text-gray-600 dark:text-gray-400">Wrong check-in/out time?</p>
-      <Button variant="link">Request Correction</Button>
-    </div>
-  </Card>
+    {#if attendances.hasNextPage}
+      <div class="flex items-center justify-center py-4">
+        <LoadMoreBtn
+          onclick={() => attendances.fetchNextPage()}
+          loading={attendances.isFetchingNextPage}
+          disabled={attendances.isFetchingNextPage}
+        />
+      </div>
+    {/if}
+  </div>
 </div>
-

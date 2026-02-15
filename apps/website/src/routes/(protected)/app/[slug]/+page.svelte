@@ -159,7 +159,7 @@
       <Card.Root>
         <Card.Header class="flex items-center justify-between">
           <Card.Title class="text-muted-foreground">Leave Balance</Card.Title>
-          <a href={`/app/${params.slug}/attendances`} class={buttonVariants({ variant: "link" })}
+          <a href={`/app/${params.slug}/leave`} class={buttonVariants({ variant: "link" })}
             >View details</a
           >
         </Card.Header>
