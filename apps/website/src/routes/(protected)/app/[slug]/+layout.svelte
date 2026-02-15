@@ -33,7 +33,9 @@
     {items}
   />
   <Sidebar.Inset>
-    {@render children()}
+    <div class="min-h-[calc(100dvh-70px)]">
+      {@render children()}
+    </div>
     <AppDock {items} currentPath={page.url.pathname} />
   </Sidebar.Inset>
 </Sidebar.Provider>
