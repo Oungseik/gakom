@@ -9,10 +9,10 @@
   import AttendanceCheckInCheckoutCard from "$lib/components/cards/AttendanceCheckInCheckoutCard.svelte";
   import LeaveUsageChart from "$lib/components/charts/LeaveUsageChart.svelte";
   import AttendanceCheckInCheckoutError from "$lib/components/errors/AttendanceCheckInCheckoutError.svelte";
-  import { columns } from "$lib/components/tables/AttendanceTable/app_columns";
   import { columns as leaveRequestsColumn } from "$lib/components/tables/LeaveRequestsTable/app_columns";
   import DataTable from "$lib/components/tables/common/DataTable.svelte";
   import { orpc } from "$lib/orpc_client";
+  import { getAttendanceStatusBadgeClass, getTimeInTimezone } from "$lib/utils";
 
   import type { PageProps } from "./$types";
 
@@ -144,13 +144,52 @@
             >View details</a
           >
         </Card.Header>
-        <Card.Content>
-          <DataTable
-            {columns}
-            border={false}
-            data={allAttendances}
-            loading={attendances.isLoading}
-          />
+        <Card.Content class="space-y-2">
+          {#if attendances.isLoading}
+            {#each Array(3) as _, i}
+              <div class="animate-pulse py-3 {i === 0 ? 'pt-0' : ''}">
+                <div class="flex items-center justify-between gap-4">
+                  <div class="flex-1">
+                    <div class="bg-muted mb-1.5 h-4 w-24 rounded"></div>
+                    <div class="bg-muted h-3 w-32 rounded"></div>
+                  </div>
+                  <div class="bg-muted h-5 w-16 rounded-full"></div>
+                </div>
+              </div>
+            {/each}
+          {:else if allAttendances.length === 0}
+            <div class="py-8 text-center">
+              <p class="text-muted-foreground">No recent attendance records</p>
+            </div>
+          {:else}
+            {#each allAttendances.slice(0, 5) as attendance, i (attendance.id)}
+              <div class="flex items-center justify-between gap-4">
+                <div class="min-w-0 flex-1">
+                  <p class="truncate">{attendance.date}</p>
+                  <p class="text-muted-foreground truncate text-sm">
+                    {attendance.checkInAt
+                      ? getTimeInTimezone(attendance.policy.timezone, attendance.checkInAt, {
+                          hour12: true,
+                        })
+                      : "-"}
+                    -
+                    {attendance.checkOutAt
+                      ? getTimeInTimezone(attendance.policy.timezone, attendance.checkOutAt, {
+                          hour12: true,
+                        })
+                      : "-"}
+                  </p>
+                </div>
+                <span
+                  class="inline-flex flex-shrink-0 items-center rounded-full px-2.5 py-0.5 text-xs font-medium {getAttendanceStatusBadgeClass(
+                    attendance.status
+                  )}"
+                >
+                  {attendance.status.replace("_", " ")}
+                </span>
+              </div>
+            {/each}
+          {/if}
         </Card.Content>
       </Card.Root>
     </section>

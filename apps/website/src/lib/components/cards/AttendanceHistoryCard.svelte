@@ -9,24 +9,14 @@
     date: string;
     checkInAt: Date | null;
     checkOutAt: Date | null;
-    workedSeconds: number | null;
     status: AttendanceStatus;
     timezone: TimeZone;
   };
 
-  const { date, checkInAt, checkOutAt, workedSeconds, status, timezone }: Props = $props();
-
-  function formatWorkHours(seconds: number | null): string {
-    if (seconds === null) return "-";
-    const hours = Math.floor(seconds / 3600);
-    const minutes = Math.floor((seconds % 3600) / 60);
-    return `${hours}h ${minutes}m`;
-  }
+  const { date, checkInAt, checkOutAt, status, timezone }: Props = $props();
 </script>
 
-<div
-  class="group border-border bg-card hover:bg-muted/50 rounded-lg border px-4 py-2.5 transition-colors"
->
+<div class="group border-border bg-card rounded-lg border px-4 py-2.5 transition-colors">
   <div class="flex items-center justify-between gap-4">
     <div class="flex-1">
       <p class="font-semibold">{date}</p>
@@ -37,9 +27,6 @@
       </p>
     </div>
     <div class="flex items-center gap-3">
-      <span class="text-muted-foreground text-xs tabular-nums"
-        >{formatWorkHours(workedSeconds)}</span
-      >
       <Badge class={getAttendanceStatusBadgeClass(status)}>
         {status.replace("_", " ")}
       </Badge>

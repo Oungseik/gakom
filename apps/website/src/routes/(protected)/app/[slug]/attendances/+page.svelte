@@ -76,7 +76,6 @@
               <div class="bg-muted h-3 w-32 rounded"></div>
             </div>
             <div class="flex items-center gap-3">
-              <div class="bg-muted h-3 w-12 rounded"></div>
               <div class="bg-muted h-5 w-16 rounded-full"></div>
             </div>
           </div>
@@ -92,7 +91,6 @@
           date={attendance.date}
           checkInAt={attendance.checkInAt}
           checkOutAt={attendance.checkOutAt}
-          workedSeconds={attendance.workedSeconds}
           status={attendance.status}
           timezone={attendance.policy.timezone}
         />
