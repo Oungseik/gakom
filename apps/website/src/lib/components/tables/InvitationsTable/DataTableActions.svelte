@@ -22,12 +22,8 @@
     attendancePolicyId?: string;
   } = $props();
 
-  const cancelInvitation = createMutation(() =>
-    orpc.invitations.cancel.mutationOptions()
-  );
-  const sendInvitation = createMutation(() =>
-    orpc.invitations.send.mutationOptions()
-  );
+  const cancelInvitation = createMutation(() => orpc.invitations.cancel.mutationOptions());
+  const sendInvitation = createMutation(() => orpc.invitations.send.mutationOptions());
   const queryClient = useQueryClient();
 
   async function handleResendInvitation() {
@@ -91,6 +87,7 @@
       <DropdownMenu.Item onclick={handleResendInvitation}>
         <MailIcon size={16} class="mr-2" /> Resend Invitation
       </DropdownMenu.Item>
+      <DropdownMenu.Separator />
       <DropdownMenu.Item
         onclick={handleCancelInvitation}
         variant="destructive"

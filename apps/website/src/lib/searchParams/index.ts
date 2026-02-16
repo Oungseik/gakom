@@ -15,6 +15,11 @@ export const attendancesFilterSchema = createSearchParamsSchema({
   dateTo: { type: "string" },
 });
 
+export const attendancesHistoryFilterSchema = createSearchParamsSchema({
+  dateFrom: { type: "string" },
+  dateTo: { type: "string" },
+});
+
 export const leaveRequestsFilterSchema = createSearchParamsSchema({
   search: { type: "string" },
   status: {

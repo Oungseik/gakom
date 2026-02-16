@@ -3,7 +3,7 @@
   import { Skeleton } from "@repo/ui/skeleton";
 </script>
 
-<Card.Root class="h-62">
+<Card.Root class="h-66">
   <Card.Header>
     <Skeleton class="h-5 w-40" />
   </Card.Header>

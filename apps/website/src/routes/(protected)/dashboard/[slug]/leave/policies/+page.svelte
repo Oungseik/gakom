@@ -43,8 +43,8 @@
 />
 
 <DashboardContainer>
-  <div class="mb-6 flex items-center justify-between">
-    <h1 class="text-2xl font-bold">Leave Policies</h1>
+  <div class="flex items-center justify-between">
+    <div></div>
     <Button onclick={handleCreate} variant="outline">
       <PlusIcon class="mr-2 size-4" />
       New Policy

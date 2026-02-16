@@ -25,7 +25,7 @@
   const { attendance, policy, onCheckIn, onCheckOut, disabled = false }: Props = $props();
 </script>
 
-<Card.Root class="h-62">
+<Card.Root>
   <Card.Header>
     <Card.Title class="text-muted-foreground">Today's Attendance</Card.Title>
   </Card.Header>
@@ -64,6 +64,7 @@
       </div>
     </div>
   </Card.Content>
+
   <Card.Footer>
     {#if !attendance?.checkInAt}
       <Button class="w-full" onclick={onCheckIn} {disabled}>Check in</Button>
