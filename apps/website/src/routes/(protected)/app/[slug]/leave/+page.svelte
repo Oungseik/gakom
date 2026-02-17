@@ -17,6 +17,7 @@
   import { toast } from "svelte-sonner";
 
   import LoadMoreBtn from "$lib/components/buttons/LoadMoreBtn.svelte";
+  import EventCalendar from "$lib/components/calendars/EventCalendar.svelte";
   import LeaveUsageChart from "$lib/components/charts/LeaveUsageChart.svelte";
   import { orpc } from "$lib/orpc_client";
   import { leaveRequestsFilterSchema } from "$lib/searchParams";
@@ -55,6 +56,57 @@
   );
 
   const allRequests = $derived(leaveRequests.data?.pages.flatMap((p) => p.items) ?? []);
+
+  const today = new Date();
+  const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+  const endOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+
+  const attendances = createQuery(() =>
+    orpc.attendances.list.queryOptions({
+      input: {
+        slug: params.slug,
+        pageSize: 100,
+        filter: {
+          self: true,
+          dateFrom: startOfMonth.toISOString().split("T")[0],
+          dateTo: endOfMonth.toISOString().split("T")[0],
+        },
+      },
+      enabled: !!params.slug,
+    })
+  );
+
+  const calendarEvents = createQuery(() =>
+    orpc.calendarEvents.list.queryOptions({
+      input: {
+        slug: params.slug,
+        pageSize: 100,
+        filter: {
+          from: startOfMonth.toISOString().split("T")[0],
+          to: endOfMonth.toISOString().split("T")[0],
+        },
+      },
+      enabled: !!params.slug,
+    })
+  );
+
+  const attendancesData = $derived(
+    attendances.data?.items.map((item) => ({
+      date: item.date,
+      checkInAt: item.checkInAt,
+      checkOutAt: item.checkOutAt,
+    })) ?? []
+  );
+
+  // TODO: Remove mock data when API properly returns user's calendar events
+  // Currently returns empty if user has no assigned calendar (MEMBER role)
+  const MOCK_EVENTS: Date[] = [];
+
+  const eventsData = $derived(
+    calendarEvents.data?.items.length
+      ? calendarEvents.data.items.map((item) => new Date(item.date))
+      : MOCK_EVENTS
+  );
 
   const createRequest = createMutation(() => orpc.leaveRequests.create.mutationOptions());
   const cancelRequest = createMutation(() => orpc.leaveRequests.cancel.mutationOptions());
@@ -164,6 +216,13 @@
         <p class="text-muted-foreground">View your leave balances and history</p>
       </div>
     </div>
+
+    <section class="space-y-3">
+      <div class="flex items-center justify-between">
+        <h2 class="text-lg font-semibold">Work Calendar</h2>
+      </div>
+      <EventCalendar attendances={attendancesData} events={eventsData} />
+    </section>
 
     <section class="space-y-3">
       <div class="flex items-center justify-between">

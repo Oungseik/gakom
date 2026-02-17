@@ -1,7 +1,12 @@
 <script lang="ts">
   import { buttonVariants } from "@repo/ui/button";
   import { ScrollArea, Scrollbar } from "@repo/ui/scroll-area";
-  import { createInfiniteQuery, createMutation, createQuery } from "@tanstack/svelte-query";
+  import {
+    createInfiniteQuery,
+    createMutation,
+    createQuery,
+    useQueryClient,
+  } from "@tanstack/svelte-query";
   import { toast } from "svelte-sonner";
 
   import AttendanceCheckInCheckOutSkeleton from "$lib/components/cards/AttendanceCheckInCheckOutSkeleton.svelte";
@@ -14,6 +19,7 @@
   import type { PageProps } from "./$types";
 
   const { data, params }: PageProps = $props();
+  const queryClient = useQueryClient();
   let coords = $state({ latitude: 0, longitude: 0, accuracy: 0 });
 
   const attendance = createQuery(() =>
@@ -107,8 +113,8 @@
           { slug: params.slug, ...coords },
           {
             onSuccess: () => {
-              attendance.refetch();
-              attendances.refetch();
+              queryClient.invalidateQueries({ queryKey: orpc.attendances.get.key() });
+              queryClient.invalidateQueries({ queryKey: orpc.attendances.list.key() });
             },
             onError: () => {},
           }
@@ -119,8 +125,8 @@
           { slug: params.slug, ...coords },
           {
             onSuccess: () => {
-              attendance.refetch();
-              attendances.refetch();
+              queryClient.invalidateQueries({ queryKey: orpc.attendances.get.key() });
+              queryClient.invalidateQueries({ queryKey: orpc.attendances.list.key() });
             },
             onError: () => {},
           }
