@@ -1,6 +1,5 @@
 <script lang="ts">
   import CalendarIcon from "@lucide/svelte/icons/calendar";
-  import ClipboardListIcon from "@lucide/svelte/icons/clipboard-list";
   import ClockIcon from "@lucide/svelte/icons/clock";
   import HouseIcon from "@lucide/svelte/icons/house";
   import UserIcon from "@lucide/svelte/icons/user";
@@ -19,7 +18,6 @@
   const items = $derived([
     { name: "Home", icon: HouseIcon, url: `/app/${slug}` },
     { name: "Attendances", icon: ClockIcon, url: `/app/${slug}/attendances` },
-    { name: "Tasks", icon: ClipboardListIcon, url: `/app/${slug}/tasks` },
     { name: "Leave", icon: CalendarIcon, url: `/app/${slug}/leave` },
     { name: "Profile", icon: UserIcon, url: `/app/${slug}/profile` },
   ]);

@@ -101,10 +101,7 @@
     for (let week = 0; week < 6; week++) {
       const lastDayOfWeek = currentDate.add({ days: 6 });
 
-      if (
-        lastDayOfWeek.month !== placeholder.month &&
-        currentDate.month !== placeholder.month
-      ) {
+      if (lastDayOfWeek.month !== placeholder.month && currentDate.month !== placeholder.month) {
         break;
       }
 
@@ -128,7 +125,7 @@
 </script>
 
 <div class="flex w-full flex-col gap-2 rounded-md border p-3 sm:gap-3">
-  <div class="flex items-center justify-center gap-4">
+  <div class="mb-2 flex items-center justify-center gap-4">
     <Button variant="ghost" size="icon" class="size-7 sm:size-8" onclick={goToPrevMonth}>
       <ChevronLeft class="size-3.5 sm:size-4" />
     </Button>
@@ -144,7 +141,7 @@
     {/each}
   </div>
 
-  <div class="grid grid-cols-7 gap-0.5 sm:gap-1">
+  <div class="grid grid-cols-7 grid-rows-6 gap-0.5 sm:gap-1">
     {#each weeks as week}
       {#each week as date}
         {@const attendance = getAttendanceStatus(date)}
@@ -157,20 +154,24 @@
           !isFutureDate && attendance && attendance.checkInAt && !attendance.checkOutAt}
         <button
           type="button"
-          class="hover:bg-accent hover:text-accent-foreground focus-visible:ring-ring relative flex aspect-square flex-col items-center justify-center rounded-md border-0 p-0 text-xs transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 sm:text-sm
-            {isTodayDate ? 'bg-primary/10 text-primary font-semibold' : ''}
-            {!isCurrentMonth ? 'text-muted-foreground opacity-50' : ''}"
+          class={[
+            "hover:bg-accent hover:text-accent-foreground focus-visible:ring-ring flex aspect-square flex-col items-center justify-center gap-1 rounded-md border-0 p-0 text-xs transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 sm:text-sm",
+            isTodayDate && "bg-primary/10 text-primary font-semibold",
+            !isCurrentMonth && "text-muted-foreground opacity-50",
+          ]}
           disabled={!isCurrentMonth || isFutureDate}
           onclick={() => handleSelect(date)}
         >
-          {#if hasEventDay}
-            <span
-              class="absolute top-0.5 h-1 w-1 rounded-full bg-blue-500 sm:top-1 sm:h-1.5 sm:w-1.5"
-            ></span>
-          {/if}
+          <div class="mb-0.5 flex">
+            {#if hasEventDay}
+              <span class="h-1 w-1 rounded-full bg-blue-500 sm:top-1 sm:h-1.5 sm:w-1.5"></span>
+            {:else}
+              <span class="h-1 w-1 sm:top-1 sm:h-1.5 sm:w-1.5"></span>
+            {/if}
+          </div>
           <span class="z-10">{date.day}</span>
-          {#if !isFutureDate && isCurrentMonth}
-            <div class="mt-0.5 flex gap-0.5">
+          {#if isCurrentMonth && !isFutureDate}
+            <div class="mt-0.5 flex h-1 gap-0.5">
               <span
                 class="h-1 w-1 rounded-full sm:h-1.5 sm:w-1.5
                   {attendance?.checkInAt
@@ -188,6 +189,8 @@
                     : 'bg-transparent'}"
               ></span>
             </div>
+          {:else}
+            <div class="mt-0.5 flex h-1 gap-0.5"></div>
           {/if}
         </button>
       {/each}
