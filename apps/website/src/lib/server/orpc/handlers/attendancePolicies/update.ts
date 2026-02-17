@@ -12,6 +12,7 @@ const input = z.object({
     timezone: z.enum(TIMEZONES),
     clockIn: z.number(),
     clockOut: z.number(),
+    gracePeriod: z.number(),
     workdays: z.array(z.enum(["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"])),
   }),
 });
@@ -26,6 +27,7 @@ export const updateAttendancePolicyHandler = os
         ...input.data,
         clockInSec: input.data.clockIn,
         clockOutSec: input.data.clockOut,
+        gracePeriodSec: input.data.gracePeriod,
       })
       .where(
         and(

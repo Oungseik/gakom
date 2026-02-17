@@ -21,6 +21,7 @@ export const listAttendancePoliciesHandler = os
         timezone: attendancePolicy.timezone,
         clockIn: attendancePolicy.clockInSec,
         clockOut: attendancePolicy.clockOutSec,
+        gracePeriod: attendancePolicy.gracePeriodSec,
         workdays: attendancePolicy.workdays,
         offset: attendancePolicy.timezone,
         updatedAt: attendancePolicy.updatedAt,

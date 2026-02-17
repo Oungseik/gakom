@@ -51,8 +51,8 @@ export const checkOutHandler = os
     const time = getTimeInTimezone(policy.timezone, now);
     const [hours, minutes] = time.split(":").map(Number);
     const currentSeconds = hours * 3600 + minutes * 60;
-    const isEarlyLeave = currentSeconds < policy.clockOutSec;
-    const isLateCheckOut = currentSeconds > policy.clockOutSec;
+    const isEarlyLeave = currentSeconds < policy.clockOutSec - policy.gracePeriodSec;
+    const isLateCheckOut = currentSeconds > policy.clockOutSec + policy.gracePeriodSec;
     const workedSeconds = Math.floor((now.getTime() - checkIn.getTime()) / 1000);
 
     const isLateCheckIn = existingRecord.status === "LATE";

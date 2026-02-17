@@ -11,6 +11,7 @@ export type AttendancePolicy = {
   timezone: (typeof TIMEZONES)[number];
   clockIn: number;
   clockOut: number;
+  gracePeriod: number;
   workdays: Day[];
   updatedAt: Date;
   organizationId: string;

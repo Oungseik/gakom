@@ -77,4 +77,8 @@
   {/if}
 </DashboardContainer>
 
-<AttendancePolicyDialog bind:open={isDialogOpen} slug={params.slug} policy={editingPolicy} />
+{#if editingPolicy}
+  <AttendancePolicyDialog bind:open={isDialogOpen} slug={params.slug} policy={editingPolicy} />
+{:else}
+  <AttendancePolicyDialog bind:open={isDialogOpen} slug={params.slug} />
+{/if}

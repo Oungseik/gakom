@@ -11,6 +11,7 @@ const input = z.object({
     timezone: z.enum(TIMEZONES),
     clockIn: z.number(),
     clockOut: z.number(),
+    gracePeriod: z.number(),
     workdays: z.array(z.enum(["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"])),
   }),
 });
@@ -23,6 +24,7 @@ export const createAttendancePolicyHandler = os
       ...input.data,
       clockInSec: input.data.clockIn,
       clockOutSec: input.data.clockOut,
+      gracePeriodSec: input.data.gracePeriod,
       organizationId: context.organization.id,
     });
   });

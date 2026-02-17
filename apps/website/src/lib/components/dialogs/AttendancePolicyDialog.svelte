@@ -45,12 +45,14 @@
     timezone?: TimeZone;
     clockIn: string;
     clockOut: string;
+    gracePeriod: number;
     workdays: Day[];
   } = $derived({
     name: policy?.name ?? "",
     timezone,
     clockIn: policy ? secondsToTime(policy.clockIn) : "09:00",
     clockOut: policy ? secondsToTime(policy.clockOut) : "17:00",
+    gracePeriod: policy ? Math.floor(policy.gracePeriod / 60) : 0,
     workdays: policy?.workdays ?? ["MON", "TUE", "WED", "THU", "FRI"],
   });
 
@@ -68,6 +70,7 @@
         timezone: value.timezone,
         clockIn: timeToSeconds(value.clockIn),
         clockOut: timeToSeconds(value.clockOut),
+        gracePeriod: value.gracePeriod * 60,
       };
 
       if (policy) {
@@ -75,8 +78,6 @@
       } else {
         createAttendancePolicy(data);
       }
-
-      isSubmitting = false;
     },
   }));
 
@@ -91,9 +92,14 @@
           queryClient.invalidateQueries({
             queryKey: orpc.attendancesPolicies.list.key(),
           });
+          form.reset();
+          isSubmitting = false;
           open = false;
         },
-        onError: (error) => toast.error(error.message),
+        onError: (error) => {
+          toast.error(error.message);
+          isSubmitting = false;
+        },
       }
     );
   }
@@ -110,9 +116,14 @@
           queryClient.invalidateQueries({
             queryKey: orpc.attendancesPolicies.list.key(),
           });
+          form.reset();
+          isSubmitting = false;
           open = false;
         },
-        onError: (error) => toast.error(error.message),
+        onError: (error) => {
+          toast.error(error.message);
+          isSubmitting = false;
+        },
       }
     );
   }
@@ -244,6 +255,36 @@
         </form.Field>
       </div>
 
+      <form.Field
+        name="gracePeriod"
+        validators={{
+          onChange: ({ value }) => {
+            const { error } = z.number().min(0).max(60).safeParse(value);
+            return error?.issues?.at(0)?.message ?? undefined;
+          },
+        }}
+      >
+        {#snippet children(field)}
+          <div class="space-y-2">
+            <Label for={field.name}>Grace Period (minutes)</Label>
+            <Input
+              id={field.name}
+              name={field.name}
+              value={field.state.value}
+              type="number"
+              min="0"
+              max="60"
+              onblur={field.handleBlur}
+              onchange={(e) => field.handleChange(Number(e.currentTarget.value))}
+              disabled={isSubmitting}
+            />
+            {#if field.state.meta.errors.length}
+              <p class="text-sm text-red-500">{field.state.meta.errors}</p>
+            {/if}
+          </div>
+        {/snippet}
+      </form.Field>
+
       <form.Field name="workdays">
         {#snippet children(field)}
           <div class="space-y-2">
@@ -274,7 +315,9 @@
       </form.Field>
 
       <Dialog.Footer>
-        <Dialog.Close class={buttonVariants({ variant: "outline" })}>Cancel</Dialog.Close>
+        <Dialog.Close class={buttonVariants({ variant: "outline" })} type="button"
+          >Cancel</Dialog.Close
+        >
         <Button type="submit" disabled={isSubmitting} class="w-17">
           {#if isSubmitting}
             <Loader2Icon class="size-4 animate-spin" />
