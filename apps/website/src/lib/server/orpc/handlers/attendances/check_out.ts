@@ -50,12 +50,21 @@ export const checkOutHandler = os
 
     const time = getTimeInTimezone(policy.timezone, now);
     const [hours, minutes] = time.split(":").map(Number);
-    const seconds = hours * 3600 + minutes * 60;
-    const isEarlyLeave = seconds < policy.clockOutSec;
+    const currentSeconds = hours * 3600 + minutes * 60;
+    const isEarlyLeave = currentSeconds < policy.clockOutSec;
+    const isLateCheckOut = currentSeconds > policy.clockOutSec;
     const workedSeconds = Math.floor((now.getTime() - checkIn.getTime()) / 1000);
 
-    const status =
-      existingRecord.status === "LATE" ? "LATE" : isEarlyLeave ? "EARLY_LEAVE" : "PRESENT";
+    const isLateCheckIn = existingRecord.status === "LATE";
+
+    let status: "PRESENT" | "LATE" | "EARLY_LEAVE";
+    if (isLateCheckIn || isLateCheckOut) {
+      status = "LATE";
+    } else if (isEarlyLeave) {
+      status = "EARLY_LEAVE";
+    } else {
+      status = "PRESENT";
+    }
 
     await db
       .update(attendance)

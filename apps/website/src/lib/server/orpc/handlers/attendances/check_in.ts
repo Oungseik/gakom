@@ -3,7 +3,7 @@ import { attendance } from "@repo/db";
 import { z } from "zod";
 import { db } from "$lib/server/db";
 import { organizationMiddleware, os } from "$lib/server/orpc/base";
-import { getDateInTimezone } from "$lib/utils";
+import { getDateInTimezone, getTimeInTimezone } from "$lib/utils";
 
 const input = z.object({
   slug: z.string(),
@@ -27,6 +27,13 @@ export const checkInHandler = os
     }))!;
 
     const now = new Date();
+
+    const time = getTimeInTimezone(policy.timezone, now);
+    const [hours, minutes] = time.split(":").map(Number);
+    const currentSeconds = hours * 3600 + minutes * 60;
+    const isLate = currentSeconds > policy.clockInSec;
+    const initialStatus = isLate ? "LATE" : "PRESENT";
+
     const currentDateInTimezone = getDateInTimezone(policy.timezone, now);
 
     // use `findMany` because `findFirst` will fail when do relation at this moment
@@ -57,7 +64,7 @@ export const checkInHandler = os
         longitude: input.longitude,
         accuracy: input.accuracy,
       },
-      status: "INCOMPLETE",
+      status: initialStatus,
       workedSeconds: 0,
       updatedAt: now,
     });
