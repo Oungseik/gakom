@@ -1,6 +1,6 @@
 import { ORPCError, onError, ValidationError } from "@orpc/server";
 import { RPCHandler } from "@orpc/server/fetch";
-import { StrictGetMethodPlugin } from "@orpc/server/plugins";
+import { BatchHandlerPlugin, StrictGetMethodPlugin } from "@orpc/server/plugins";
 import z from "zod";
 
 import { router } from "$lib/server/orpc/router";
@@ -9,7 +9,7 @@ import type { RequestHandler } from "./$types";
 
 const handler = new RPCHandler(router, {
   strictGetMethodPluginEnabled: true,
-  plugins: [new StrictGetMethodPlugin()],
+  plugins: [new StrictGetMethodPlugin(), new BatchHandlerPlugin()],
   clientInterceptors: [
     onError((error) => {
       console.error(error);

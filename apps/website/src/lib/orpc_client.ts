@@ -1,10 +1,12 @@
 import { createORPCClient } from "@orpc/client";
 import { RPCLink } from "@orpc/client/fetch";
+import { BatchLinkPlugin } from "@orpc/client/plugins";
 import type { RouterClient } from "@orpc/server";
 import {
   createTanstackQueryUtils,
   TANSTACK_QUERY_OPERATION_CONTEXT_SYMBOL,
 } from "@orpc/tanstack-query";
+import { PUBLIC_ENVIRONMENT } from "$env/static/public";
 
 import type { Router } from "$lib/server/orpc/router";
 
@@ -21,7 +23,11 @@ const link = new RPCLink({
 
     return "POST";
   },
-  plugins: [],
+  plugins: [
+    new BatchLinkPlugin({
+      groups: [{ condition: () => PUBLIC_ENVIRONMENT !== "development", context: {} }],
+    }),
+  ],
 });
 
 const client: RouterClient<Router> = globalThis.$client ?? createORPCClient(link);
