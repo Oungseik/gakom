@@ -11,7 +11,7 @@ export const load: LayoutLoad = async () => {
   const queryClient = new QueryClient({
     defaultOptions: {
       queries: {
-        staleTime: 60 * 1000,
+        staleTime: 61 * 1000,
         enabled: browser,
       },
       dehydrate: {
