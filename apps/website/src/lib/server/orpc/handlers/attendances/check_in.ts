@@ -32,7 +32,7 @@ export const checkInHandler = os
     const [hours, minutes] = time.split(":").map(Number);
     const currentSeconds = hours * 3600 + minutes * 60;
     const isLate = currentSeconds > policy.clockInSec + policy.gracePeriodSec;
-    const initialStatus = isLate ? "LATE" : "PRESENT";
+    const initialStatus = isLate ? "LATE" : "INCOMPLETE";
 
     const currentDateInTimezone = getDateInTimezone(policy.timezone, now);
 
