@@ -5,15 +5,19 @@
   import MapPinIcon from "@lucide/svelte/icons/map-pin";
   import ShieldIcon from "@lucide/svelte/icons/shield";
   import { Avatar, AvatarFallback, AvatarImage } from "@repo/ui/avatar";
+  import { Button } from "@repo/ui/button";
   import { Card, CardContent, CardHeader, CardTitle } from "@repo/ui/card";
   import { createQuery } from "@tanstack/svelte-query";
 
+  import UpdateContactDialog from "$lib/components/dialogs/UpdateContactDialog.svelte";
   import { orpc } from "$lib/orpc_client";
   import { getNameIntials } from "$lib/utils";
 
   import type { PageProps } from "./$types";
 
   const { params }: PageProps = $props();
+
+  let isEditContactDialogOpen = $state(false);
 
   const member = createQuery(() =>
     orpc.members.get.queryOptions({
@@ -35,7 +39,7 @@
   }
 </script>
 
-<div class="flex h-[calc(100dvh-70px)] flex-col items-center justify-center p-4">
+<div class="flex flex-col p-4">
   <div class="w-full max-w-2xl space-y-6">
     {#if member.isLoading}
       <Card>
@@ -71,7 +75,10 @@
 
       <Card>
         <CardHeader>
-          <CardTitle class="text-lg">Contact Information</CardTitle>
+          <div class="flex items-center justify-between">
+            <CardTitle class="text-lg">Contact Information</CardTitle>
+            <Button variant="link" onclick={() => (isEditContactDialogOpen = true)}>Edit</Button>
+          </div>
         </CardHeader>
         <CardContent class="space-y-4">
           <div class="flex items-center gap-3">
@@ -139,4 +146,12 @@
       </Card>
     {/if}
   </div>
+
+  <UpdateContactDialog
+    bind:open={isEditContactDialogOpen}
+    slug={params.slug}
+    address={member.data?.address}
+    city={member.data?.city}
+    countryCode={member.data?.countryCode}
+  />
 </div>

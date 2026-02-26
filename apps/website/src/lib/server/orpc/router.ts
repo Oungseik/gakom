@@ -45,6 +45,7 @@ import { listMembersHandler } from "./handlers/members/list";
 import { removeMemberHandler } from "./handlers/members/remove";
 import { getStatisticsHandler } from "./handlers/members/stats";
 import { updateMemberHandler } from "./handlers/members/update";
+import { updateContactHandler } from "./handlers/members/update_contact";
 import { createOrganizationHandler } from "./handlers/organizations/create";
 
 export const router = os.router({
@@ -87,6 +88,7 @@ export const router = os.router({
     list: listMembersHandler,
     get: getMemberHandler,
     update: updateMemberHandler,
+    updateContact: updateContactHandler,
     remove: removeMemberHandler,
     stats: getStatisticsHandler,
   },
