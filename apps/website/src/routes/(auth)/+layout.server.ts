@@ -29,7 +29,7 @@ export const load: LayoutServerLoad = async ({ locals, url }) => {
   }
 
   const organizations = await db.query.organization.findMany({
-    where: { members: { user: { email: user?.email, members: { status: "ACTIVE" } } } },
+    where: { members: { user: { email: user?.email, members: { leftAt: { isNull: true } } } } },
   });
 
   if (organizations.length === 0 && pathname === "/setup") {

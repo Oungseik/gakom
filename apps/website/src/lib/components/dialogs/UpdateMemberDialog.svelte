@@ -33,7 +33,7 @@
 
   const attendancePolicies = createQuery(() =>
     orpc.attendancesPolicies.list.queryOptions({
-      input: { slug, pageSize: 100, cursor: 0 },
+      input: { slug, pageSize: 100 },
       enabled: !!slug,
     })
   );
@@ -47,7 +47,7 @@
 
   const calendars = createQuery(() =>
     orpc.calendars.list.queryOptions({
-      input: { slug, pageSize: 100, cursor: 0 },
+      input: { slug, pageSize: 100 },
       enabled: !!slug,
     })
   );
@@ -183,7 +183,7 @@
                     {p?.name}
                     {#if p}
                       <span class="text-muted-foreground"
-                        >({formatTime(p.clockIn)} - {formatTime(p.clockOut)})</span
+                        >({formatTime(p.clockInSec)} - {formatTime(p.clockOutSec)})</span
                       >
                     {/if}
                   {:else}
@@ -196,7 +196,7 @@
                   <Select.Item value={p.id}>
                     {p.name}
                     <span class="text-muted-foreground"
-                      >({formatTime(p.clockIn)} - {formatTime(p.clockOut)})</span
+                      >({formatTime(p.clockInSec)} - {formatTime(p.clockOutSec)})</span
                     >
                   </Select.Item>
                 {/each}

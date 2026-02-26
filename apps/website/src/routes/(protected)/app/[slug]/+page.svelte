@@ -1,12 +1,7 @@
 <script lang="ts">
   import { buttonVariants } from "@repo/ui/button";
   import { ScrollArea, Scrollbar } from "@repo/ui/scroll-area";
-  import {
-    createInfiniteQuery,
-    createMutation,
-    createQuery,
-    useQueryClient,
-  } from "@tanstack/svelte-query";
+  import { createMutation, createQuery, useQueryClient } from "@tanstack/svelte-query";
   import { toast } from "svelte-sonner";
 
   import AttendanceCheckInCheckOutSkeleton from "$lib/components/cards/AttendanceCheckInCheckOutSkeleton.svelte";
@@ -29,20 +24,12 @@
     })
   );
 
-  const attendances = createInfiniteQuery(() =>
-    orpc.attendances.list.infiniteOptions({
-      initialPageParam: 0,
-      input: (cursor) => ({
-        slug: params.slug,
-        cursor,
-        pageSize: 5,
-        filter: { self: true },
-      }),
-      getNextPageParam: (lastPage) => lastPage.nextCursor,
+  const attendances = createQuery(() =>
+    orpc.attendances.list.queryOptions({
+      input: { slug: params.slug, pageSize: 5 },
       enabled: !!params.slug,
     })
   );
-  const allAttendances = $derived(attendances.data?.pages.flatMap((page) => page.items) ?? []);
 
   const leaveBalances = createQuery(() =>
     orpc.leaveBalances.list.queryOptions({
@@ -156,27 +143,27 @@
             </div>
           </div>
         {/each}
-      {:else if allAttendances.length === 0}
+      {:else if attendances.data?.items?.length === 0}
         <div class="py-8 text-center">
           <p class="text-muted-foreground">No recent attendance records</p>
         </div>
       {:else}
-        {#each allAttendances.slice(0, 5) as attendance (attendance.id)}
+        {#each attendances.data?.items as attendance (attendance.id)}
           <div class="flex items-center justify-between border-b p-4 last:border-b-0">
             <div class="min-w-0 flex-1">
               <p class="font-medium">{attendance.date}</p>
               <p class="text-muted-foreground truncate text-sm">
                 {attendance.checkInAt
-                  ? getTimeInTimezone(attendance.policy.timezone, attendance.checkInAt, {
+                  ? getTimeInTimezone(attendance.attendancePolicy.timezone, attendance.checkInAt, {
                       hour12: true,
                     })
-                  : "-"}
+                  : ""}
                 -
                 {attendance.checkOutAt
-                  ? getTimeInTimezone(attendance.policy.timezone, attendance.checkOutAt, {
+                  ? getTimeInTimezone(attendance.attendancePolicy.timezone, attendance.checkOutAt, {
                       hour12: true,
                     })
-                  : "-"}
+                  : ""}
               </p>
             </div>
             <span

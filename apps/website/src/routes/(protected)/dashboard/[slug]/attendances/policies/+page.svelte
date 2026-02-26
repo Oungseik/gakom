@@ -22,8 +22,8 @@
 
   const policies = createInfiniteQuery(() =>
     orpc.attendancesPolicies.list.infiniteOptions({
-      initialPageParam: 0,
-      input: (cursor) => ({ pageSize: 20, cursor, slug: params.slug }),
+      initialPageParam: undefined,
+      input: (cursor: string | undefined) => ({ pageSize: 20, cursor, slug: params.slug }),
       getNextPageParam: (lastPage) => lastPage.nextCursor,
       enabled: !!params.slug,
     })
@@ -57,14 +57,7 @@
     </Button>
   </div>
 
-  <DataTable
-    columns={columns(handleEdit)}
-    data={allPolicies.map((p) => ({
-      ...p,
-      organizationId: params.slug,
-    }))}
-    loading={policies.isLoading}
-  />
+  <DataTable columns={columns(handleEdit)} data={allPolicies} loading={policies.isLoading} />
 
   {#if policies.hasNextPage}
     <div class="flex items-center justify-center py-4">

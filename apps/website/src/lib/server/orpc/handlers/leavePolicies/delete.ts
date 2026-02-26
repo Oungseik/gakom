@@ -1,4 +1,4 @@
-import { and, count, eq, leave, leaveBalance, leaveRequest } from "@repo/db";
+import { and, count, eq, leavePolicy, leaveBalance, leaveRequest } from "@repo/db";
 import z from "zod";
 import { db } from "$lib/server/db";
 import { organizationMiddleware, os } from "$lib/server/orpc/base";
@@ -46,6 +46,6 @@ export const deleteLeavePolicyHandler = os
     }
 
     await db
-      .delete(leave)
-      .where(and(eq(leave.id, input.id), eq(leave.organizationId, context.organization.id)));
+      .delete(leavePolicy)
+      .where(and(eq(leavePolicy.id, input.id), eq(leavePolicy.organizationId, context.organization.id)));
   });

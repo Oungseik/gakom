@@ -1,4 +1,4 @@
-import { and, desc, eq, leave, like, organization } from "@repo/db";
+import { and, desc, eq, leavePolicy, like, organization } from "@repo/db";
 import z from "zod";
 import { db } from "$lib/server/db";
 import { organizationMiddleware, os } from "$lib/server/orpc/base";
@@ -24,21 +24,21 @@ export const listLeavePoliciesHandler = os
 
     const items = await db
       .select({
-        id: leave.id,
-        name: leave.name,
-        days: leave.days,
-        createdAt: leave.createdAt,
-        updatedAt: leave.updatedAt,
+        id: leavePolicy.id,
+        name: leavePolicy.name,
+        days: leavePolicy.days,
+        createdAt: leavePolicy.createdAt,
+        updatedAt: leavePolicy.updatedAt,
       })
-      .from(leave)
-      .innerJoin(organization, eq(leave.organizationId, organization.id))
+      .from(leavePolicy)
+      .innerJoin(organization, eq(leavePolicy.organizationId, organization.id))
       .where(
         and(
           eq(organization.id, context.organization.id),
-          filter?.search ? like(leave.name, `%${filter.search}%`) : undefined,
+          filter?.search ? like(leavePolicy.name, `%${filter.search}%`) : undefined,
         ),
       )
-      .orderBy(desc(leave.createdAt))
+      .orderBy(desc(leavePolicy.createdAt))
       .offset(input.cursor ?? 0)
       .limit(limit);
 

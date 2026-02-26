@@ -7,7 +7,7 @@ export const calendar = sqliteTable(
   {
     id: text("id")
       .primaryKey()
-      .$defaultFn(() => crypto.randomUUID()),
+      .$defaultFn(() => Bun.randomUUIDv7()),
     name: text("name").notNull(),
     organizationId: text("organization_id")
       .notNull()
@@ -32,7 +32,7 @@ export const calendarEvent = sqliteTable(
   {
     id: text("id")
       .primaryKey()
-      .$defaultFn(() => crypto.randomUUID()),
+      .$defaultFn(() => Bun.randomUUIDv7()),
     calendarId: text("calendar_id")
       .notNull()
       .references(() => calendar.id, { onDelete: "cascade" }),

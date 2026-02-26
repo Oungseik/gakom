@@ -1,5 +1,5 @@
+import type { TimeZone } from "@repo/config";
 import type { Day } from "@repo/db";
-import type { TimeZone } from "@repo/db/timezone";
 import { Checkbox } from "@repo/ui/checkbox";
 import { renderComponent } from "@repo/ui/data-table";
 import type { ColumnDef } from "@tanstack/table-core";

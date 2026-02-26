@@ -22,9 +22,13 @@ export const checkOutHandler = os
       });
     }
 
-    const policy = (await db.query.attendancePolicy.findFirst({
+    const policy = await db.query.attendancePolicy.findFirst({
       where: { id: context.member.attendancePolicyId },
-    }))!;
+    });
+
+    if (!policy) {
+      throw new ORPCError("INTERNAL_SERVER_ERROR", { message: "Attendance policy must exist." });
+    }
 
     const now = new Date();
     const currentDateInTimezone = getDateInTimezone(policy.timezone, now);

@@ -1,4 +1,4 @@
-import { and, count, eq, gte, isNull, leave, leaveRequest, lte, member } from "@repo/db";
+import { and, count, eq, gte, isNull, leavePolicy, leaveRequest, lte, member } from "@repo/db";
 import { z } from "zod";
 import { db } from "$lib/server/db";
 import { organizationMiddleware, os } from "$lib/server/orpc/base";
@@ -19,11 +19,11 @@ export const getStatsHandler = os
     const totalPendingRequests = db
       .select({ count: count() })
       .from(leaveRequest)
-      .innerJoin(leave, eq(leaveRequest.leaveId, leave.id))
+      .innerJoin(leavePolicy, eq(leaveRequest.leaveId, leavePolicy.id))
       .innerJoin(member, eq(leaveRequest.memberId, member.id))
       .where(
         and(
-          eq(leave.organizationId, context.organization.id),
+          eq(leavePolicy.organizationId, context.organization.id),
           eq(leaveRequest.status, "PENDING"),
           isNull(member.leftAt),
         ),
@@ -32,11 +32,11 @@ export const getStatsHandler = os
     const totalApprovedToday = db
       .select({ count: count() })
       .from(leaveRequest)
-      .innerJoin(leave, eq(leaveRequest.leaveId, leave.id))
+      .innerJoin(leavePolicy, eq(leaveRequest.leaveId, leavePolicy.id))
       .innerJoin(member, eq(leaveRequest.memberId, member.id))
       .where(
         and(
-          eq(leave.organizationId, context.organization.id),
+          eq(leavePolicy.organizationId, context.organization.id),
           eq(leaveRequest.status, "APPROVED"),
           isNull(member.leftAt),
           lte(leaveRequest.updatedAt, endOfDay),
@@ -47,11 +47,11 @@ export const getStatsHandler = os
     const totalOnLeaveToday = db
       .select({ count: count() })
       .from(leaveRequest)
-      .innerJoin(leave, eq(leaveRequest.leaveId, leave.id))
+      .innerJoin(leavePolicy, eq(leaveRequest.leaveId, leavePolicy.id))
       .innerJoin(member, eq(leaveRequest.memberId, member.id))
       .where(
         and(
-          eq(leave.organizationId, context.organization.id),
+          eq(leavePolicy.organizationId, context.organization.id),
           eq(leaveRequest.status, "APPROVED"),
           isNull(member.leftAt),
           lte(leaveRequest.startDate, endOfDay),

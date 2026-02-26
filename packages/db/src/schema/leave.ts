@@ -10,12 +10,12 @@ import {
 } from "drizzle-orm/sqlite-core";
 import { member, organization } from "./organization";
 
-export const leave = sqliteTable(
-  "leave",
+export const leavePolicy = sqliteTable(
+  "leave_policy",
   {
     id: text("id")
       .primaryKey()
-      .$defaultFn(() => crypto.randomUUID()),
+      .$defaultFn(() => Bun.randomUUIDv7()),
     name: text("name").notNull(),
     days: real("days").notNull(),
     organizationId: text("organization_id")
@@ -37,13 +37,13 @@ export const leaveRequest = sqliteTable(
   {
     id: text("id")
       .primaryKey()
-      .$defaultFn(() => crypto.randomUUID()),
+      .$defaultFn(() => Bun.randomUUIDv7()),
     memberId: text("member_id")
       .notNull()
       .references(() => member.id, { onDelete: "no action" }),
-    leaveId: text("leaveId")
+    leaveId: text("leave_id")
       .notNull()
-      .references(() => leave.id, { onDelete: "cascade" }),
+      .references(() => leavePolicy.id, { onDelete: "cascade" }),
     startDate: integer("start_date", { mode: "timestamp_ms" }).notNull(),
     endDate: integer("end_date", { mode: "timestamp_ms" }).notNull(),
     status: text("status", { enum: ["PENDING", "APPROVED", "REJECTED", "CANCELLED"] })
@@ -74,13 +74,13 @@ export const leaveBalance = sqliteTable(
   {
     id: text("id")
       .primaryKey()
-      .$defaultFn(() => crypto.randomUUID()),
+      .$defaultFn(() => Bun.randomUUIDv7()),
     memberId: text("member_id")
       .notNull()
       .references(() => member.id, { onDelete: "cascade" }),
     leaveId: text("leave_id")
       .notNull()
-      .references(() => leave.id, { onDelete: "cascade" }),
+      .references(() => leavePolicy.id, { onDelete: "cascade" }),
     totalDays: real("total_days").notNull(),
     usedDays: real("used_days").notNull().default(0),
     pendingDays: real("pending_days").notNull().default(0),
@@ -104,7 +104,7 @@ export const leaveBalanceAdjustment = sqliteTable(
   {
     id: text("id")
       .primaryKey()
-      .$defaultFn(() => crypto.randomUUID()),
+      .$defaultFn(() => Bun.randomUUIDv7()),
     balanceId: text("balance_id")
       .notNull()
       .references(() => leaveBalance.id, { onDelete: "cascade" }),
@@ -113,7 +113,7 @@ export const leaveBalanceAdjustment = sqliteTable(
       .references(() => member.id, { onDelete: "cascade" }),
     leaveId: text("leave_id")
       .notNull()
-      .references(() => leave.id, { onDelete: "cascade" }),
+      .references(() => leavePolicy.id, { onDelete: "cascade" }),
     adjustmentType: text("adjustment_type", {
       enum: ["ACCRUAL", "USAGE", "ADJUSTMENT", "CARRY_FORWARD"],
     }).notNull(),
@@ -137,7 +137,7 @@ export const leaveToMember = sqliteTable(
   {
     leaveId: text("leave_id")
       .notNull()
-      .references(() => leave.id, { onDelete: "cascade" }),
+      .references(() => leavePolicy.id, { onDelete: "cascade" }),
     memberId: text("member_id")
       .notNull()
       .references(() => member.id, { onDelete: "cascade" }),

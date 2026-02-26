@@ -4,7 +4,8 @@ import { attendance, attendancePolicy } from "./schema/attendance";
 import { calendar, calendarEvent } from "./schema/calendar";
 import { account, session, twoFactor, user, verification } from "./schema/core";
 import { image } from "./schema/image";
-import { leave, leaveBalance, leaveBalanceAdjustment, leaveRequest } from "./schema/leave";
+import { jwks } from "./schema/jwt";
+import { leaveBalance, leaveBalanceAdjustment, leavePolicy, leaveRequest } from "./schema/leave";
 import { invitation, member, organization, team, teamMember } from "./schema/organization";
 import { relations } from "./schema/relations";
 
@@ -27,11 +28,12 @@ export function connect(url: string) {
       attendancePolicy,
       attendance,
       leaveRequest,
-      leave,
+      leave: leavePolicy,
       leaveBalance,
       leaveBalanceAdjustment,
       calendar,
       calendarEvent,
+      jwks,
     },
     relations,
   });
@@ -43,6 +45,7 @@ export * from "./schema/attendance";
 export * from "./schema/calendar";
 export * from "./schema/core";
 export * from "./schema/image";
+export * from "./schema/jwt";
 export * from "./schema/leave";
 export * from "./schema/organization";
 export * from "./schema/relations";

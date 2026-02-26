@@ -18,8 +18,8 @@
   const calendars = createInfiniteQuery(() =>
     orpc.calendars.list.infiniteOptions({
       enabled: !!params.slug,
-      initialPageParam: 0,
-      input: (cursor) => ({ pageSize: 20, cursor, slug: params.slug }),
+      initialPageParam: undefined,
+      input: (cursor?: string) => ({ pageSize: 20, cursor, slug: params.slug }),
       getNextPageParam: (lastPage) => lastPage.nextCursor,
     })
   );

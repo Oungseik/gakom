@@ -6,7 +6,7 @@ import {
   gte,
   inArray,
   isNull,
-  leave,
+  leavePolicy,
   leaveRequest,
   like,
   lte,
@@ -54,7 +54,7 @@ export const listLeaveRequestsHandler = os
         id: leaveRequest.id,
         memberId: leaveRequest.memberId,
         leaveId: leaveRequest.leaveId,
-        name: leave.name,
+        name: leavePolicy.name,
         startDate: leaveRequest.startDate,
         endDate: leaveRequest.endDate,
         status: leaveRequest.status,
@@ -67,15 +67,15 @@ export const listLeaveRequestsHandler = os
         updatedAt: leaveRequest.updatedAt,
       })
       .from(leaveRequest)
-      .innerJoin(leave, eq(leaveRequest.leaveId, leave.id))
-      .innerJoin(organization, eq(leave.organizationId, organization.id))
+      .innerJoin(leavePolicy, eq(leaveRequest.leaveId, leavePolicy.id))
+      .innerJoin(organization, eq(leavePolicy.organizationId, organization.id))
       .innerJoin(member, eq(leaveRequest.memberId, member.id))
       .innerJoin(user, eq(member.userId, user.id))
       .leftJoin(reviewer, eq(leaveRequest.reviewerId, reviewer.id))
       .leftJoin(reviewerUser, eq(reviewer.userId, reviewerUser.id))
       .where(
         and(
-          eq(leave.organizationId, context.organization.id),
+          eq(leavePolicy.organizationId, context.organization.id),
           isNull(member.leftAt),
           filter?.search
             ? or(like(user.name, `%${filter.search}%`), like(member.position, `%${filter.search}%`))

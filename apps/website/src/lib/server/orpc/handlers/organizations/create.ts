@@ -14,7 +14,6 @@ export const createOrganizationHandler = os
   .input(input)
   .use(authMiddleware)
   .handler(async ({ input, context }) => {
-    // Check if slug is already taken
     const existingOrg = await db.query.organization.findFirst({
       where: { slug: input.slug },
       columns: { id: true },
@@ -24,8 +23,7 @@ export const createOrganizationHandler = os
       throw new ORPCError("BAD_REQUEST", { message: `The slug "${input.slug}" is already taken.` });
     }
 
-    // Create the organization
-    const orgId = crypto.randomUUID();
+    const orgId = Bun.randomUUIDv7();
     const now = new Date();
 
     await db.insert(organization).values({
@@ -36,7 +34,6 @@ export const createOrganizationHandler = os
       createdAt: now,
     });
 
-    // Add the creator as an OWNER member
     await db.insert(member).values({
       organizationId: orgId,
       userId: context.session.user.id,

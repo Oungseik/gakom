@@ -59,6 +59,7 @@
     "@orpc/client": "^1.13.5",
     "@orpc/server": "^1.13.5",
     "@orpc/tanstack-query": "^1.13.5",
+    "@repo/config": "workspace:*",
     "@repo/db": "workspace:*",
     "@repo/ui": "workspace:*",
     "@tanstack/svelte-form": "^1.28.3",

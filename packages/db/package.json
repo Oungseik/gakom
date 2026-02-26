@@ -17,18 +17,11 @@
     ".": {
       "types": "./src/index.ts",
       "default": "./src/index.ts"
-    },
-    "./country": {
-      "types": "./src/country.ts",
-      "default": "./src/country.ts"
-    },
-    "./timezone": {
-      "types": "./src/timezone.ts",
-      "default": "./src/timezone.ts"
     }
   },
   "dependencies": {
     "@tursodatabase/database": "^0.4.4",
+    "@repo/config": "workspace:*",
     "dotenv": "^17.3.1",
     "drizzle-orm": "1.0.0-beta.12-a5629fb"
   },

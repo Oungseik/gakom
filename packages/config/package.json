@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json.schemastore.org/package.json",
+  "name": "@repo/config",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "with-env": "dotenv -e ../../.env --",
+    "check": "biome check --write .",
+    "build": "tsdown",
+    "check-types": "tsc --noEmit"
+  },
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./src/index.ts"
+    },
+    "./country": {
+      "types": "./src/country.ts",
+      "default": "./src/country.ts"
+    },
+    "./timezone": {
+      "types": "./src/timezone.ts",
+      "default": "./src/timezone.ts"
+    }
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "@types/bun": "^1.3.9",
+    "tsdown": "0.20.3",
+    "typescript": "^5.9.3"
+  }
+}

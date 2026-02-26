@@ -39,8 +39,8 @@
 
   const attendances = createInfiniteQuery(() =>
     orpc.attendances.list.infiniteOptions({
-      initialPageParam: 0,
-      input: (cursor) => ({
+      initialPageParam: undefined,
+      input: (cursor: string | undefined) => ({
         slug: params.slug,
         cursor,
         pageSize: 20,

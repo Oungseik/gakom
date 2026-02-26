@@ -4,7 +4,7 @@ import { db } from "$lib/server/db";
 import { organizationMiddleware, os } from "$lib/server/orpc/base";
 
 const input = z.object({
-  cursor: z.number().optional(),
+  cursor: z.string().optional(),
   pageSize: z.number(),
   slug: z.string(),
 });
@@ -14,33 +14,18 @@ export const listAttendancePoliciesHandler = os
   .input(input)
   .use(organizationMiddleware(["ADMIN", "OWNER"]))
   .handler(async ({ context, input }) => {
-    const items = await db
-      .select({
-        id: attendancePolicy.id,
-        name: attendancePolicy.name,
-        timezone: attendancePolicy.timezone,
-        clockIn: attendancePolicy.clockInSec,
-        clockOut: attendancePolicy.clockOutSec,
-        gracePeriod: attendancePolicy.gracePeriodSec,
-        workdays: attendancePolicy.workdays,
-        offset: attendancePolicy.timezone,
-        updatedAt: attendancePolicy.updatedAt,
-      })
-      .from(attendancePolicy)
-      .where(eq(attendancePolicy.organizationId, context.organization.id))
-      .orderBy(asc(attendancePolicy.createdAt))
-      .offset(input.cursor ?? 0)
-      .limit(input.pageSize + 1);
+    const items = await db.query.attendancePolicy.findMany({
+      where: { organizationId: context.organization.id, id: { gte: input.cursor } },
+      orderBy: { id: "asc" },
+      limit: input.pageSize + 1,
+    });
 
-    let nextCursor: typeof input.cursor;
+    let nextCursor: string | undefined;
+
     if (items.length > input.pageSize) {
-      items.pop();
-      nextCursor = (input.cursor ?? 0) + input.pageSize;
+      const next = items.pop();
+      nextCursor = next?.id;
     }
 
-    return {
-      items,
-      nextCursor,
-      pageSize: input.pageSize,
-    };
+    return { items, pageSize: input.pageSize, nextCursor };
   });

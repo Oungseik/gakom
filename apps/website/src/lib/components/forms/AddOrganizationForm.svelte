@@ -23,8 +23,8 @@
   let logo: string | undefined = $state(undefined);
   let src = $state("");
 
-  const imageUploadMutation = createMutation(() => orpc.images.upload.mutationOptions());
-  const createOrganization = createMutation(() => orpc.organizations.create.mutationOptions());
+  const uploadImage = createMutation(() => orpc.uploadImage.mutationOptions());
+  const createOrganization = createMutation(() => orpc.createOrganization.mutationOptions());
 
   const form = createForm(() => ({
     defaultValues: { name: "", slug: "" },
@@ -76,7 +76,7 @@
         onCropped={async (url) => {
           isUploading = true;
           const file = await getFileFromUrl(url);
-          imageUploadMutation.mutate(
+          uploadImage.mutate(
             { file },
             {
               onSuccess: (data) => {

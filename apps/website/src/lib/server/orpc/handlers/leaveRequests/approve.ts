@@ -1,5 +1,12 @@
 import { ORPCError } from "@orpc/server";
-import { eq, leave, leaveBalance, leaveBalanceAdjustment, leaveRequest, member } from "@repo/db";
+import {
+  eq,
+  leaveBalance,
+  leaveBalanceAdjustment,
+  leavePolicy,
+  leaveRequest,
+  member,
+} from "@repo/db";
 import { z } from "zod";
 import { db } from "$lib/server/db";
 import { organizationMiddleware, os } from "$lib/server/orpc/base";
@@ -39,10 +46,10 @@ export const approveLeaveRequestHandler = os
           status: leaveRequest.status,
           startDate: leaveRequest.startDate,
           endDate: leaveRequest.endDate,
-          organizationId: leave.organizationId,
+          organizationId: leavePolicy.organizationId,
         })
         .from(leaveRequest)
-        .innerJoin(leave, eq(leaveRequest.leaveId, leave.id))
+        .innerJoin(leavePolicy, eq(leaveRequest.leaveId, leavePolicy.id))
         .where(eq(leaveRequest.id, input.id))
         .limit(1)
     ).at(0);

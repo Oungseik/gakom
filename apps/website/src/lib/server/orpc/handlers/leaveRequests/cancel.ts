@@ -2,9 +2,9 @@ import { ORPCError } from "@orpc/server";
 import {
   and,
   eq,
-  leave,
   leaveBalance,
   leaveBalanceAdjustment,
+  leavePolicy,
   leaveRequest,
   member,
 } from "@repo/db";
@@ -46,10 +46,10 @@ export const cancelLeaveRequestHandler = os
           startDate: leaveRequest.startDate,
           endDate: leaveRequest.endDate,
           leaveId: leaveRequest.leaveId,
-          organizationId: leave.organizationId,
+          organizationId: leavePolicy.organizationId,
         })
         .from(leaveRequest)
-        .innerJoin(leave, eq(leaveRequest.leaveId, leave.id))
+        .innerJoin(leavePolicy, eq(leaveRequest.leaveId, leavePolicy.id))
         .where(and(eq(leaveRequest.id, input.id), eq(leaveRequest.memberId, canceler.id)))
         .limit(1)
     ).at(0);

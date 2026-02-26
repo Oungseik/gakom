@@ -20,24 +20,28 @@ export const sendInvitationHandler = os
   .input(input)
   .use(organizationMiddleware(["ADMIN", "OWNER"]))
   .handler(async ({ input, context }) => {
-    const members = await db.query.member.findMany({
-      where: { user: { email: input.email }, organizationId: context.organization.id },
-      columns: { id: true, status: true },
+    const member = await db.query.member.findFirst({
+      where: {
+        user: { email: input.email },
+        organizationId: context.organization.id,
+        leftAt: { isNull: true },
+      },
+      columns: { id: true, leftAt: true },
     });
 
-    if (members.at(0)?.status === "ACTIVE") {
+    if (member) {
       throw new ORPCError("FORBIDDEN", { message: "Member already exist" });
     }
 
     const expiresAt = new Date();
     expiresAt.setMinutes(expiresAt.getMinutes() + 10);
 
-    await db.transaction(async (tx) => {
-      const oldInvitation = await tx.query.invitation.findFirst({
-        where: { organizationId: context.organization.id, email: input.email, status: "PENDING" },
-        orderBy: { expiresAt: "desc" },
-      });
+    const oldInvitation = await db.query.invitation.findFirst({
+      where: { organizationId: context.organization.id, email: input.email, status: "PENDING" },
+      orderBy: { expiresAt: "desc" },
+    });
 
+    await db.transaction(async (tx) => {
       if (oldInvitation) {
         await tx
           .update(invitation)
@@ -56,25 +60,25 @@ export const sendInvitationHandler = os
           teamId: null,
         });
       }
+    });
 
-      const token = Bun.SHA256.hash(
-        JSON.stringify({
-          organizationId: context.organization.id,
-          expiresAt,
-          inviterId: context.session.user.id,
-          role: input.role,
-          position: input.position,
-          attendancePolicyId: input.attendancePolicyId,
-        }),
-        "base64url",
-      );
+    const token = Bun.SHA256.hash(
+      JSON.stringify({
+        organizationId: context.organization.id,
+        expiresAt,
+        inviterId: context.session.user.id,
+        role: input.role,
+        position: input.position,
+        attendancePolicyId: input.attendancePolicyId,
+      }),
+      "base64url",
+    );
 
-      const inviteLink = `${getBaseURL()}/accept-invitation/${token}`;
-      await transporter.sendMail({
-        from: NO_REPLY_EMAIL,
-        to: input.email,
-        subject: "Invitation",
-        html: `Invite to an organization. Click this link: ${inviteLink}`,
-      });
+    const inviteLink = `${getBaseURL()}/accept-invitation/${token}`;
+    await transporter.sendMail({
+      from: NO_REPLY_EMAIL,
+      to: input.email,
+      subject: "Invitation",
+      html: `Invite to an organization. Click this link: ${inviteLink}`,
     });
   });

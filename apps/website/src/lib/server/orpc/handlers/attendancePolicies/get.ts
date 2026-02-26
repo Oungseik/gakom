@@ -13,25 +13,9 @@ export const getAttendancePolicyHandler = os
   .input(input)
   .use(organizationMiddleware())
   .handler(async ({ context, input, errors }) => {
-    const item = await db
-      .select({
-        id: attendancePolicy.id,
-        name: attendancePolicy.name,
-        timezone: attendancePolicy.timezone,
-        clockIn: attendancePolicy.clockInSec,
-        clockOut: attendancePolicy.clockOutSec,
-        workdays: attendancePolicy.workdays,
-        organizationId: attendancePolicy.organizationId,
-        createdAt: attendancePolicy.createdAt,
-        updatedAt: attendancePolicy.updatedAt,
-      })
-      .from(attendancePolicy)
-      .where(
-        and(
-          eq(attendancePolicy.id, input.id),
-          eq(attendancePolicy.organizationId, context.organization.id),
-        ),
-      );
+    const item = await db.query.attendancePolicy.findFirst({
+      where: { id: input.id, organizationId: context.organization.id },
+    });
 
     if (!item) {
       throw errors.NOT_FOUND();

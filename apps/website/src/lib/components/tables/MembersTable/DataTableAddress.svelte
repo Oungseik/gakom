@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { COUNTRIES, type CountryCode } from "@repo/db/country";
+  import { COUNTRIES, type CountryCode } from "@repo/config";
 
   let {
     address,

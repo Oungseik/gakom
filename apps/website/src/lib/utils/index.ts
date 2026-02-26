@@ -1,4 +1,4 @@
-import type { TimeZone } from "@repo/db/timezone";
+import type { TimeZone } from "@repo/config";
 import type { DehydratedState } from "@tanstack/svelte-query";
 import { env } from "$env/dynamic/public";
 

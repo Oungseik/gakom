@@ -8,6 +8,9 @@ const input = z.object({
   slug: z.string(),
 });
 
+/**
+ * Get attendance of the current day for the signed-in user
+ * */
 export const getAttendanceHandler = os
   .route({ method: "GET" })
   .input(input)
@@ -19,25 +22,26 @@ export const getAttendanceHandler = os
       });
     }
 
-    const policy = (await db.query.attendancePolicy.findFirst({
+    const policy = await db.query.attendancePolicy.findFirst({
       where: { id: context.member.attendancePolicyId },
-    }))!;
+    });
+
+    if (!policy) {
+      throw new ORPCError("NOT_FOUND", { message: "Leave policy not found." });
+    }
 
     const currentDate = new Date();
     const currentDateInTimezone = getDateInTimezone(policy.timezone, currentDate);
 
-    // use `findMany` because `findFirst` will fail when do relation at this moment
-    const attendances = await db.query.attendance.findMany({
+    const attendance = await db.query.attendance.findFirst({
       where: {
         memberId: context.member.id,
         date: currentDateInTimezone,
         organizationId: context.organization.id,
       },
       with: { attendancePolicy: true },
-      limit: 1,
     });
 
-    const attendance = attendances.at(0);
     if (!attendance || !attendance.attendancePolicy) {
       return { attendance: null };
     }

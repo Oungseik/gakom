@@ -1,5 +1,5 @@
+import type { TIMEZONES } from "@repo/config";
 import type { Day } from "@repo/db";
-import type { TIMEZONES } from "@repo/db/timezone";
 import { renderComponent } from "@repo/ui/data-table";
 import type { ColumnDef } from "@tanstack/table-core";
 import DataTableActions from "./DataTableActions.svelte";
@@ -9,9 +9,9 @@ export type AttendancePolicy = {
   id: string;
   name: string;
   timezone: (typeof TIMEZONES)[number];
-  clockIn: number;
-  clockOut: number;
-  gracePeriod: number;
+  clockInSec: number;
+  clockOutSec: number;
+  gracePeriodSec: number;
   workdays: Day[];
   updatedAt: Date;
   organizationId: string;
@@ -40,8 +40,8 @@ export const columns = (
     header: "Schedule",
     cell: ({ row }) =>
       renderComponent(DataTableSchedule, {
-        clockIn: row.original.clockIn,
-        clockOut: row.original.clockOut,
+        clockIn: row.original.clockInSec,
+        clockOut: row.original.clockOutSec,
         workdays: row.original.workdays,
       }),
   },

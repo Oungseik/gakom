@@ -15,7 +15,7 @@ export const createCalendarHandler = os
   .input(input)
   .use(organizationMiddleware(["ADMIN", "OWNER"]))
   .handler(async ({ context, input }) => {
-    const id = crypto.randomUUID();
+    const id = Bun.randomUUIDv7();
 
     await db.transaction(async (tx) => {
       if (input.data.isDefault) {

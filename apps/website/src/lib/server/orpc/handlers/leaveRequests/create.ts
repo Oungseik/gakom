@@ -1,13 +1,5 @@
 import { ORPCError } from "@orpc/server";
-import {
-  and,
-  eq,
-  leave,
-  leaveBalance,
-  leaveBalanceAdjustment,
-  leaveRequest,
-  member,
-} from "@repo/db";
+import { eq, leaveBalance, leaveBalanceAdjustment, leaveRequest } from "@repo/db";
 import { z } from "zod";
 import { db } from "$lib/server/db";
 import { organizationMiddleware, os } from "$lib/server/orpc/base";
@@ -25,34 +17,17 @@ export const createLeaveRequestHandler = os
   .input(input)
   .use(organizationMiddleware())
   .handler(async ({ context, input }) => {
-    const requester = (
-      await db
-        .select({
-          id: member.id,
-          createdAt: member.createdAt,
-        })
-        .from(member)
-        .where(eq(member.id, context.session.user.id))
-        .limit(1)
-    ).at(0);
+    const requester = await db.query.member.findFirst({ where: { id: context.member.id } });
 
     if (!requester) {
       throw new ORPCError("NOT_FOUND", { message: "Member not found." });
     }
 
-    // Verify the leave exists and belongs to the organization
-    const leavePolicy = (
-      await db
-        .select({
-          id: leave.id,
-          organizationId: leave.organizationId,
-        })
-        .from(leave)
-        .where(and(eq(leave.id, input.leaveId), eq(leave.organizationId, context.organization.id)))
-        .limit(1)
-    ).at(0);
+    const policy = await db.query.leavePolicy.findFirst({
+      where: { id: input.leaveId, organizationId: context.organization.id },
+    });
 
-    if (!leavePolicy) {
+    if (!policy) {
       throw new ORPCError("NOT_FOUND", { message: "Leave policy not found." });
     }
 
@@ -67,7 +42,6 @@ export const createLeaveRequestHandler = os
     const leaveYearNumber = getLeaveYearNumber(requester.createdAt, startDate);
 
     await db.transaction(async (tx) => {
-      // Check leave balance
       const balance = await tx.query.leaveBalance.findFirst({
         where: {
           memberId: requester.id,
@@ -89,7 +63,6 @@ export const createLeaveRequestHandler = os
         });
       }
 
-      // Create leave request
       const [newRequest] = await tx
         .insert(leaveRequest)
         .values({
@@ -102,13 +75,11 @@ export const createLeaveRequestHandler = os
         })
         .returning();
 
-      // Update leave balance
       await tx
         .update(leaveBalance)
         .set({ pendingDays: balance.pendingDays + requestedDays })
         .where(eq(leaveBalance.id, balance.id));
 
-      // Create balance adjustment record
       await tx.insert(leaveBalanceAdjustment).values({
         balanceId: balance.id,
         memberId: requester.id,

@@ -24,13 +24,11 @@
 
   const attendancePolicies = createQuery(() =>
     orpc.attendancesPolicies.list.queryOptions({
-      input: { slug: organization.slug, pageSize: 100, cursor: 0 },
+      input: { slug: organization.slug, pageSize: 100 },
     })
   );
   const allPolicies = $derived(attendancePolicies.data?.items ?? []);
-  const sendInvitation = createMutation(() =>
-    orpc.invitations.send.mutationOptions()
-  );
+  const sendInvitation = createMutation(() => orpc.invitations.send.mutationOptions());
 
   const defaultValues: {
     role: "MEMBER" | "ADMIN";
@@ -186,7 +184,7 @@
                     {p?.name}
                     {#if p}
                       <span class="text-muted-foreground"
-                        >({formatTime(p.clockIn)} - {formatTime(p.clockOut)})</span
+                        >({formatTime(p.clockInSec)} - {formatTime(p.clockOutSec)})</span
                       >
                     {/if}
                   {:else}
@@ -199,7 +197,7 @@
                   <Select.Item value={p.id}>
                     {p.name}
                     <span class="text-muted-foreground"
-                      >({formatTime(p.clockIn)} - {formatTime(p.clockOut)})</span
+                      >({formatTime(p.clockInSec)} - {formatTime(p.clockOutSec)})</span
                     >
                   </Select.Item>
                 {/each}

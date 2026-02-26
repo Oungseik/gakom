@@ -26,7 +26,7 @@ import { connect } from "./index";
 import type { AttendanceLocation, Day } from "./schema/attendance";
 import { attendance, attendancePolicy } from "./schema/attendance";
 import { account, user } from "./schema/core";
-import { leave, leaveBalance, leaveBalanceAdjustment, leaveRequest } from "./schema/leave";
+import { leaveBalance, leaveBalanceAdjustment, leavePolicy, leaveRequest } from "./schema/leave";
 import { invitation, member, organization } from "./schema/organization";
 
 // Database connection
@@ -100,7 +100,7 @@ async function main() {
     await db.delete(invitation);
     await db.delete(member);
     await db.delete(attendancePolicy);
-    await db.delete(leave);
+    await db.delete(leavePolicy);
     await db.delete(account);
     await db.delete(organization);
     await db.delete(user);
@@ -109,7 +109,7 @@ async function main() {
 
   // 1. Create Organization
   console.log("📦 Creating organization...");
-  const orgId = crypto.randomUUID();
+  const orgId = Bun.randomUUIDv7();
   await db.insert(organization).values({
     id: orgId,
     name: "Acme Corporation",
@@ -137,7 +137,7 @@ async function main() {
   const userIds: { id: string; role: "OWNER" | "ADMIN" | "MEMBER" }[] = [];
 
   for (const userData of userNames) {
-    const userId = crypto.randomUUID();
+    const userId = Bun.randomUUIDv7();
     await db.insert(user).values({
       id: userId,
       name: userData.name,
@@ -151,7 +151,7 @@ async function main() {
 
     // Create credential account for each user
     await db.insert(account).values({
-      id: crypto.randomUUID(),
+      id: Bun.randomUUIDv7(),
       accountId: userData.email,
       providerId: "credential",
       userId: userId,
@@ -165,7 +165,7 @@ async function main() {
   console.log("📋 Creating attendance policies...");
   const policies = [
     {
-      id: crypto.randomUUID(),
+      id: Bun.randomUUIDv7(),
       name: "Standard Weekday Schedule",
       timezone: "America/New_York" as const,
       clockInSec: 9 * 3600, // 9:00 AM
@@ -174,7 +174,7 @@ async function main() {
       organizationId: orgId,
     },
     {
-      id: crypto.randomUUID(),
+      id: Bun.randomUUIDv7(),
       name: "Six Day Work Week",
       timezone: "Asia/Tokyo" as const,
       clockInSec: 8 * 3600, // 8:00 AM
@@ -183,7 +183,7 @@ async function main() {
       organizationId: orgId,
     },
     {
-      id: crypto.randomUUID(),
+      id: Bun.randomUUIDv7(),
       name: "Middle East Schedule",
       timezone: "Asia/Dubai" as const,
       clockInSec: 10 * 3600, // 10:00 AM
@@ -237,10 +237,9 @@ async function main() {
     const tenure = memberTenures[i] || memberTenures[memberTenures.length - 1];
     const joinDate = calculateJoinDate(tenure.yearsAgo, tenure.monthsAgo);
 
-    const memberId = crypto.randomUUID();
+    const memberId = Bun.randomUUIDv7();
     await db.insert(member).values({
       id: memberId,
-      status: "ACTIVE",
       organizationId: orgId,
       userId: userIds[i].id,
       attendancePolicyId: policy.id,
@@ -288,7 +287,7 @@ async function main() {
 
   for (const inv of invitations) {
     await db.insert(invitation).values({
-      id: crypto.randomUUID(),
+      id: Bun.randomUUIDv7(),
       organizationId: orgId,
       email: inv.email,
       role: inv.role,
@@ -367,7 +366,7 @@ async function main() {
       };
 
       await db.insert(attendance).values({
-        id: crypto.randomUUID(),
+        id: Bun.randomUUIDv7(),
         userId: memberRecord.userId,
         memberId: memberRecord.id,
         organizationId: orgId,
@@ -390,24 +389,24 @@ async function main() {
   console.log("🏖️ Creating leave types...");
   const leaveTypes = [
     {
-      id: crypto.randomUUID(),
+      id: Bun.randomUUIDv7(),
       name: "Annual Leave",
       days: 10,
     },
     {
-      id: crypto.randomUUID(),
+      id: Bun.randomUUIDv7(),
       name: "Sick Leave",
       days: 5,
     },
     {
-      id: crypto.randomUUID(),
+      id: Bun.randomUUIDv7(),
       name: "Personal Leave",
       days: 10,
     },
   ];
 
   for (const leaveTypeData of leaveTypes) {
-    await db.insert(leave).values({
+    await db.insert(leavePolicy).values({
       id: leaveTypeData.id,
       name: leaveTypeData.name,
       days: leaveTypeData.days,
@@ -492,7 +491,7 @@ async function main() {
         status = "CANCELLED";
       }
 
-      const requestId = crypto.randomUUID();
+      const requestId = Bun.randomUUIDv7();
       await db.insert(leaveRequest).values({
         id: requestId,
         memberId: memberData.memberId,
@@ -531,7 +530,7 @@ async function main() {
       const totalDays = leaveTypeData.days + year;
 
       await db.insert(leaveBalance).values({
-        id: crypto.randomUUID(),
+        id: Bun.randomUUIDv7(),
         memberId: memberRecord.memberId,
         leaveId: leaveTypeData.id,
         totalDays: totalDays,
@@ -563,7 +562,7 @@ async function main() {
     if (balanceRecord) {
       // Create usage adjustment for the approved leave request
       await db.insert(leaveBalanceAdjustment).values({
-        id: crypto.randomUUID(),
+        id: Bun.randomUUIDv7(),
         balanceId: balanceRecord.id,
         memberId: approvedRequest.memberId,
         leaveId: approvedRequest.leaveId,

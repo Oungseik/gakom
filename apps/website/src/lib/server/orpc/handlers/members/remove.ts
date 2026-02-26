@@ -14,9 +14,7 @@ export const removeMemberHandler = os
   .handler(async ({ input, context }) => {
     await db
       .update(member)
-      .set({
-        status: "DEACTIVATED",
-      })
+      .set({ leftAt: new Date() })
       .where(
         and(eq(member.userId, input.userId), eq(member.organizationId, context.organization.id)),
       );

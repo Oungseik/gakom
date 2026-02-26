@@ -1,7 +1,7 @@
 <script lang="ts">
   import Loader2Icon from "@lucide/svelte/icons/loader-2";
   import type { Day } from "@repo/db";
-  import { TIMEZONES, type TimeZone } from "@repo/db/timezone";
+  import { TIMEZONES, type TimeZone } from "@repo/config";
   import { Button, buttonVariants } from "@repo/ui/button";
   import * as Dialog from "@repo/ui/dialog";
   import { Input } from "@repo/ui/input";

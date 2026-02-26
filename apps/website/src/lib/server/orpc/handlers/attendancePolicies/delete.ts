@@ -22,7 +22,16 @@ export const deleteAttendancePolicyHandler = os
       throw errors.INTERNAL_SERVER_ERROR({ message: "Failed to count attendance policies" });
     }
     if (policiesCount === 1) {
-      throw errors.FORBIDDEN({ message: "Cannot delte the last attendance policy." });
+      throw errors.FORBIDDEN({ message: "Cannot delete the last attendance policy." });
+    }
+
+    const assignments = await db
+      .select({ count: count() })
+      .from(member)
+      .where(eq(member.attendancePolicyId, input.id));
+
+    if (assignments.at(0)?.count) {
+      throw errors.FORBIDDEN({ message: "Cannot delete attendance policy assigned to the member" });
     }
 
     await db

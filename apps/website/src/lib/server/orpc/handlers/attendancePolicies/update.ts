@@ -1,5 +1,5 @@
+import { TIMEZONES } from "@repo/config";
 import { and, attendancePolicy, eq } from "@repo/db";
-import { TIMEZONES } from "@repo/db/timezone";
 import z from "zod";
 import { db } from "$lib/server/db";
 import { organizationMiddleware, os } from "$lib/server/orpc/base";

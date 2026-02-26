@@ -1,4 +1,4 @@
-import { and, desc, eq, leave, leaveBalance, like, member } from "@repo/db";
+import { and, desc, eq, leavePolicy, leaveBalance, like, member } from "@repo/db";
 import { ORPCError } from "@orpc/server";
 import z from "zod";
 import { db } from "$lib/server/db";
@@ -36,7 +36,7 @@ export const listLeaveBalancesHandler = os
         id: leaveBalance.id,
         memberId: leaveBalance.memberId,
         leaveId: leaveBalance.leaveId,
-        leaveName: leave.name,
+        leaveName: leavePolicy.name,
         totalDays: leaveBalance.totalDays,
         usedDays: leaveBalance.usedDays,
         pendingDays: leaveBalance.pendingDays,
@@ -45,12 +45,12 @@ export const listLeaveBalancesHandler = os
         updatedAt: leaveBalance.updatedAt,
       })
       .from(leaveBalance)
-      .innerJoin(leave, eq(leaveBalance.leaveId, leave.id))
+      .innerJoin(leavePolicy, eq(leaveBalance.leaveId, leavePolicy.id))
       .innerJoin(member, eq(leaveBalance.memberId, member.id))
       .where(
         and(
           eq(leaveBalance.memberId, targetMemberId),
-          filter?.search ? like(leave.name, `%${filter.search}%`) : undefined,
+          filter?.search ? like(leavePolicy.name, `%${filter.search}%`) : undefined,
         ),
       )
       .orderBy(desc(leaveBalance.year), desc(leaveBalance.createdAt))

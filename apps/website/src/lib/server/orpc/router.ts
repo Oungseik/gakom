@@ -10,7 +10,7 @@ import { updateAttendancePolicyHandler } from "./handlers/attendancePolicies/upd
 import { checkInHandler } from "./handlers/attendances/check_in";
 import { checkOutHandler } from "./handlers/attendances/check_out";
 import { getAttendanceHandler } from "./handlers/attendances/get";
-import { listHandler } from "./handlers/attendances/list";
+import { listAttendancesHandler } from "./handlers/attendances/list";
 import { getStatsHandler as getAttendanceStatsHandler } from "./handlers/attendances/stats";
 import { createCalendarEventsHandler } from "./handlers/calendarEvents/create";
 import { deleteCalendarEventHandler } from "./handlers/calendarEvents/delete";
@@ -23,18 +23,17 @@ import { getCalendarHandler } from "./handlers/calendars/get";
 import { listCalendarsHandler } from "./handlers/calendars/list";
 import { setDefaultCalendarHandler } from "./handlers/calendars/setDefault";
 import { updateCalendarHandler } from "./handlers/calendars/update";
-import { healthCheckHandler } from "./handlers/health/health_check";
 import { removeImageHandler } from "./handlers/images/remove_image";
 import { uploadImageHandler } from "./handlers/images/upload_image";
 import { acceptInvitationHandler } from "./handlers/invitations/accept";
 import { cancelInvitationHandler } from "./handlers/invitations/cancel";
 import { listInvitationsHandler } from "./handlers/invitations/list";
 import { sendInvitationHandler } from "./handlers/invitations/send";
-import { createLeavePolicyHandler } from "./handlers/leave/create";
-import { deleteLeavePolicyHandler } from "./handlers/leave/delete";
-import { listLeavePoliciesHandler } from "./handlers/leave/list";
-import { updateLeavePolicyHandler } from "./handlers/leave/update";
 import { listLeaveBalancesHandler } from "./handlers/leaveBalances/list";
+import { createLeavePolicyHandler } from "./handlers/leavePolicies/create";
+import { deleteLeavePolicyHandler } from "./handlers/leavePolicies/delete";
+import { listLeavePoliciesHandler } from "./handlers/leavePolicies/list";
+import { updateLeavePolicyHandler } from "./handlers/leavePolicies/update";
 import { approveLeaveRequestHandler } from "./handlers/leaveRequests/approve";
 import { cancelLeaveRequestHandler } from "./handlers/leaveRequests/cancel";
 import { createLeaveRequestHandler } from "./handlers/leaveRequests/create";
@@ -49,7 +48,11 @@ import { updateMemberHandler } from "./handlers/members/update";
 import { createOrganizationHandler } from "./handlers/organizations/create";
 
 export const router = os.router({
-  health: { check: healthCheckHandler },
+  createOrganization: createOrganizationHandler,
+
+  uploadImage: uploadImageHandler,
+  removeImage: removeImageHandler,
+
   calendars: {
     list: listCalendarsHandler,
     get: getCalendarHandler,
@@ -65,14 +68,10 @@ export const router = os.router({
     update: updateCalendarEventHandler,
     delete: deleteCalendarEventHandler,
   },
-  images: {
-    remove: removeImageHandler,
-    upload: uploadImageHandler,
-  },
   attendances: {
     checkIn: checkInHandler,
     checkOut: checkOutHandler,
-    list: listHandler,
+    list: listAttendancesHandler,
     stats: getAttendanceStatsHandler,
     get: getAttendanceHandler,
   },
@@ -113,9 +112,6 @@ export const router = os.router({
     cancel: cancelLeaveRequestHandler,
     reject: rejectLeaveRequestHandler,
     stats: getStatsHandler,
-  },
-  organizations: {
-    create: createOrganizationHandler,
   },
 });
 

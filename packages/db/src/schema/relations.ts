@@ -1,9 +1,16 @@
 import { defineRelations } from "drizzle-orm";
 import { attendance, attendancePolicy } from "./attendance";
 import { calendar, calendarEvent } from "./calendar";
-import { account, session, twoFactor, user } from "./core";
+import { account, session, twoFactor, user, verification } from "./core";
 import { image } from "./image";
-import { leave, leaveBalance, leaveBalanceAdjustment, leaveRequest, leaveToMember } from "./leave";
+import { jwks } from "./jwt";
+import {
+  leaveBalance,
+  leaveBalanceAdjustment,
+  leavePolicy,
+  leaveRequest,
+  leaveToMember,
+} from "./leave";
 import { invitation, member, organization, team, teamMember } from "./organization";
 
 export const relations = defineRelations(
@@ -11,6 +18,7 @@ export const relations = defineRelations(
     user,
     session,
     account,
+    verification,
     invitation,
     organization,
     member,
@@ -20,13 +28,14 @@ export const relations = defineRelations(
     image,
     attendancePolicy,
     attendance,
-    leave,
+    leavePolicy,
     leaveToMember,
     leaveRequest,
     leaveBalance,
     leaveBalanceAdjustment,
     calendar,
     calendarEvent,
+    jwks,
   },
   (r) => ({
     user: {
@@ -50,7 +59,7 @@ export const relations = defineRelations(
       invitations: r.many.invitation(),
       teams: r.many.team(),
       attendancePolicies: r.many.attendancePolicy(),
-      leave: r.many.leave(),
+      leave: r.many.leavePolicy(),
       calendars: r.many.calendar(),
     },
     member: {
@@ -107,15 +116,18 @@ export const relations = defineRelations(
         to: r.attendancePolicy.id,
       }),
     },
-    leave: {
-      organization: r.one.organization({ from: r.leave.organizationId, to: r.organization.id }),
+    leavePolicy: {
+      organization: r.one.organization({
+        from: r.leavePolicy.organizationId,
+        to: r.organization.id,
+      }),
       leaveRequests: r.many.leaveRequest(),
       leaveBalances: r.many.leaveBalance(),
       leaveBalanceAdjustments: r.many.leaveBalanceAdjustment(),
       leaveToMembers: r.many.leaveToMember(),
     },
     leaveRequest: {
-      leave: r.one.leave({ from: r.leaveRequest.leaveId, to: r.leave.id }),
+      leave: r.one.leavePolicy({ from: r.leaveRequest.leaveId, to: r.leavePolicy.id }),
       member: r.one.member({ from: r.leaveRequest.memberId, to: r.member.id }),
       reviewer: r.one.member({ from: r.leaveRequest.reviewerId, to: r.member.id }),
       leaveBalanceAdjustment: r.one.leaveBalanceAdjustment({
@@ -125,7 +137,7 @@ export const relations = defineRelations(
     },
     leaveBalance: {
       member: r.one.member({ from: r.leaveBalance.memberId, to: r.member.id }),
-      leave: r.one.leave({ from: r.leaveBalance.leaveId, to: r.leave.id }),
+      leave: r.one.leavePolicy({ from: r.leaveBalance.leaveId, to: r.leavePolicy.id }),
       leaveBalanceAdjustments: r.many.leaveBalanceAdjustment({
         from: r.leaveBalance.id,
         to: r.leaveBalanceAdjustment.balanceId,
@@ -137,7 +149,7 @@ export const relations = defineRelations(
         to: r.leaveBalance.id,
       }),
       member: r.one.member({ from: r.leaveBalanceAdjustment.memberId, to: r.member.id }),
-      leave: r.one.leave({ from: r.leaveBalanceAdjustment.leaveId, to: r.leave.id }),
+      leave: r.one.leavePolicy({ from: r.leaveBalanceAdjustment.leaveId, to: r.leavePolicy.id }),
       request: r.one.leaveRequest({
         from: r.leaveBalanceAdjustment.requestId,
         to: r.leaveRequest.id,
@@ -145,7 +157,7 @@ export const relations = defineRelations(
     },
     leaveToMember: {
       member: r.one.member({ from: r.leaveToMember.memberId, to: r.member.id }),
-      leave: r.one.leave({ from: r.leaveToMember.leaveId, to: r.leave.id }),
+      leave: r.one.leavePolicy({ from: r.leaveToMember.leaveId, to: r.leavePolicy.id }),
     },
     calendar: {
       organization: r.one.organization({ from: r.calendar.organizationId, to: r.organization.id }),
@@ -155,5 +167,7 @@ export const relations = defineRelations(
     calendarEvent: {
       calendar: r.one.calendar({ from: r.calendarEvent.calendarId, to: r.calendar.id }),
     },
+    verification: {},
+    jwks: {},
   }),
 );

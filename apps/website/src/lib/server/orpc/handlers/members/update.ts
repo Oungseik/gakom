@@ -44,9 +44,11 @@ export const updateMemberHandler = os
           ),
         );
 
-      await tx
-        .insert(leaveToMember)
-        .values(input.data.leaveIds.map((id) => ({ leaveId: id, memberId: input.memberId })));
+      if (input.data.leaveIds.length > 0) {
+        await tx
+          .insert(leaveToMember)
+          .values(input.data.leaveIds.map((id) => ({ leaveId: id, memberId: input.memberId })));
+      }
 
       await tx
         .update(member)
@@ -56,6 +58,6 @@ export const updateMemberHandler = os
           attendancePolicyId: input.data.attendancePolicyId,
           calendarId: input.data.calendarId,
         })
-        .where(eq(member.userId, input.memberId));
+        .where(eq(member.id, input.memberId));
     });
   });

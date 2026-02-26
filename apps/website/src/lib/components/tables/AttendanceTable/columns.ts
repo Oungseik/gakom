@@ -1,5 +1,5 @@
+import type { TimeZone } from "@repo/config";
 import type { AttendanceLocation } from "@repo/db";
-import type { TimeZone } from "@repo/db/timezone";
 import { renderComponent } from "@repo/ui/data-table";
 import type { ColumnDef } from "@tanstack/table-core";
 import { formatDate } from "$lib/utils";
@@ -24,7 +24,7 @@ export type AttendanceItem = {
     email: string;
     image: string | null;
   };
-  policy: {
+  attendancePolicy: {
     id: string;
     name: string;
     timezone: TimeZone;
@@ -58,7 +58,7 @@ export const columns: ColumnDef<AttendanceItem>[] = [
     header: "Check in - Check out",
     cell: ({ row }) => {
       return renderComponent(DataTableCheckInCheckOut, {
-        attendanceTimezone: row.original.policy.timezone,
+        attendanceTimezone: row.original.attendancePolicy.timezone,
         checkInAt: row.original.checkInAt,
         checkOutAt: row.original.checkOutAt,
       });
@@ -77,7 +77,7 @@ export const columns: ColumnDef<AttendanceItem>[] = [
   },
   {
     header: "Attendance Timezone",
-    cell: ({ row }) => renderComponent(DataTableTimezone, row.original.policy),
+    cell: ({ row }) => renderComponent(DataTableTimezone, row.original.attendancePolicy),
   },
   {
     accessorKey: "status",
