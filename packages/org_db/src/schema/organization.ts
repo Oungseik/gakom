@@ -1,0 +1,126 @@
+import { COUNTRY_CODES } from "@repo/config";
+import { sql } from "drizzle-orm";
+import { index, integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
+import { attendancePolicy } from "./attendance";
+import { calendar } from "./calendar";
+import { user } from "./core";
+
+export const InvitationStatus = ["ACCEPTED", "CANCELED", "PENDING", "REJECTED"] as const;
+
+export const organization = sqliteTable(
+  "organization",
+  {
+    id: text("id").primaryKey(),
+    name: text("name").notNull(),
+    slug: text("slug").notNull().unique(),
+    logo: text("logo").notNull(),
+    countryCode: text("country_code", { enum: COUNTRY_CODES }),
+    createdAt: integer("created_at", { mode: "timestamp_ms" })
+      .default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)
+      .notNull(),
+    metadata: text("metadata"),
+  },
+  (table) => [index("organization_slug_idx").on(table.slug)],
+);
+
+export const member = sqliteTable(
+  "member",
+  {
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => Bun.randomUUIDv7()),
+    organizationId: text("organization_id")
+      .notNull()
+      .references(() => organization.id, { onDelete: "cascade" }),
+    userId: text("user_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    attendancePolicyId: text("attendance_policy_id").references(() => attendancePolicy.id),
+    calendarId: text("calendar_id").references(() => calendar.id, { onDelete: "set null" }),
+    role: text("role", { enum: ["OWNER", "ADMIN", "MEMBER"] })
+      .default("MEMBER")
+      .notNull(),
+    position: text("position"),
+    createdAt: integer("created_at", { mode: "timestamp_ms" })
+      .default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)
+      .notNull(),
+    leftAt: integer("left_at", { mode: "timestamp_ms" }),
+  },
+  (table) => [
+    index("member_organization_id_idx").on(table.organizationId),
+    index("member_user_id_idx").on(table.userId),
+    index("member_attendance_policy_id_idx").on(table.attendancePolicyId),
+    index("member_calendar_id_idx").on(table.calendarId),
+  ],
+);
+
+export const invitation = sqliteTable(
+  "invitation",
+  {
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => Bun.randomUUIDv7()),
+    organizationId: text("organization_id")
+      .notNull()
+      .references(() => organization.id, { onDelete: "cascade" }),
+    email: text("email").notNull(),
+    role: text("role").notNull(),
+    position: text("position").notNull(),
+    status: text("status", { enum: InvitationStatus }).default("PENDING").notNull(),
+    expiresAt: integer("expires_at", { mode: "timestamp_ms" }).notNull(),
+    attendancePolicyId: text("attendance_policy_id").references(() => attendancePolicy.id),
+    createdAt: integer("created_at", { mode: "timestamp_ms" })
+      .default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)
+      .notNull(),
+    inviterId: text("inviter_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    teamId: text("team_id").references(() => team.id, { onDelete: "cascade" }),
+  },
+  // null != null in unique index
+  (table) => [
+    index("invitation_organization_id_idx").on(table.organizationId),
+    index("invitation_email_idx").on(table.email),
+    index("invitation_team_id_idx").on(table.teamId),
+  ],
+);
+
+export const team = sqliteTable(
+  "team",
+  {
+    id: text("id").primaryKey(),
+    name: text("name").notNull(),
+    tzCountryCode: text("timezone_country_code", { enum: COUNTRY_CODES }),
+    organizationId: text("organization_id")
+      .notNull()
+      .references(() => organization.id, { onDelete: "cascade" }),
+    createdAt: integer("created_at", { mode: "timestamp_ms" })
+      .default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)
+      .notNull(),
+    updatedAt: integer("updated_at", { mode: "timestamp_ms" })
+      .default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)
+      .$onUpdate(() => /* @__PURE__ */ new Date())
+      .notNull(),
+  },
+  (table) => [index("team_organization_id_idx").on(table.organizationId)],
+);
+
+export const teamMember = sqliteTable(
+  "team_member",
+  {
+    id: text("id").primaryKey(),
+    teamId: text("team_id")
+      .notNull()
+      .references(() => team.id, { onDelete: "cascade" }),
+    userId: text("user_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    createdAt: integer("created_at", { mode: "timestamp_ms" })
+      .default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)
+      .notNull(),
+  },
+  (table) => [
+    index("team_member_team_id_idx").on(table.teamId),
+    index("team_member_user_id_idx").on(table.userId),
+  ],
+);
