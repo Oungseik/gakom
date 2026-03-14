@@ -1,0 +1,4 @@
+interface:
+  display_name: "Backend Developer"
+  short_description: "Build oRPC handlers for org and HR features"
+  default_prompt: "Use $backend-developer to implement or update an oRPC backend API in `apps/website` or `apps/dashboard`, including schema checks, middleware composition, auth or organization scoping, and router wiring."

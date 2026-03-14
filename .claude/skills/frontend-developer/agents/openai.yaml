@@ -1,0 +1,4 @@
+interface:
+  display_name: "Frontend Developer"
+  short_description: "Build SvelteKit UI for the website and dashboard apps"
+  default_prompt: "Use $frontend-developer to implement or refactor frontend pages, dialogs, forms, tables, and query flows in `apps/website` or `apps/dashboard` using this repo's Svelte 5, `@repo/ui`, TanStack, and oRPC patterns."
