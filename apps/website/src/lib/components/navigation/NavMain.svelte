@@ -10,19 +10,36 @@
     icon: Component;
   };
 
-  let { features }: { features: Feature[] } = $props();
+  let {
+    features,
+    title,
+    separator = false,
+  }: {
+    features: Feature[];
+    title?: string;
+    separator?: boolean;
+  } = $props();
 </script>
+
+{#if title}
+  <Sidebar.GroupLabel
+    class="text-muted-foreground/70 px-2 py-1.5 text-[11px] font-semibold tracking-wider uppercase"
+  >
+    {title}
+  </Sidebar.GroupLabel>
+{/if}
+
+{#if separator}
+  <Sidebar.Separator class="my-2" />
+{/if}
 
 <Sidebar.Group class="group-data-[collapsible=icon]:hidden">
   <Sidebar.Menu>
     {#each features as item (item.url)}
       <Sidebar.MenuItem>
         <Sidebar.MenuButton
+          isActive={page.url.pathname === item.url}
           tooltipContent={item.name}
-          class={{
-            "bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground active:bg-primary/90 active:text-primary-foreground min-w-8 duration-200 ease-linear":
-              page.url.pathname === item.url,
-          }}
         >
           {#snippet child({ props })}
             <a href={item.url} {...props}>

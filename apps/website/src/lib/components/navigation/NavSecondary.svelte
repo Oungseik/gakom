@@ -16,7 +16,7 @@
     <Sidebar.Menu>
       {#each items as item (item.title)}
         <Sidebar.MenuItem>
-          <Sidebar.MenuButton>
+          <Sidebar.MenuButton tooltipContent={item.title}>
             {#snippet child({ props })}
               {#if item.fullReload}
                 <a href={item.url} {...props} data-sveltekit-reload>

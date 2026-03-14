@@ -11,6 +11,7 @@
   import UserSearchIcon from "@lucide/svelte/icons/user-search";
   import UsersIcon from "@lucide/svelte/icons/users";
   import * as Sidebar from "@repo/ui/sidebar";
+  import { ScrollArea } from "@repo/ui/scroll-area";
   import type { ComponentProps } from "svelte";
 
   import NavMain from "$lib/components/navigation/NavMain.svelte";
@@ -49,58 +50,70 @@
   const organization = $derived(orgs.find((o) => o.slug === slug) ?? orgs.at(0)!);
   let open = $state(false);
 
-  const data = $derived([
-    {
-      name: "Dashboard",
-      url: `/dashboard/${organization.slug}`,
-      icon: LayoutDashboardIcon,
-    },
-    {
-      name: "Leave Requests",
-      url: `/dashboard/${organization.slug}/leave`,
-      icon: TicketsPlaneIcon,
-    },
-    {
-      name: "Members",
-      url: `/dashboard/${organization.slug}/members`,
-      icon: UsersIcon,
-    },
-    {
-      name: "Invitations",
-      url: `/dashboard/${organization.slug}/invitations`,
-      icon: UserPlusIcon,
-    },
-    {
-      name: "Attendance Policies",
-      url: `/dashboard/${organization.slug}/attendances/policies`,
-      icon: ClipboardClockIcon,
-    },
-    {
-      name: "Leave Policies",
-      url: `/dashboard/${organization.slug}/leave/policies`,
-      icon: ClipboardListIcon,
-    },
-    {
-      name: "Recruits",
-      url: `/dashboard/${organization.slug}/recruits`,
-      icon: UserSearchIcon,
-    },
-    {
-      name: "Reports",
-      url: `/dashboard/${organization.slug}/reports`,
-      icon: FileChartColumnIncreasingIcon,
-    },
-    {
-      name: "Calendars",
-      url: `/dashboard/${organization.slug}/calendars`,
-      icon: CalendarDaysIcon,
-    },
-    {
-      name: "Settings",
-      url: `/dashboard/${organization.slug}/settings`,
-      icon: SettingsIcon,
-    },
-  ]);
+  const data = {
+    overview: [
+      {
+        name: "Dashboard",
+        url: `/dashboard/${organization.slug}`,
+        icon: LayoutDashboardIcon,
+      },
+    ],
+    people: [
+      {
+        name: "Members",
+        url: `/dashboard/${organization.slug}/members`,
+        icon: UsersIcon,
+      },
+      {
+        name: "Invitations",
+        url: `/dashboard/${organization.slug}/invitations`,
+        icon: UserPlusIcon,
+      },
+      {
+        name: "Recruits",
+        url: `/dashboard/${organization.slug}/recruits`,
+        icon: UserSearchIcon,
+      },
+    ],
+    timeOff: [
+      {
+        name: "Leave Requests",
+        url: `/dashboard/${organization.slug}/leave`,
+        icon: TicketsPlaneIcon,
+      },
+      {
+        name: "Leave Policies",
+        url: `/dashboard/${organization.slug}/leave/policies`,
+        icon: ClipboardListIcon,
+      },
+    ],
+    attendance: [
+      {
+        name: "Attendance Policies",
+        url: `/dashboard/${organization.slug}/attendances/policies`,
+        icon: ClipboardClockIcon,
+      },
+      {
+        name: "Calendars",
+        url: `/dashboard/${organization.slug}/calendars`,
+        icon: CalendarDaysIcon,
+      },
+    ],
+    insights: [
+      {
+        name: "Reports",
+        url: `/dashboard/${organization.slug}/reports`,
+        icon: FileChartColumnIncreasingIcon,
+      },
+    ],
+    system: [
+      {
+        name: "Settings",
+        url: `/dashboard/${organization.slug}/settings`,
+        icon: SettingsIcon,
+      },
+    ],
+  };
 </script>
 
 <Sidebar.Root {collapsible} {...restProps}>
@@ -112,18 +125,25 @@
     />
   </Sidebar.Header>
   <Sidebar.Content>
-    <NavMain features={data} />
-    <NavSecondary
-      class="mt-auto"
-      items={[
-        {
-          url: `/app/${organization.slug}`,
-          icon: AppWindowIcon,
-          title: "Application",
-          fullReload: true,
-        },
-      ]}
-    />
+    <ScrollArea class="h-full w-full">
+      <NavMain features={data.overview} title="Overview" />
+      <NavMain features={data.people} title="People"  />
+      <NavMain features={data.timeOff} title="Time Off" />
+      <NavMain features={data.attendance} title="Attendance" />
+      <NavMain features={data.insights} title="Insights" />
+      <NavMain features={data.system} title="System" />
+      <NavSecondary
+        class="mt-auto"
+        items={[
+          {
+            url: `/app/${organization.slug}`,
+            icon: AppWindowIcon,
+            title: "Application",
+            fullReload: true,
+          },
+        ]}
+      />
+    </ScrollArea>
   </Sidebar.Content>
   <Sidebar.Footer>
     <NavUser {user} />
